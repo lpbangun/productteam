@@ -1,0 +1,46 @@
+{
+  "ts": "2026-08-05",
+  "iter": 1,
+  "kind": "iteration",
+  "contract": "v1",
+  "panel": "3 scorers (A strict, B fresh-eyes, C skeptic), same prompts as baseline",
+  "scores": {
+    "correctness": {
+      "score": 9.0,
+      "evidence": "All 5 index.html hrefs resolve in research/; SKILL data path exists; plan deliverables present; P7 exception now consistent in SKILL+syllabus. Residual: README overclaims 'each project verified by check.ts' (P7 excepted); PLAN §3 test_loop.py example contradicts resolved TypeScript."
+    },
+    "simplicity": {
+      "score": 8.5,
+      "evidence": "Root holds only product (skill, 4 data files, index.html, README); research corpus purpose-tagged in research/. Residual: repo's 4 data files duplicate the live dir's; research index not itemized."
+    },
+    "maintainability": {
+      "score": 8.0,
+      "evidence": "Link contract documented; conventions consistent. Residual trap: stranger editing repo data files sees no effect — shipped skill reads the author's live dir, undocumented as a hazard (README documents setup but not the split)."
+    },
+    "usability": {
+      "score": 8.5,
+      "evidence": "README is a true entry point: numbered quickstart, file map, is/is-not. Residual: cold start requires editing the absolute path; no example coaching session showing what using the skill feels like."
+    },
+    "educational-quality": {
+      "score": 9.0,
+      "evidence": "Pedagogy coherent across SKILL/syllabus/concepts/PLAN: U0-U5 evidence gate, assisted caps, predict-before-reveal, check-script rule with documented P7 exception. Residual: PLAN §3 python example vs TS decision."
+    },
+    "developer-experience": {
+      "score": 7.5,
+      "evidence": "Clone-to-value: harness prerequisite + absolute-path edit; repo data files are a dead copy until path edited (undocumented trap); no way to see a check pass from clone (learner-authored by design); sibling links author-machine only."
+    },
+    "architecture": {
+      "score": 8.0,
+      "evidence": "Product surface separated from research/ provenance; skill in .claude/skills/. Residual: canonical data location ambiguous (skill points outside repo) — escalated, owner decision."
+    },
+    "documentation": {
+      "score": 7.5,
+      "evidence": "README strong (map, contract, non-goals, quickstart); PLAN refreshed. Residual: research corpus not inventoried; advisor-review-round-1.md orphaned (nothing links it); README check.ts overclaim; no dead-copy warning."
+    },
+    "product-clarity": {
+      "score": 9.0,
+      "evidence": "Identity in <1 minute: README opening + What this is not + Stage-0 status framing reconciles skill-first v0 with research's hybrid destination."
+    }
+  },
+  "overall": 8.3
+}

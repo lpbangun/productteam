@@ -26,6 +26,15 @@ and evidence-linked.
 
 ## Lessons
 
+- 2026-08-05 · Debate pays: Critic cut `scripts/verify.sh` (weak
+  justification, would have baked in the broken path) and an index.html
+  edit (frozen research artifact already framed correctly), and caught
+  that a documentation-only fix would codify a bug instead of fixing it.
+  Net: 2 files not created, 1 artifact untouched, scope sharpened.
+- 2026-08-05 · When moving files in a client repo, grep for BOTH href
+  patterns (`href="…"` in HTML) and markdown links (`](…)`) including
+  `../` sibling links — the sibling links were the ones that would have
+  broken silently.
 - 2026-08-05 · Score client repos from a fresh clone, not the live
   working copy, so uncommitted owner work doesn't skew baseline.
   Carry the owner's uncommitted intent into scope explicitly.
@@ -42,4 +51,19 @@ and evidence-linked.
 
 ## Escalations (awaiting owner)
 
-_(none yet)_
+- **agcode-learning · SKILL.md data path (2026-08-05).** The skill
+  hardcodes an absolute data directory (`/home/logani/projects/AgCode
+  Learning/`) that is a *sibling* of the repo, so a fresh clone cannot
+  run the skill without editing it, and the repo's own tracked data
+  files are not what the shipped skill reads. Fixing this changes
+  product behavior, so it is the owner's call. Options the org can
+  implement on request, cheapest first:
+  1. **Document-only** (done in iter-1 README): state the requirement
+     and the shipped path; user edits on install.
+  2. **Repo-relative data dir**: point SKILL.md at the repo's own data
+     files so a clone is self-contained.
+  3. **Per-harness override**: make the data dir a documented variable
+     each harness sets, keeping portability without a fixed absolute
+     path.
+  The org recommends option 2 or 3 but will not apply either without
+  owner sign-off (Constitution: product-behavior change = escalate).
