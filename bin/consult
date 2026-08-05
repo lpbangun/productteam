@@ -1,0 +1,291 @@
+#!/usr/bin/env bash
+# consult — interface to the Product Consulting Harness.
+# Calm, inspectable, honest. All state lives in plain files under state/.
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+STATE="$ROOT/state/engagements"
+source "$ROOT/lib/provider.sh"
+
+# ── rendering ────────────────────────────────────────────────────────
+if [[ -t 1 && -z "${NO_COLOR:-}" ]]; then
+  B=$'\e[1m' D=$'\e[2m' R=$'\e[0m' G=$'\e[32m' Y=$'\e[33m' RD=$'\e[31m' C=$'\e[36m'
+else
+  B='' D='' R='' G='' Y='' RD='' C=''
+fi
+
+score_color() { # $1=score → color code
+  awk -v s="$1" 'BEGIN{exit !(s>=9)}' && { printf '%s' "$G"; return; }
+  awk -v s="$1" 'BEGIN{exit !(s>=7)}' && { printf '%s' "$Y"; return; }
+  printf '%s' "$RD"
+}
+
+bar() { # $1=score (0-10) → 10-cell bar
+  local n; n=$(awk -v s="$1" 'BEGIN{printf "%d", (s+0.5)>10?10:int(s+0.5)}')
+  local out=''
+  for i in $(seq 1 10); do
+    if (( i <= n )); then out+='▰'; else out+='▱'; fi
+  done
+  printf '%s' "$out"
+}
+
+spark() { # newline-separated overalls → sparkline
+  local blocks='▁▂▃▄▅▆▇█' out='' i
+  while read -r v; do
+    [[ -z "$v" ]] && continue
+    i=$(awk -v s="$v" 'BEGIN{x=int(s/10*7.99); if(x>7)x=7; if(x<0)x=0; print x}')
+    out+="${blocks:i:1}"
+  done
+  printf '%s' "$out"
+}
+
+die() { printf '\n  %serror:%s %s\n\n' "$RD" "$R" "$1" >&2; exit 1; }
+client_dir() {
+  local c="$1"
+  [[ -d "$STATE/$c" ]] || die "no engagement '$c'. Engagements: $(ls "$STATE" 2>/dev/null | tr '\n' ' ')"
+  printf '%s' "$STATE/$c"
+}
+latest_run() { # client dir → highest iter-N name or empty
+  ls "$1/runs" 2>/dev/null | grep -E '^iter-[0-9]+$' | sort -t- -k2 -n | tail -1
+}
+
+# ── commands ─────────────────────────────────────────────────────────
+cmd_help() {
+  cat <<EOF
+
+  ${B}consult${R} — Product Consulting Harness
+
+  ${B}Commands${R}
+    consult                     Org status and engagements overview
+    consult bench <client>      Benchmark contract + history + latest scores
+    consult bench <client> run  Score the client now via the provider, append to history
+    consult run <client> <n>    One iteration in full: scores and evidence
+    consult report <client>     Latest iteration report (reasoning, lessons, org review)
+    consult memory              Organizational memory
+    consult org                 The organization: roles and rules
+    consult help                This text
+
+  ${D}State is plain files under state/engagements/<client>/ — everything this
+  CLI shows, you can read directly. Provider: ${CONSULT_PROVIDER:-claude}${R}
+
+EOF
+}
+
+cmd_status() {
+  cat <<EOF
+
+  ${B}Product Consulting Harness${R}
+  ${D}Autonomous product consulting · evidence over opinion · delete before adding${R}
+
+EOF
+  local found=0
+  for d in "$STATE"/*/; do
+    [[ -d "$d" ]] || continue
+    found=1
+    local name; name=$(basename "$d")
+    local last; last=$(latest_run "$d")
+    local desc=''
+    [[ -f "$d/engagement.md" ]] && desc=$(awk -F': ' '/^Vision:/{print $2; exit}' "$d/engagement.md")
+    if [[ -n "$last" && -f "$d/runs/$last/scores.json" ]]; then
+      local ov prev ov_prev trend
+      ov=$(jq -r '.overall' "$d/runs/$last/scores.json")
+      prev=$(ls "$d/runs" 2>/dev/null | grep -E '^iter-[0-9]+$' | sort -t- -k2 -n | awk -v l="$last" '$0!=l' | tail -1)
+      if [[ -n "$prev" && -f "$d/runs/$prev/scores.json" ]]; then
+        ov_prev=$(jq -r '.overall' "$d/runs/$prev/scores.json")
+        trend=$(awk -v a="$ov" -v b="$ov_prev" 'BEGIN{d=a-b; printf "%s%.1f", (d>=0?"+":""), d}')
+      else
+        trend='baseline'
+      fi
+      local at
+      at=$(jq -r '[.scores | to_entries[] | select(.value.score>=9)] | length' "$d/runs/$last/scores.json")
+      printf '  %s●%s %s%s%s   overall %s%s%s (target 9.0, %s)   %s areas ≥9\n' \
+        "$C" "$R" "$B" "$name" "$R" "$(score_color "$ov")" "$ov" "$R" "$trend" "$at"
+      printf '    %s%s · %s · %s%s\n' "$D" "${desc:-no brief}" "$last" "$(ls "$d/runs" 2>/dev/null | grep -cE '^iter-' || true) runs" "$R"
+    else
+      printf '  %s○%s %s%s%s   %snot yet scored%s\n' "$D" "$R" "$B" "$name" "$R" "$D" "$R"
+      printf '    %s%s%s\n' "$D" "${desc:-no brief}" "$R"
+    fi
+  done
+  (( found )) || printf '  %sNo engagements yet. Create state/engagements/<client>/engagement.md.%s\n' "$D" "$R"
+  printf '\n  %sbench <client> for scores · report <client> for reasoning · help for all%s\n\n' "$D" "$R"
+}
+
+cmd_org() {
+  cat <<EOF
+
+  ${B}The organization${R} ${D}(full charter: AGENTS.md · law: CONSTITUTION.md)${R}
+
+    Principal   orchestrates the loop; decides, escalates; never self-scores
+    Analyst     inspects and scores against the frozen contract, with evidence
+    Builder     implements accepted items; smallest diff; verification attached
+    Critic      rebuts priorities, audits diffs and scores, reviews the org
+
+  ${B}Loop${R}
+    Inspect → Benchmark → Prioritize → Debate → Implement → Test →
+    Re-benchmark → Critique → Memory → Improve the org
+
+  ${B}Autonomy${R}
+    Auto-apply: low-risk, reversible, evidence-backed.
+    Escalate:   permanent workers · architecture · security/auth ·
+                autonomy policy · destructive acts · scope changes.
+
+  ${D}Permanent workers beyond these four require evidence + owner approval.${R}
+
+EOF
+}
+
+cmd_memory() {
+  [[ -f "$ROOT/MEMORY.md" ]] || die 'MEMORY.md not found'
+  printf '\n'; sed 's/^/  /' "$ROOT/MEMORY.md"; printf '\n'
+}
+
+cmd_bench() {
+  local c="$1" d; d=$(client_dir "$c")
+  printf '\n  %sBenchmark — %s%s%s\n' "$B" "$c" "$R" "$D"
+  printf '  Contract v1 · frozen 2026-08-05 · target ≥ 9.0 in every area%s\n\n' "$R"
+
+  # history
+  if [[ -f "$d/history.jsonl" && -s "$d/history.jsonl" ]]; then
+    printf '  %sHISTORY%s\n' "$B" "$R"
+    printf '   %siter  date        kind        overall   areas≥9   weakest%s\n' "$D" "$R"
+    local sparkvals=''
+    while IFS= read -r line; do
+      local iter kind ts ov at weak ws
+      iter=$(jq -r '.iter' <<<"$line")
+      kind=$(jq -r '.kind' <<<"$line")
+      ts=$(jq -r '.ts' <<<"$line")
+      ov=$(jq -r '.overall' <<<"$line")
+      at=$(jq -r '[.scores | to_entries[] | select(.value.score>=9)] | length' <<<"$line")
+      weak=$(jq -r '.scores | to_entries | min_by(.value.score) | "\(.key) \(.value.score)"' <<<"$line")
+      printf '   %-5s %-11s %-11s %s%-8s%s %-9s %s\n' \
+        "$iter" "$ts" "$kind" "$(score_color "$ov")" "$ov" "$R" "$at" "$weak"
+      sparkvals+="$ov"$'\n'
+    done < "$d/history.jsonl"
+    printf '   %strend: %s%s\n\n' "$D" "$(spark <<<"$sparkvals")" "$R"
+  else
+    printf '  %sNo scored runs yet. First: consult bench %s run%s\n\n' "$D" "$c" "$R"
+  fi
+
+  # latest detail
+  local last; last=$(latest_run "$d")
+  [[ -n "$last" && -f "$d/runs/$last/scores.json" ]] || return 0
+  printf '  %sLATEST — %s%s\n' "$B" "$last" "$R"
+  jq -r '.scores | to_entries[] | "\(.key)\t\(.value.score)\t\(.value.evidence)"' \
+    "$d/runs/$last/scores.json" | \
+  while IFS=$'\t' read -r area sc ev; do
+    printf '   %-20s %s%4s%s %s  %s%s%s\n' "$area" "$(score_color "$sc")" "$sc" "$R" "$(bar "$sc")" "$D" "$ev" "$R"
+  done
+  local ov; ov=$(jq -r '.overall' "$d/runs/$last/scores.json")
+  printf '\n   %soverall%s  %s%s%s   %s%s/scores.json%s\n\n' "$B" "$R" "$(score_color "$ov")" "$ov" "$R" "$D" "$d/runs/$last" "$R"
+}
+
+cmd_run_detail() {
+  local c="$1" n="$2" d; d=$(client_dir "$c")
+  local rd="$d/runs/iter-$n"
+  [[ -f "$rd/scores.json" ]] || die "no scores for $c iter-$n"
+  printf '\n  %s%s — %s%s\n' "$B" "$c" "iter-$n" "$R"
+  jq -r '.scores | to_entries[] | "\(.key)\t\(.value.score)\t\(.value.evidence)"' "$rd/scores.json" | \
+  while IFS=$'\t' read -r area sc ev; do
+    printf '   %-20s %s%4s%s %s\n     %s%s%s\n' "$area" "$(score_color "$sc")" "$sc" "$R" "$(bar "$sc")" "$D" "$ev" "$R"
+  done
+  printf '\n   %soverall%s %s%s\n' "$B" "$R" "$(score_color "$(jq -r .overall "$rd/scores.json")")" "$(jq -r .overall "$rd/scores.json")"
+  [[ -f "$rd/report.md" ]] && printf '\n  %sreport:%s %s\n' "$D" "$R" "$rd/report.md"
+  printf '\n'
+}
+
+cmd_report() {
+  local c="$1" d; d=$(client_dir "$c")
+  local last; last=$(latest_run "$d")
+  [[ -n "$last" && -f "$d/runs/$last/report.md" ]] || die "no report yet for $c"
+  printf '\n'; sed 's/^/  /' "$d/runs/$last/report.md"; printf '\n'
+}
+
+cmd_bench_run() {
+  local c="$1" d; d=$(client_dir "$c")
+  [[ -f "$d/engagement.md" ]] || die "missing $d/engagement.md (brief with Repo: path)"
+  local repo; repo=$(awk -F': ' '/^Repo:/{print $2; exit}' "$d/engagement.md")
+  [[ -d "$repo" ]] || die "client repo not found: $repo"
+
+  local n=0 last; last=$(latest_run "$d")
+  [[ -n "$last" ]] && n=$(( ${last#iter-} + 1 ))
+  local kind='iteration'; (( n == 0 )) && kind='baseline'
+  local rd="$d/runs/iter-$n"; mkdir -p "$rd"
+
+  printf '\n  %sScoring %s — iter %s (%s)%s\n' "$B" "$c" "$n" "$kind" "$R"
+  printf '  %sProvider: %s · repo: %s%s\n' "$D" "${CONSULT_PROVIDER:-claude}" "$repo" "$R"
+  printf '  %sThe Analyst is inspecting the client…%s\n\n' "$D" "$R"
+
+  local prompt reply
+  prompt=$(cat <<EOF
+You are the Analyst of a consulting organization scoring a client repo against a FROZEN benchmark contract. Score strictly and independently; cite file-path evidence for every score. Never inflate: 9-10 means excellent with evidence, 5-6 means works but real gaps, below 4 means broken/missing.
+
+Client repo: $repo
+Engagement brief: $d/engagement.md
+
+Contract v1 — score each area 0-10 (one decimal):
+1. correctness — claims/links/paths/code do what they say
+2. simplicity — nothing removable without loss
+3. maintainability — a stranger can change it safely
+4. usability — first-time user succeeds cold
+5. educational-quality — pedagogy sound, complete, consistent (learning product)
+6. developer-experience — clone-to-value friction
+7. architecture — structure matches purpose, no over-build
+8. documentation — right docs, current, findable
+9. product-clarity — what/for-whom/not-what visible within a minute
+
+Read the brief and the repo (key files, structure, links, README, entry points). Then output ONLY a JSON object, no prose:
+{"scores":{"correctness":{"score":0.0,"evidence":"path: why"},...one entry per area...}}
+EOF
+)
+  reply=$(provider_ask "$prompt" "$repo") || die 'provider failed'
+
+  # extract the first balanced JSON object from the reply; write scores.json
+  if ! printf '%s' "$reply" | python3 -c '
+import json, sys, datetime
+out, iter_n, kind = sys.argv[1], int(sys.argv[2]), sys.argv[3]
+raw = sys.stdin.read()
+obj, i = None, raw.find("{")
+while i != -1:
+    try:
+        obj, _ = json.JSONDecoder().raw_decode(raw[i:]); break
+    except Exception:
+        i = raw.find("{", i + 1)
+if obj is None: sys.exit(1)
+areas = ["correctness","simplicity","maintainability","usability","educational-quality","developer-experience","architecture","documentation","product-clarity"]
+scores = {a: {"score": round(float(obj["scores"][a]["score"]), 1),
+              "evidence": str(obj["scores"][a].get("evidence", "")).strip()[:300]} for a in areas}
+overall = round(sum(s["score"] for s in scores.values()) / len(scores), 1)
+json.dump({"ts": datetime.date.today().isoformat(), "iter": iter_n, "kind": kind,
+           "scores": scores, "overall": overall}, open(out, "w"), indent=2)
+' "$rd/scores.json" "$n" "$kind"; then
+    printf '%s\n' "$reply" > "$rd/raw-provider-output.txt"
+    die "provider returned no parseable contract JSON (raw output kept in $rd/raw-provider-output.txt)"
+  fi
+
+  jq -c '{ts, iter, kind, overall, scores}' "$rd/scores.json" >> "$d/history.jsonl"
+  local ov; ov=$(jq -r '.overall' "$rd/scores.json")
+  printf '  %sRecorded iter %s — overall %s%s\n' "$B" "$n" "$(score_color "$ov")" "$ov"
+  printf '  %s%s%s\n\n' "$D" "$rd/scores.json" "$R"
+}
+
+# ── dispatch ─────────────────────────────────────────────────────────
+main() {
+  local cmd="${1:-status}"; shift || true
+  case "$cmd" in
+    help|-h|--help) cmd_help ;;
+    status)         cmd_status ;;
+    org)            cmd_org ;;
+    memory)         cmd_memory ;;
+    bench)
+      [[ $# -ge 1 ]] || die 'usage: consult bench <client> [run]'
+      if [[ "${2:-}" == 'run' ]]; then cmd_bench_run "$1"; else cmd_bench "$1"; fi ;;
+    run)
+      [[ $# -ge 2 ]] || die 'usage: consult run <client> <iter>'
+      cmd_run_detail "$1" "$2" ;;
+    report)
+      [[ $# -ge 1 ]] || die 'usage: consult report <client>'
+      cmd_report "$1" ;;
+    *) die "unknown command '$cmd' — try: consult help" ;;
+  esac
+}
+main "$@"
