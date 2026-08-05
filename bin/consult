@@ -21,12 +21,17 @@ score_color() { # $1=score → color code
 }
 
 bar() { # $1=score (0-10) → 10-cell bar
-  local n; n=$(awk -v s="$1" 'BEGIN{printf "%d", (s+0.5)>10?10:int(s+0.5)}')
-  local out=''
+  local n; n=$(awk -v s="$1" 'BEGIN{x=int(s+0.5); if(x>10)x=10; if(x<0)x=0; print x}')
+  local out='' i
   for i in $(seq 1 10); do
     if (( i <= n )); then out+='▰'; else out+='▱'; fi
   done
   printf '%s' "$out"
+}
+
+trunc() { # $1=text $2=max → truncate with ellipsis
+  local t="$1" m="${2:-72}"
+  (( ${#t} > m )) && printf '%s…' "${t:0:$((m-1))}" || printf '%s' "$t"
 }
 
 spark() { # newline-separated overalls → sparkline
@@ -173,7 +178,7 @@ cmd_bench() {
   jq -r '.scores | to_entries[] | "\(.key)\t\(.value.score)\t\(.value.evidence)"' \
     "$d/runs/$last/scores.json" | \
   while IFS=$'\t' read -r area sc ev; do
-    printf '   %-20s %s%4s%s %s  %s%s%s\n' "$area" "$(score_color "$sc")" "$sc" "$R" "$(bar "$sc")" "$D" "$ev" "$R"
+    printf '   %-20s %s%4s%s %s  %s%s%s\n' "$area" "$(score_color "$sc")" "$sc" "$R" "$(bar "$sc")" "$D" "$(trunc "$ev" 72)" "$R"
   done
   local ov; ov=$(jq -r '.overall' "$d/runs/$last/scores.json")
   printf '\n   %soverall%s  %s%s%s   %s%s/scores.json%s\n\n' "$B" "$R" "$(score_color "$ov")" "$ov" "$R" "$D" "$d/runs/$last" "$R"

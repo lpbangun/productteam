@@ -1,0 +1,17 @@
+{
+  "contract": "v1",
+  "scorers": {
+    "A": {"stance": "strict", "scores": {"correctness": 6.0, "simplicity": 6.0, "maintainability": 6.0, "usability": 4.5, "educational-quality": 8.5, "developer-experience": 5.0, "architecture": 6.5, "documentation": 5.5, "product-clarity": 6.0}},
+    "B": {"stance": "fresh-eyes", "scores": {"correctness": 8.0, "simplicity": 7.0, "maintainability": 6.0, "usability": 4.5, "educational-quality": 9.0, "developer-experience": 4.5, "architecture": 5.5, "documentation": 5.0, "product-clarity": 6.5}},
+    "C": {"stance": "skeptic", "scores": {"correctness": 8.0, "simplicity": 4.5, "maintainability": 5.0, "usability": 4.0, "educational-quality": 7.5, "developer-experience": 3.5, "architecture": 4.0, "documentation": 3.5, "product-clarity": 5.0}},
+    "D": {"stance": "tiebreak (simplicity/architecture only, repo-properties frame)", "scores": {"simplicity": 6.5, "architecture": 5.5}}
+  },
+  "spreads_flagged": {"simplicity": 2.5, "architecture": 2.5},
+  "aggregation": "median; flagged areas use 4-scorer median",
+  "principal_audit": [
+    "Verified C's contradiction claims against source: PLAN.md:84 open language checkbox vs syllabus.md:14 TypeScript — confirmed stale.",
+    "Verified syllabus.md:275 declares P7 the explicit exception; SKILL.md rule 8 (line 48) omits it — confirmed minor inconsistency.",
+    "Panel deducted in places for the sibling working copy existing on the owner's machine; tiebreak D re-framed this as machine context (not a repo defect) while keeping the hardcoded-path coupling as a real defect. Median aggregation absorbed the rest.",
+    "All VERIFY-class claims (hrefs, path existence, deliverables) re-checked by Principal with bash — all hold."
+  ]
+}
