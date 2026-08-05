@@ -1,0 +1,14 @@
+{
+  "contract": "v1",
+  "iteration": 1,
+  "critique_audit": {
+    "by": "Critic, post-scoring",
+    "findings": [
+      "correctness 9.0 not defensible: the README check.ts overclaim was a factual error introduced by iter-1 itself; true value ~7.5-8.0. Iter-2 item 1a fixes it.",
+      "usability 8.5 too high while the seed-copy trap is documented-but-unwarned (~7); iter-2 item 1b mitigates.",
+      "maintainability 8.0 generous with advisor-review-round-1.md orphaned; iter-2 adds the index.html link.",
+      "SKILL.md project-7 clause flagged as adjacent to escalated surface; Principal ruling: escalation covers behavior changes, not consistency fixes for contradictions all three baseline scorers cited."
+    ],
+    "disposition": "Recorded, not re-scored: history is never rewritten (Constitution). The iter-2 panel scores the corrected repo; the delta is the honest measure."
+  }
+}

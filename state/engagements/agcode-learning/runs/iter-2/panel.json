@@ -1,0 +1,35 @@
+{
+  "contract": "v1",
+  "iteration": 2,
+  "panel_medians": {
+    "correctness": 8.5,
+    "simplicity": 8.5,
+    "maintainability": 8.0,
+    "usability": 8.0,
+    "educational-quality": 9.0,
+    "developer-experience": 7.5,
+    "architecture": 8.5,
+    "documentation": 8.5,
+    "product-clarity": 9.0
+  },
+  "critique_audit": {
+    "adjusted": {
+      "correctness": "8.5\u21928.0",
+      "documentation": "8.5\u21927.5"
+    },
+    "defended": [
+      "simplicity 8.5",
+      "maintainability 8.0",
+      "usability 8.0",
+      "educational-quality 9.0",
+      "developer-experience 7.5",
+      "architecture 8.5",
+      "product-clarity 9.0"
+    ],
+    "notes": [
+      "Scorer C's '\u224848 concepts' objection overruled: Principal+Critic both verified exactly 40 concept rows.",
+      "Iter-2 closed the round-1 orphan but left the README count stale \u2014 self-grading bias recorded."
+    ],
+    "disposition": "Accepted scores are the audited values; panel medians preserved in panel_raw."
+  }
+}

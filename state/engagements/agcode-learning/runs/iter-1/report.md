@@ -64,3 +64,26 @@ developer-experience, simplicity, and architecture.
 
 Debate value, move-files link-grep rule, and the escalation options were
 recorded in MEMORY.md.
+
+## Org self-evaluation (end of iter-1)
+
+- **Workers.** Principal implemented directly; Builder not spawned.
+  Ruling: at 4 doc-centric commits, a Builder handoff adds loss without
+  parallelism benefit. Builder spawns when items exceed Principal
+  context or parallelize. Analyst panel (3 + tiebreak) and Critic
+  performed well; Critic was the highest-leverage worker (cut 2 weak
+  items, found 1 missing fix, later caught panel self-grading bias).
+- **Orchestration.** Scorer A emitted a duplicate JSON key; parser
+  tolerated it. Fix applied to scorer prompts: "exactly one entry per
+  area" (iter-2 prompts).
+- **Process gap found.** Critic's score audit landed AFTER the iter-1
+  run was recorded. AGENTS.md already required audit-before-acceptance;
+  the org executed it late. Behavioral fix: future runs are recorded
+  only after the Critic audit. (No document change needed — the rule
+  existed; compliance did.)
+- **Memory.** Lessons + escalation recorded; backlog created.
+- **CLI.** Two bugs found in live use (pipefail under empty runs; awk
+  ternary in bars) and fixed the same iteration. Evidence truncation
+  added for calm rendering.
+- **Unnecessary complexity.** None added; two proposed additions were
+  deleted in debate (verify.sh, index.html identity edit).

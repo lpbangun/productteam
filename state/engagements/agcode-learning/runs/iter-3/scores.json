@@ -1,0 +1,47 @@
+{
+  "ts": "2026-08-05",
+  "iter": 3,
+  "kind": "iteration-final",
+  "contract": "v1",
+  "panel": "3 scorers + tiebreak D for usability (spread 3.0 > 2.0)",
+  "scores": {
+    "correctness": {
+      "score": 9.3,
+      "evidence": "All 6 index.html hrefs resolve; SKILL data path exists; deliverables present; 40 concepts/10 domains match README; P7 exception consistent in 4 files; link-contract claims verified; seven file:// hrefs now repo-relative and resolving. Residual (scorer C): research/01 sibling links author-machine only — disclosed in link contract."
+    },
+    "simplicity": {
+      "score": 8.0,
+      "evidence": "Product surface minimal (skill + 4 files, no app/db); research corpus large (~640KB) but is the declared dated evidence record; nothing clearly removable without loss."
+    },
+    "maintainability": {
+      "score": 7.5,
+      "evidence": "Link contract + conventions documented; single repoint path documented. Residual: repo-vs-live-copy split remains the trap (warned, unresolved — escalated); no canonical-source declaration between the two trees."
+    },
+    "usability": {
+      "score": 7.8,
+      "evidence": "4-scorer median after contract tiebreak (spread 3.0). Entry point obvious from first look; ordered quickstart works cold; inert-seed hazard explicitly warned. Residual: required path-repoint config; harness mounting assumes familiarity."
+    },
+    "educational-quality": {
+      "score": 9.0,
+      "evidence": "U0-U5 evidence gate, assisted caps, predict-before-reveal, deterministic check.ts verification with documented capstone exception, confidence decay — consistent across SKILL/concepts/syllabus/README/PLAN; coaching-moment example accurate."
+    },
+    "developer-experience": {
+      "score": 7.0,
+      "evidence": "Clone-to-value requires harness + absolute-path repoint; inert seeds until then; no LICENSE (reuse terms undefined). All friction documented; none removed — structurally owned by escalated decisions."
+    },
+    "architecture": {
+      "score": 8.5,
+      "evidence": "Runtime (skill + data files) / evidence corpus (research/) / synthesis (index.html) cleanly separated; local-first, purpose-fitted; nothing over-built. Residual: absolute-path coupling yields dual-tree hazard (escalated)."
+    },
+    "documentation": {
+      "score": 8.5,
+      "evidence": "README comprehensive, honest, internally consistent after iter-3 fixes; PLAN records decisions; research dated and labeled. Residual: no LICENSE (owner decision); dense research docs navigate via one-line inventory only."
+    },
+    "product-clarity": {
+      "score": 9.0,
+      "evidence": "Identity in one line; explicit non-goals; Stage-0 status upfront; graspable in under a minute."
+    }
+  },
+  "overall": 8.3,
+  "audit": "Principal cross-audit: green areas independently verified by ≥2 scorers with bash checks; amber areas match the Critic's iter-2 convergence forecast. Scorer B's CLAUDE.md/changelog/TOC requests stand overruled per iter-2 debate (ceremony for a single-learner repo; historical artifacts stay frozen)."
+}

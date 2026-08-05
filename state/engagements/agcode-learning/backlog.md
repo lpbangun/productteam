@@ -2,6 +2,14 @@
 
 Ranked by (expected lift × confidence) ÷ risk. Living document.
 
+## From iter-2 panel
+
+- README link contract overstates: "everything else is self-contained
+  markdown" but research/concepts-analysis.md + plan-analysis.md embed
+  file:// links to the author's machine. Fix the sentence (iter-3).
+- No LICENSE — reuse terms ambiguous for a portable skill. License
+  choice is owner's call → escalate with recommendation.
+
 ## Candidates surfaced by iter-1 panel
 
 - Inventory the research corpus in README (file list, one line each) —

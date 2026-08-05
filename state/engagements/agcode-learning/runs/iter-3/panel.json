@@ -1,0 +1,59 @@
+{
+  "contract": "v1",
+  "iteration": 3,
+  "scorers": {
+    "A": {
+      "stance": "strict",
+      "scores": {
+        "correctness": 9.3,
+        "simplicity": 8.0,
+        "maintainability": 8.5,
+        "usability": 7.5,
+        "educational-quality": 9.0,
+        "developer-experience": 7.0,
+        "architecture": 8.5,
+        "documentation": 9.0,
+        "product-clarity": 8.5
+      }
+    },
+    "B": {
+      "stance": "fresh-eyes",
+      "scores": {
+        "correctness": 9.5,
+        "simplicity": 8.5,
+        "maintainability": 7.5,
+        "usability": 9.0,
+        "educational-quality": 9.5,
+        "developer-experience": 7.0,
+        "architecture": 8.5,
+        "documentation": 7.5,
+        "product-clarity": 9.0
+      }
+    },
+    "C": {
+      "stance": "skeptic",
+      "scores": {
+        "correctness": 8.0,
+        "simplicity": 8.0,
+        "maintainability": 6.5,
+        "usability": 6.0,
+        "educational-quality": 8.5,
+        "developer-experience": 6.0,
+        "architecture": 8.0,
+        "documentation": 8.5,
+        "product-clarity": 9.0
+      }
+    },
+    "D": {
+      "stance": "tiebreak (usability only, contract-language frame)",
+      "scores": {
+        "usability": 8.0
+      }
+    }
+  },
+  "spreads_flagged": {
+    "usability": 3.0
+  },
+  "aggregation": "median; usability uses 4-scorer median (7.75\u21927.8)",
+  "principal_audit": "Green areas (correctness 9.3, educational-quality 9.0, product-clarity 9.0) each verified by >=2 scorers with bash-checked evidence. Amber areas track the Critic's forecast; held below target by escalated owner decisions, not by scoring generosity."
+}
