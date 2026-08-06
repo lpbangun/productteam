@@ -6,6 +6,9 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 STATE="$ROOT/state/engagements"
 source "$ROOT/lib/provider.sh"
+source "$ROOT/lib/github.sh"
+CONSULT_ROOT="$ROOT"
+export CONSULT_ROOT
 
 # ── rendering ────────────────────────────────────────────────────────
 if [[ -t 1 && -z "${NO_COLOR:-}" ]]; then
@@ -47,7 +50,12 @@ spark() { # newline-separated overalls → sparkline
 die() { printf '\n  %serror:%s %s\n\n' "$RD" "$R" "$1" >&2; exit 1; }
 client_dir() {
   local c="$1"
-  [[ -d "$STATE/$c" ]] || die "no engagement '$c'. Engagements: $(ls "$STATE" 2>/dev/null | tr '\n' ' ')"
+  if [[ "$c" == "harness-evolution" || "$c" == "harness" ]]; then
+    [[ -d "$ROOT/state/harness-evolution" ]] || die "missing state/harness-evolution"
+    printf '%s' "$ROOT/state/harness-evolution"
+    return
+  fi
+  [[ -d "$STATE/$c" ]] || die "no engagement '$c'. Engagements: $(ls "$STATE" 2>/dev/null | tr '\n' ' ')harness-evolution"
   printf '%s' "$STATE/$c"
 }
 latest_run() { # client dir → highest iter-N name or empty
@@ -70,6 +78,8 @@ engagement_scorer() { # engagement dir → checks|provider
 }
 
 cmd_help() {
+  local prov
+  prov="$(runtime_default 2>/dev/null || echo '(none)')"
   cat <<EOF
 
   ${B}consult${R} — Product Consulting Harness
@@ -83,6 +93,16 @@ cmd_help() {
     consult bench <client>      Benchmark contract + history + latest scores
     consult bench <client> run  Provider scoring (scorer=provider only)
     consult checks <client>     Deterministic checks (scorer=checks only)
+    consult harness-checks [iter-dir]
+                                Objective harness-apc checks + secrets scan
+    consult runtime [--check]   Detect coding runtimes; --check fails if none
+    consult gh preflight [dir]  GitHub auth + permissions (tokens redacted)
+    consult gh pr-create [dir]  Push branch + open PR (CONSULT_PR_*)
+    consult gh status [dir] [n] PR view JSON
+    consult gh checks [dir] [n] PR checks
+    consult gh merge [dir] [n]  Merge only if authorize-merge present (no --admin)
+    consult gh validate [dir] [ref] [out]
+                                Post-merge/PR validation artifact
     consult run <client> <n>    Show scores for iteration n
     consult report <client>     Latest iteration report
     consult memory              Organizational memory
@@ -90,17 +110,63 @@ cmd_help() {
     consult smoke               CLI smoke tests
     consult help                This text
 
-  ${D}State: state/engagements/<client>/ · Client repos: siblings (Repo: path)
-  Judgment: JUDGMENT.md · Provider: ${CONSULT_PROVIDER:-agent}${R}
+  ${D}State: state/engagements/<client>/ · harness-evolution: state/harness-evolution/
+  Client repos: siblings (Repo: path) · Judgment: JUDGMENT.md
+  Provider: ${CONSULT_PROVIDER:-$prov} · Learning: docs/learning-schema.md${R}
 
 EOF
 }
 
+cmd_runtime() {
+  local check=0
+  [[ "${1:-}" == "--check" ]] && check=1
+  printf '\n  %sCoding runtimes%s\n' "$B" "$R"
+  local name status path found=0 active
+  active="${CONSULT_PROVIDER:-}"
+  if [[ -z "$active" ]]; then
+    active="$(runtime_default 2>/dev/null || true)"
+  fi
+  while IFS=$'\t' read -r name status path; do
+    if [[ "$status" == found ]]; then
+      found=1
+      if [[ "$name" == "$active" || "$(basename "$active" 2>/dev/null)" == "$name" ]]; then
+        printf '  %s●%s %-10s %s%s%s  %s(active)%s\n' "$G" "$R" "$name" "$D" "$path" "$R" "$C" "$R"
+      else
+        printf '  %s●%s %-10s %s%s%s\n' "$G" "$R" "$name" "$D" "$path" "$R"
+      fi
+    else
+      printf '  %s○%s %-10s %smissing%s\n' "$D" "$R" "$name" "$D" "$R"
+    fi
+  done < <(runtime_detect)
+  printf '\n  %sActive provider: %s%s\n' "$D" "${active:-none}" "$R"
+  printf '  %sSwap: CONSULT_PROVIDER=<bin> · seam: lib/provider.sh%s\n\n' "$D" "$R"
+  if (( check )); then
+    if [[ -z "$active" ]] || { ! runtime_have "$active" && [[ ! -x "$active" ]]; }; then
+      die "provider ${active:-unset} not found on PATH. Install agent|claude|codex|opencode|gemini or set CONSULT_PROVIDER."
+    fi
+  fi
+}
+
+cmd_harness_checks() {
+  local iter="${1:-}"
+  local checker="$ROOT/lib/harness-checks.sh"
+  [[ -f "$checker" ]] || die "missing $checker"
+  if [[ -n "$iter" ]]; then
+    mkdir -p "$iter"
+    bash "$checker" "$iter"
+  else
+    bash "$checker"
+  fi
+}
+
 cmd_status() {
+  local prov
+  prov="$(runtime_default 2>/dev/null || echo none)"
   cat <<EOF
 
   ${B}Product Consulting Harness${R}
   ${D}Autonomous product consulting · evidence over opinion · delete before adding${R}
+  ${D}Provider: ${CONSULT_PROVIDER:-$prov} · runtimes: consult runtime${R}
 
 EOF
   local found=0
@@ -230,6 +296,36 @@ cmd_score() {
   esac
 }
 
+cmd_gh() {
+  local sub="${1:-}"; shift || true
+  case "$sub" in
+    preflight) gh_preflight "${1:-$PWD}" ;;
+    pr-create)
+      local dir="${1:-$PWD}"
+      local url
+      url=$(gh_pr_create "$dir") || die 'pr-create failed'
+      printf '\n  %sPR:%s %s\n\n' "$G" "$R" "$url"
+      mkdir -p "$ROOT/state/harness-evolution/runs"
+      printf '%s\n' "$url" > "$ROOT/state/harness-evolution/runs/.last-pr-url"
+      ;;
+    status)  gh_pr_status "${1:-$PWD}" "${2:-}" ;;
+    checks)  gh_pr_checks "${1:-$PWD}" "${2:-}" ;;
+    merge)
+      gh_pr_merge "${1:-$PWD}" "${2:-}" || die 'merge refused or failed'
+      ;;
+    validate)
+      local dir="${1:-$PWD}" ref="${2:-HEAD}" out="${3:-}"
+      if [[ -z "$out" ]]; then
+        out="$ROOT/state/harness-evolution/runs/.last-validate.txt"
+      fi
+      mkdir -p "$(dirname "$out")"
+      gh_pr_validate "$dir" "$ref" "$out"
+      printf '\n  %svalidation →%s %s\n\n' "$D" "$R" "$out"
+      ;;
+    *) die "usage: consult gh preflight|pr-create|status|checks|merge|validate …" ;;
+  esac
+}
+
 cmd_smoke() {
   bash "$ROOT/tests/consult-smoke.sh"
 }
@@ -320,7 +416,7 @@ cmd_bench_run() {
   local rd="$d/runs/iter-$n"; mkdir -p "$rd"
 
   printf '\n  %sScoring %s — iter %s (%s)%s\n' "$B" "$c" "$n" "$kind" "$R"
-  printf '  %sProvider: %s · repo: %s%s\n' "$D" "${CONSULT_PROVIDER:-claude}" "$repo" "$R"
+  printf '  %sProvider: %s · repo: %s%s\n' "$D" "${CONSULT_PROVIDER:-$(runtime_default 2>/dev/null || echo none)}" "$repo" "$R"
   printf '  %sThe Analyst is inspecting the client…%s\n\n' "$D" "$R"
 
   local prompt reply
@@ -385,6 +481,12 @@ main() {
     org)            cmd_org ;;
     memory)         cmd_memory ;;
     smoke)          cmd_smoke ;;
+    runtime)        cmd_runtime "$@" ;;
+    harness-checks)
+      cmd_harness_checks "${1:-}" ;;
+    gh)
+      [[ $# -ge 1 ]] || die 'usage: consult gh preflight|pr-create|status|checks|merge|validate …'
+      cmd_gh "$@" ;;
     judge)
       [[ $# -ge 1 ]] || die 'usage: consult judge <client> [set <mode>]'
       if [[ "${2:-}" == 'set' ]]; then

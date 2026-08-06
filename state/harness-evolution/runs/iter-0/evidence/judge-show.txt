@@ -1,0 +1,23 @@
+
+  Product Judgment — onboarding-flight-control
+  Mode: Guided   (Guided|Directive|Challenge|Override)
+
+  ## Mission
+  
+  Improve **Onboarding Flight Control**—a fictional People Ops onboarding
+  portfolio demo (React/Vite, localStorage, no backend)—so it measurably
+  exceeds baseline on onboarding fidelity, cross-role workflow clarity,
+  first-run usability, maintainability, documentation, developer
+  experience, product identity, and structural simplicity. The engagement
+  preserves the product vision: a local-only prototype that makes cohort
+  onboarding, handoffs, and lightweight coordinator support legible across
+  People Ops, manager, and new-hire views without introducing real
+  integrations, authentication, employee data, or AI model calls. Success
+  means every dimension of contract `ofc-v1` reaches **9.0** within five
+  iterations, evidenced by passing automated checks and verified
+  documentation that lets an evaluator clone, run, and complete the Maya
+  Chen manager-introduction walkthrough without out-of-band guidance.
+  
+
+  Full modes: JUDGMENT.md · set: consult judge onboarding-flight-control set <mode>
+

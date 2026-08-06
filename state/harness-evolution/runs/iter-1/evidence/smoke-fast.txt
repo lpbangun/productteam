@@ -1,0 +1,26 @@
+
+  consult smoke
+
+  PASS  help
+  PASS  status
+  PASS  org
+  PASS  memory
+  PASS  judge show
+  PASS  bench
+  PASS  bench contract id
+  PASS  help lists score
+  PASS  help lists runtime
+  PASS  help lists harness-checks
+  PASS  runtime
+  PASS  runtime --check refuses missing provider
+  PASS  client checks skipped (CONSULT_SMOKE_SKIP_CLIENT)
+  PASS  ofc refuses provider run
+  PASS  agcode refuses checks
+  PASS  unknown rejects
+  PASS  help lists judge
+  PASS  learning schema
+  PASS  challenge example
+  PASS  override example
+
+  all smoke checks passed
+

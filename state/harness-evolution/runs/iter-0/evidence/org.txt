@@ -1,0 +1,28 @@
+
+  The organization (AGENTS.md · CONSTITUTION.md · JUDGMENT.md)
+
+    Principal   orchestrates the loop; decides, escalates; never self-scores
+    Analyst     inspects and scores against the frozen contract, with evidence
+    Builder     implements accepted items; smallest diff; verification attached
+    Critic      rebuts priorities, audits diffs and scores, reviews the org
+
+  Product Judgment modes
+    Guided · Directive · Challenge · Override   (see JUDGMENT.md)
+
+  Temporary specialists (spawned per engagement, then disbanded)
+    Repository Analyst · Benchmark Designer · Test Engineer ·
+    Product Specialists · Implementation Agent · Independent Verifier ·
+    Harness Critic
+
+  Loop
+    Inspect → Measure baseline → Prioritize → Implement → Test →
+    Re-benchmark → Independently verify → Critique → Memory →
+    Safe harness improvements → Repeat
+
+  Autonomy
+    Auto-apply: low-risk, reversible, evidence-backed.
+    Escalate:   permanent workers · architecture · security/auth ·
+                autonomy policy · destructive acts · scope changes.
+
+  Permanent workers beyond the four require evidence + owner approval.
+

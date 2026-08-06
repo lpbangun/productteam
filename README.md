@@ -9,8 +9,13 @@ and a frozen benchmark contract.
 
 ```sh
 bin/consult                  # org overview
-bin/consult judge <client>   # mode + mission
+bin/consult runtime          # detect coding runtimes (agent/claude/codex/…)
+bin/consult judge <client>   # mode + mission (also: harness-evolution)
 bin/consult checks <client>  # deterministic contract checks
+bin/consult harness-checks   # harness-apc objective checks + secrets scan
+bin/consult gh preflight     # GitHub auth + permissions (redacted)
+bin/consult gh pr-create|status|checks|merge|validate
+                             # gated PR workflow (merge needs authorize-merge)
 bin/consult bench <client>   # scores + history
 bin/consult report <client>  # latest iteration reasoning
 bin/consult memory           # durable lessons
@@ -19,7 +24,14 @@ bin/consult smoke            # CLI smoke tests
 ```
 
 Provider: authenticated Cursor `agent` CLI by default (`CONSULT_PROVIDER` to swap).
-No API keys. No mocks.
+Detected runtimes: `bin/consult runtime`. No API keys. No mocks.
+
+GitHub: `bin/consult gh …` wraps `gh` with gates — **never** `--admin` /
+force-merge. Merge requires `state/harness-evolution/authorize-merge` (or
+`CONSULT_AUTHORIZE_MERGE`).
+
+Learning artifacts: `docs/learning-schema.md` · harness evolution under
+`state/harness-evolution/` (locked contract `harness-apc-v1`).
 
 ## Product Judgment modes
 
@@ -55,11 +67,15 @@ Full text: `JUDGMENT.md`.
 | `JUDGMENT.md` | Product Judgment modes + temporary specialists |
 | `BENCHMARKS.md` | Harness-wide contract v1 (prior engagements) |
 | `MEMORY.md` | Durable organizational memory |
+| `docs/learning-schema.md` | Harness-evolution learning artifact schema |
 | `bin/consult` | CLI |
-| `lib/provider.sh` | Cursor `agent` provider seam |
+| `lib/provider.sh` | Provider + runtime detection seam |
+| `lib/github.sh` | Gated PR/merge/validate helpers (no `--admin`) |
 | `lib/run-checks.sh` | Deterministic checks (`scorer=checks`) |
+| `lib/harness-checks.sh` | Harness-apc objective checks + secrets scan |
 | `tests/consult-smoke.sh` | CLI smoke |
 | `state/` | Engagements, scores, history |
+| `state/harness-evolution/` | APC self-improvement (locked `harness-apc-v1`) |
 
 Client products live as **sibling repos**; each brief has `Repo: /absolute/path`
 and `contract.json` declares `scorer: checks|provider`. Use `consult score`.

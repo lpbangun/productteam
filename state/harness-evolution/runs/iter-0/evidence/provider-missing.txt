@@ -1,0 +1,2 @@
+lib/provider.sh: line 14: /nonexistent/no-such-bin: No such file or directory
+exit=127

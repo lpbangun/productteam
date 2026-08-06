@@ -1,0 +1,11 @@
+
+  Product Consulting Harness
+  Autonomous product consulting · evidence over opinion · delete before adding
+
+  ● agcode-learning   overall 6.0 (target 9.0, -0.9)   0 areas ≥9
+    Local-first agentic-coding learning system — tutor skill plus plain-text learning files; research artifacts justify the design · iter-6 · 7 runs
+  ● onboarding-flight-control   overall 9.5 (target 9.0, +3.7)   8 areas ≥9
+    Fictional People Ops onboarding coordinator portfolio demo — local-only React/Vite prototype; no backend, auth, or real AI · iter-1 · 2 runs
+
+  bench <client> for scores · report <client> for reasoning · help for all
+

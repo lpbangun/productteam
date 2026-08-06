@@ -1,0 +1,4 @@
+gh_user=lpbangun
+  ✓ Logged in to github.com account lpbangun (/home/logani/.config/gh/hosts.yml)
+  - Token scopes: 'gist', 'read:org', 'repo', 'workflow'
+repo=lpbangun/product-consulting-harness
