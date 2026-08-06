@@ -1,0 +1,15 @@
+
+> onboarding-flight-control@1.0.0 test
+> vitest run
+
+
+ RUN  v3.2.4 /home/logani/projects/Product Consulting Harness/clients/onboarding-flight-control
+
+ ✓ src/contract.test.ts (9 tests) 7ms
+ ✓ src/domain.test.ts (6 tests) 10ms
+
+ Test Files  2 passed (2)
+      Tests  15 passed (15)
+   Start at  00:33:27
+   Duration  411ms (transform 123ms, setup 0ms, collect 153ms, tests 17ms, environment 0ms, prepare 155ms)
+

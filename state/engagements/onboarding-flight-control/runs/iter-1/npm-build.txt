@@ -1,0 +1,13 @@
+
+> onboarding-flight-control@1.0.0 build
+> tsc -b && vite build
+
+vite v8.1.5 building client environment for production...
+[2Ktransforming...✓ 1789 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                   0.58 kB │ gzip:  0.34 kB
+dist/assets/index-CyUxnOkL.css   30.07 kB │ gzip:  5.73 kB
+dist/assets/index-CXfkuQ1D.js   256.17 kB │ gzip: 76.56 kB
+
+✓ built in 339ms

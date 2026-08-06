@@ -55,6 +55,20 @@ latest_run() { # client dir → highest iter-N name or empty
 }
 
 # ── commands ─────────────────────────────────────────────────────────
+engagement_scorer() { # engagement dir → checks|provider
+  local d="$1"
+  if [[ -f "$d/contract.json" ]]; then
+    local s
+    s=$(jq -r '.scorer // empty' "$d/contract.json" 2>/dev/null || true)
+    if [[ -n "$s" ]]; then printf '%s' "$s"; return; fi
+  fi
+  # Legacy default: ofc-v1 → checks, else provider
+  local cid
+  cid=$(jq -r '.contract // "v1"' "$d/contract.json" 2>/dev/null || echo v1)
+  [[ "$cid" == ofc-v1 ]] && { printf 'checks'; return; }
+  printf 'provider'
+}
+
 cmd_help() {
   cat <<EOF
 
@@ -62,16 +76,22 @@ cmd_help() {
 
   ${B}Commands${R}
     consult                     Org status and engagements overview
+    consult judge <client>      Product Judgment mode + mission
+    consult judge <client> set <mode>
+                                Set Guided|Directive|Challenge|Override
+    consult score <client>      Score via the engagement's declared scorer
     consult bench <client>      Benchmark contract + history + latest scores
-    consult bench <client> run  Score the client now via the provider, append to history
-    consult run <client> <n>    One iteration in full: scores and evidence
-    consult report <client>     Latest iteration report (reasoning, lessons, org review)
+    consult bench <client> run  Provider scoring (scorer=provider only)
+    consult checks <client>     Deterministic checks (scorer=checks only)
+    consult run <client> <n>    Show scores for iteration n
+    consult report <client>     Latest iteration report
     consult memory              Organizational memory
-    consult org                 The organization: roles and rules
+    consult org                 Roles, loop, autonomy
+    consult smoke               CLI smoke tests
     consult help                This text
 
-  ${D}State is plain files under state/engagements/<client>/ — everything this
-  CLI shows, you can read directly. Provider: ${CONSULT_PROVIDER:-claude}${R}
+  ${D}State: state/engagements/<client>/ · Client repos: siblings (Repo: path)
+  Judgment: JUDGMENT.md · Provider: ${CONSULT_PROVIDER:-agent}${R}
 
 EOF
 }
@@ -118,25 +138,100 @@ EOF
 cmd_org() {
   cat <<EOF
 
-  ${B}The organization${R} ${D}(full charter: AGENTS.md · law: CONSTITUTION.md)${R}
+  ${B}The organization${R} ${D}(AGENTS.md · CONSTITUTION.md · JUDGMENT.md)${R}
 
     Principal   orchestrates the loop; decides, escalates; never self-scores
     Analyst     inspects and scores against the frozen contract, with evidence
     Builder     implements accepted items; smallest diff; verification attached
     Critic      rebuts priorities, audits diffs and scores, reviews the org
 
+  ${B}Product Judgment modes${R}
+    Guided · Directive · Challenge · Override   ${D}(see JUDGMENT.md)${R}
+
+  ${B}Temporary specialists${R} ${D}(spawned per engagement, then disbanded)${R}
+    Repository Analyst · Benchmark Designer · Test Engineer ·
+    Product Specialists · Implementation Agent · Independent Verifier ·
+    Harness Critic
+
   ${B}Loop${R}
-    Inspect → Benchmark → Prioritize → Debate → Implement → Test →
-    Re-benchmark → Critique → Memory → Improve the org
+    Inspect → Measure baseline → Prioritize → Implement → Test →
+    Re-benchmark → Independently verify → Critique → Memory →
+    Safe harness improvements → Repeat
 
   ${B}Autonomy${R}
     Auto-apply: low-risk, reversible, evidence-backed.
     Escalate:   permanent workers · architecture · security/auth ·
                 autonomy policy · destructive acts · scope changes.
 
-  ${D}Permanent workers beyond these four require evidence + owner approval.${R}
+  ${D}Permanent workers beyond the four require evidence + owner approval.${R}
 
 EOF
+}
+
+cmd_judge() {
+  local c="$1" d; d=$(client_dir "$c")
+  [[ -f "$d/engagement.md" ]] || die "missing $d/engagement.md"
+  local mode
+  mode=$(awk '/^Mode:/{gsub(/\*/,""); print $2; exit}' "$d/engagement.md")
+  mode="${mode:-Guided}"
+  printf '\n  %sProduct Judgment — %s%s\n' "$B" "$c" "$R"
+  printf '  Mode: %s%s%s   %s(Guided|Directive|Challenge|Override)%s\n\n' "$C" "$mode" "$R" "$D" "$R"
+  if [[ -f "$d/engagement.md" ]]; then
+    awk '
+      /^## Mission/{flag=1; print "  "$0; next}
+      /^## / && flag{exit}
+      flag{print "  "$0}
+    ' "$d/engagement.md"
+  fi
+  printf '\n  %sFull modes: JUDGMENT.md · set: consult judge %s set <mode>%s\n\n' "$D" "$c" "$R"
+}
+
+cmd_judge_set() {
+  local c="$1" mode="$2" d; d=$(client_dir "$c")
+  case "$mode" in
+    Guided|Directive|Challenge|Override) ;;
+    guided) mode=Guided ;;
+    directive) mode=Directive ;;
+    challenge) mode=Challenge ;;
+    override) mode=Override ;;
+    *) die "mode must be Guided|Directive|Challenge|Override" ;;
+  esac
+  [[ -f "$d/engagement.md" ]] || die "missing $d/engagement.md"
+  if grep -q '^Mode:' "$d/engagement.md"; then
+    sed -i "s/^Mode:.*/Mode: **${mode}** (Product Judgment Layer)/" "$d/engagement.md"
+  else
+    sed -i "1a Mode: **${mode}** (Product Judgment Layer)" "$d/engagement.md"
+  fi
+  printf '\n  %sMode set to %s%s for %s\n\n' "$G" "$mode" "$R" "$c"
+}
+
+cmd_checks() {
+  local c="$1" d; d=$(client_dir "$c")
+  local scorer; scorer=$(engagement_scorer "$d")
+  [[ "$scorer" == checks ]] || die "engagement '$c' uses scorer=$scorer — use: consult score $c (or consult bench $c run)"
+  local repo
+  repo=$(awk -F': ' '/^Repo:/{print $2; exit}' "$d/engagement.md")
+  [[ -d "$repo" ]] || die "client repo not found: $repo"
+  local checker="$ROOT/lib/run-checks.sh"
+  [[ -f "$checker" ]] || die "missing $checker"
+  printf '\n  %sDeterministic checks — %s%s\n' "$B" "$c" "$R"
+  printf '  %srepo: %s · scorer: checks%s\n\n' "$D" "$repo" "$R"
+  bash "$checker" "$c" "$d" "$repo"
+}
+
+cmd_score() {
+  local c="$1" d; d=$(client_dir "$c")
+  local scorer; scorer=$(engagement_scorer "$d")
+  printf '\n  %sScoring %s via scorer=%s%s\n' "$B" "$c" "$scorer" "$R"
+  case "$scorer" in
+    checks)   cmd_checks "$c" ;;
+    provider) cmd_bench_run "$c" ;;
+    *) die "unknown scorer '$scorer' in $d/contract.json (expected checks|provider)" ;;
+  esac
+}
+
+cmd_smoke() {
+  bash "$ROOT/tests/consult-smoke.sh"
 }
 
 cmd_memory() {
@@ -146,8 +241,14 @@ cmd_memory() {
 
 cmd_bench() {
   local c="$1" d; d=$(client_dir "$c")
+  local cid='v1' frozen='2026-08-05' target='9.0'
+  if [[ -f "$d/contract.json" ]]; then
+    cid=$(jq -r '.contract // "v1"' "$d/contract.json")
+    frozen=$(jq -r '.frozen // "unknown"' "$d/contract.json")
+    target=$(jq -r '.target // 9.0' "$d/contract.json")
+  fi
   printf '\n  %sBenchmark — %s%s%s\n' "$B" "$c" "$R" "$D"
-  printf '  Contract v1 · frozen 2026-08-05 · target ≥ 9.0 in every area%s\n\n' "$R"
+  printf '  Contract %s · frozen %s · target ≥ %s in every dimension%s\n\n' "$cid" "$frozen" "$target" "$R"
 
   # history
   if [[ -f "$d/history.jsonl" && -s "$d/history.jsonl" ]]; then
@@ -207,6 +308,8 @@ cmd_report() {
 
 cmd_bench_run() {
   local c="$1" d; d=$(client_dir "$c")
+  local scorer; scorer=$(engagement_scorer "$d")
+  [[ "$scorer" == provider ]] || die "engagement '$c' uses scorer=$scorer — use: consult score $c (or consult checks $c)"
   [[ -f "$d/engagement.md" ]] || die "missing $d/engagement.md (brief with Repo: path)"
   local repo; repo=$(awk -F': ' '/^Repo:/{print $2; exit}' "$d/engagement.md")
   [[ -d "$repo" ]] || die "client repo not found: $repo"
@@ -281,6 +384,21 @@ main() {
     status)         cmd_status ;;
     org)            cmd_org ;;
     memory)         cmd_memory ;;
+    smoke)          cmd_smoke ;;
+    judge)
+      [[ $# -ge 1 ]] || die 'usage: consult judge <client> [set <mode>]'
+      if [[ "${2:-}" == 'set' ]]; then
+        [[ $# -ge 3 ]] || die 'usage: consult judge <client> set <mode>'
+        cmd_judge_set "$1" "$3"
+      else
+        cmd_judge "$1"
+      fi ;;
+    score)
+      [[ $# -ge 1 ]] || die 'usage: consult score <client>'
+      cmd_score "$1" ;;
+    checks)
+      [[ $# -ge 1 ]] || die 'usage: consult checks <client>'
+      cmd_checks "$1" ;;
     bench)
       [[ $# -ge 1 ]] || die 'usage: consult bench <client> [run]'
       if [[ "${2:-}" == 'run' ]]; then cmd_bench_run "$1"; else cmd_bench "$1"; fi ;;

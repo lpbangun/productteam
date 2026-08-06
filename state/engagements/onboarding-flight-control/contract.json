@@ -1,0 +1,37 @@
+{
+  "contract": "ofc-v1",
+  "frozen": "2026-08-06",
+  "scorer": "checks",
+  "client": "onboarding-flight-control",
+  "target": 9.0,
+  "convergence": "every dimension >= 9.0",
+  "max_iterations": 5,
+  "source": "BENCHMARK-CONTRACT.md",
+  "dimensions": [
+    "onboarding-quality",
+    "workflow-clarity",
+    "usability",
+    "maintainability",
+    "documentation",
+    "developer-experience",
+    "product-clarity",
+    "simplicity"
+  ],
+  "scoring_protocol": {
+    "analyst": "Scores independently; cite file path, command output, or test name.",
+    "independent_verifier": "Re-audits before acceptance.",
+    "subjective_scores": "Two independent justifications; conservative resolution.",
+    "void_rule": "Score without evidence is void.",
+    "overall": "Mean of eight dimensions, one decimal."
+  },
+  "baseline_rules": {
+    "iter_0": "Before any engagement change.",
+    "immutable": "Never re-scored retroactively."
+  },
+  "invariants": [
+    "Fictional People Ops onboarding portfolio demo.",
+    "No backend, auth, or real AI/model calls.",
+    "Local-only persistence via localStorage.",
+    "No change to product vision."
+  ]
+}

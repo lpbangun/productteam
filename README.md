@@ -1,49 +1,70 @@
 # Product Consulting Harness
 
-An autonomous consulting organization that improves software — and itself.
-
-This is not a dashboard, a workflow builder, or a coding agent. The CLI is
-only the interface. The product is the organization: role-defined workers,
-a frozen benchmark contract, durable memory, and an improvement loop that
-critiques its own org chart after every iteration.
+A Product Judgment Layer that turns messy product intent into a clear
+improvement mission, executes it, measures the result, and retains what
+it learns. The CLI is the interface; judgment lives in modes, evidence,
+and a frozen benchmark contract.
 
 ## Quickstart
 
 ```sh
-bin/consult status             # org overview, engagements, convergence
-bin/consult scores <client>    # benchmark history vs the frozen contract
-bin/consult report <client>    # latest iteration report (evidence bundle)
-bin/consult memory             # organizational memory
-bin/consult org                # org self-evaluation log
-bin/consult checks <client>    # deterministic checks (evidence, not vibes)
+bin/consult                  # org overview
+bin/consult judge <client>   # mode + mission
+bin/consult checks <client>  # deterministic contract checks
+bin/consult bench <client>   # scores + history
+bin/consult report <client>  # latest iteration reasoning
+bin/consult memory           # durable lessons
+bin/consult org              # roles + autonomy
+bin/consult smoke            # CLI smoke tests
 ```
+
+Provider: authenticated Cursor `agent` CLI by default (`CONSULT_PROVIDER` to swap).
+No API keys. No mocks.
+
+## Product Judgment modes
+
+| Mode | Behavior |
+|------|----------|
+| **Guided** | Propose high-leverage directions with tradeoffs |
+| **Directive** | Follow a user direction; validate risks |
+| **Challenge** | Push back with evidence when harm is likely |
+| **Override** | Follow an explicit decision; document concerns |
+
+Full text: `JUDGMENT.md`.
 
 ## How an engagement runs
 
-1. A **brief** fixes the client, its vision, and constraints (`state/engagements/<client>/brief.md`).
-2. A **Benchmark Contract** is frozen before any implementation (`BENCHMARKS.md`).
-3. The loop runs until every dimension scores ≥9/10 with evidence, or 10 iterations:
+1. Brief + mode in `state/engagements/<client>/engagement.md`
+2. Freeze `contract.json` + engagement `BENCHMARK-CONTRACT.md` before changes
+3. Build measurement tests; record iter-0 baseline
+4. Loop (max 5 iterations unless converged earlier):
 
-   `Inspect → Benchmark → Prioritize → Debate → Implement → Test → Re-benchmark → Critique → Record memory → Improve the org`
+   Inspect → Measure → Prioritize → Implement → Real tests →
+   Re-benchmark → Independently verify → Critique → Memory →
+   Safe harness improvements
 
-4. Every iteration leaves an evidence bundle: scores, reasoning, changes,
-   lessons, and an evaluation of the organization itself.
+5. Convergence: every dimension ≥ 9.0 with evidence, verifier OK,
+   no unresolved critical/high defects, no material regression.
 
 ## Layout
 
 | Path | Purpose |
-|---|---|
-| `CONSTITUTION.md` | Principles, autonomy policy, escalation rules |
-| `AGENTS.md` | The organization: roles, spawn rules, critique protocol |
-| `ARCHITECTURE.md` | Runtime, state layout, provider adapter, CLI surface |
-| `BENCHMARKS.md` | The frozen benchmark contract — never move the goalposts |
-| `MEMORY.md` | Durable organizational memory across runs |
-| `bin/consult` | The CLI (bash, zero dependencies) |
-| `state/` | Engagements, iterations, benchmark history |
+|------|---------|
+| `CONSTITUTION.md` | Principles, autonomy, escalation |
+| `AGENTS.md` | Permanent roles |
+| `JUDGMENT.md` | Product Judgment modes + temporary specialists |
+| `BENCHMARKS.md` | Harness-wide contract v1 (prior engagements) |
+| `MEMORY.md` | Durable organizational memory |
+| `bin/consult` | CLI |
+| `lib/provider.sh` | Cursor `agent` provider seam |
+| `lib/run-checks.sh` | Deterministic checks (`scorer=checks`) |
+| `tests/consult-smoke.sh` | CLI smoke |
+| `state/` | Engagements, scores, history |
+
+Client products live as **sibling repos**; each brief has `Repo: /absolute/path`
+and `contract.json` declares `scorer: checks|provider`. Use `consult score`.
 
 ## Principles
 
-Delete before adding. Every abstraction, dependency, worker, command,
-prompt, or layer must produce measurable benefit — or it goes.
-Evidence over opinion. The client's vision is a constraint, not an
-input to redesign. Full text in `CONSTITUTION.md`.
+Delete before adding. Evidence over opinion. Never move the goalposts.
+Client vision is a constraint. Full text in `CONSTITUTION.md`.

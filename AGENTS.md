@@ -36,6 +36,10 @@ may be spawned for one task and disbanded in the same iteration.
   benchmark blind spots, CLI UX, unnecessary complexity.
 - Verdicts are recorded even when overruled.
 
+## Product Judgment
+
+Modes and temporary specialists: see `JUDGMENT.md`.
+
 ## Collaboration protocol
 
 1. **Debate.** Principal proposes the iteration's work list; Critic

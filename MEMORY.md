@@ -6,6 +6,17 @@ and evidence-linked.
 
 ## Engagements
 
+- **onboarding-flight-control** (opened + closed 2026-08-06) — fictional
+  People Ops onboarding portfolio demo (React/Vite, localStorage).
+  Repo: `/home/logani/projects/onboarding-flight-control` · public
+  https://github.com/lpbangun/onboarding-flight-control · branch
+  `consult/engagement-2026-08-06`. Live copy not scored:
+  `/home/logani/projects/Onboarding Flight Control`.
+  Mode: Guided · Contract: ofc-v1 · Scorer: checks.
+  **Result:** 5.8 → 9.5 in 1 iteration; all dims ≥9 via deterministic
+  checks. Verifier ACCEPT / CONVERGED. See
+  `state/engagements/onboarding-flight-control/convergence-report.md`.
+  Client changes uncommitted pending owner PR request.
 - **agcode-learning** (opened + closed 2026-08-05) — local-first
   agentic-coding learning system: tutor skill + plain-text files +
   research brief. Repo: `/home/logani/projects/agcode-learning` ·
@@ -35,6 +46,18 @@ and evidence-linked.
 
 ## Lessons
 
+- 2026-08-06 · Owner approved: `scorer` field (`checks`|`provider`) +
+  `consult score` dispatch with refuse-wrong-path; client repos as
+  siblings only (OFC moved to `/home/logani/projects/onboarding-flight-control`).
+  No plugin router; no nested `clients/`.
+- 2026-08-06 · Deterministic `consult checks` as primary ofc-v1 scorer
+  avoided LLM re-score drift; uniform 9.5 means “all objective checks
+  pass,” not editorial excellence. Keep band mapping honest in
+  `lib/run-checks.sh`.
+- 2026-08-06 · Vitest measurement scaffold must exclude `*.test.ts` from
+  app `tsc` or baseline `build-green` falsely fails.
+- 2026-08-06 · Contract grep tests that assert strings live in `App.tsx`
+  constrain extractions — leave disclaimer/STATUS_META where checks look.
 - 2026-08-05 · Panel noise: identical states scored ±0.5 apart by
   different scorers. Report point estimates only for green areas;
   report ranges for amber. Never chase ±0.5 with a re-score.
@@ -73,6 +96,10 @@ and evidence-linked.
 
 ## Org self-improvements applied
 
+- 2026-08-06 · Product Judgment Layer: `JUDGMENT.md`, `consult judge`,
+  modes Guided/Directive/Challenge/Override; provider default → Cursor
+  `agent`; `consult checks` + smoke; contract-aware bench header;
+  `scorer` field + `consult score`; sibling client repos only.
 - 2026-08-05 · Audit-before-acceptance enforced from iter-2 (iter-1's
   late audit cost 0.2 of recorded optimism).
 - 2026-08-05 · Scorer prompts hardened: "exactly one entry per area"

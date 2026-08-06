@@ -1,0 +1,204 @@
+{
+  "ts": "2026-08-06",
+  "iter": 0,
+  "kind": "baseline",
+  "contract": "ofc-v1",
+  "scores": {
+    "onboarding-quality": {
+      "score": 7.0,
+      "evidence": "3/5 checks pass; fail: test-suite-green, domain-transitions-generic"
+    },
+    "workflow-clarity": {
+      "score": 4.5,
+      "evidence": "2/5 checks pass; fail: status-signal-consistency, board-pills-require-reason, cross-role-demo-script"
+    },
+    "usability": {
+      "score": 9.5,
+      "evidence": "5/5 checks pass"
+    },
+    "maintainability": {
+      "score": 4.0,
+      "evidence": "3/5 checks pass; fail: app-not-monolith, architecture-notes"
+    },
+    "documentation": {
+      "score": 2.0,
+      "evidence": "0/5 checks pass; fail: readme-exists, readme-required-sections, readme-clone-run-verified, walkthrough-covers-maya"
+    },
+    "developer-experience": {
+      "score": 4.0,
+      "evidence": "1/5 checks pass; fail: deps-pinned, ci-local-parity, dev-script-documented, node-version-noted"
+    },
+    "product-clarity": {
+      "score": 7.5,
+      "evidence": "4/5 checks pass; fail: readme-non-goals-explicit"
+    },
+    "simplicity": {
+      "score": 7.5,
+      "evidence": "4/5 checks pass; fail: no-dead-seed-fields"
+    }
+  },
+  "overall": 5.8,
+  "checks_snapshot": {
+    "readme-exists": {
+      "status": "fail",
+      "detail": ""
+    },
+    "readme-required-sections": {
+      "status": "fail",
+      "detail": ""
+    },
+    "walkthrough-covers-maya": {
+      "status": "fail",
+      "detail": ""
+    },
+    "docs-honest-prototype": {
+      "status": "fail",
+      "detail": ""
+    },
+    "cross-role-demo-script": {
+      "status": "fail",
+      "detail": ""
+    },
+    "architecture-notes": {
+      "status": "fail",
+      "detail": ""
+    },
+    "readme-non-goals-explicit": {
+      "status": "fail",
+      "detail": ""
+    },
+    "dev-script-documented": {
+      "status": "fail",
+      "detail": ""
+    },
+    "node-version-noted": {
+      "status": "fail",
+      "detail": ""
+    },
+    "deps-pinned": {
+      "status": "fail",
+      "detail": "[[\"@vitejs/plugin-react\",\"latest\"],[\"lucide-react\",\"latest\"],[\"react\",\"latest\"],[\"react-dom\",\"latest\"],[\"typescript\",\"latest\"],[\"vite\",\"latest\"],[\"@types/react\",\"latest\"],[\"@types/react-dom\",\"latest\"]]"
+    },
+    "test-script-exists": {
+      "status": "pass",
+      "detail": "vitest run"
+    },
+    "deps-minimal": {
+      "status": "pass",
+      "detail": "ok"
+    },
+    "domain-pure": {
+      "status": "pass",
+      "detail": "ok"
+    },
+    "app-not-monolith": {
+      "status": "fail",
+      "detail": "App.tsx=1417 extras=1"
+    },
+    "lean-src-tree": {
+      "status": "pass",
+      "detail": "src_files=4"
+    },
+    "single-derive-support": {
+      "status": "pass",
+      "detail": "count=1"
+    },
+    "demo-constants-centralized": {
+      "status": "pass",
+      "detail": "MAYA_ID_defs=1 STORAGE_KEY_defs=1"
+    },
+    "home-states-fictional": {
+      "status": "pass",
+      "detail": "ok"
+    },
+    "topbar-prototype-chip": {
+      "status": "pass",
+      "detail": "ok"
+    },
+    "copilot-not-ai": {
+      "status": "pass",
+      "detail": "ok"
+    },
+    "three-role-labels": {
+      "status": "pass",
+      "detail": "ok"
+    },
+    "build-green": {
+      "status": "pass",
+      "detail": "built"
+    },
+    "typescript-build": {
+      "status": "pass",
+      "detail": "dist/assets/index-DQ4EqRn9.js   254.20 kB \u2502 gzip: 76.17 kB  \u2713 built in 374ms "
+    },
+    "test-suite-green": {
+      "status": "fail",
+      "detail": ""
+    },
+    "maya-intro-flow": {
+      "status": "pass",
+      "detail": "pass"
+    },
+    "initial-handoffs-complete": {
+      "status": "pass",
+      "detail": "pass"
+    },
+    "domain-transitions-generic": {
+      "status": "fail",
+      "detail": ""
+    },
+    "derive-support-seed": {
+      "status": "pass",
+      "detail": "pass"
+    },
+    "status-signal-consistency": {
+      "status": "fail",
+      "detail": ""
+    },
+    "override-requires-reason": {
+      "status": "pass",
+      "detail": "pass"
+    },
+    "board-pills-require-reason": {
+      "status": "fail",
+      "detail": ""
+    },
+    "coordinator-signal-matches-domain": {
+      "status": "pass",
+      "detail": "pass"
+    },
+    "home-to-workspace": {
+      "status": "pass",
+      "detail": "pass"
+    },
+    "role-switcher-three-roles": {
+      "status": "pass",
+      "detail": "pass"
+    },
+    "reset-demo-restores-seed": {
+      "status": "pass",
+      "detail": "pass"
+    },
+    "a11y-smoke": {
+      "status": "pass",
+      "detail": "pass"
+    },
+    "no-duplicate-status-meta": {
+      "status": "pass",
+      "detail": "pass"
+    },
+    "no-dead-seed-fields": {
+      "status": "fail",
+      "detail": ""
+    },
+    "ci-local-parity": {
+      "status": "fail",
+      "detail": "build or test failed"
+    },
+    "readme-clone-run-verified": {
+      "status": "fail",
+      "detail": "readme, build, or test missing"
+    }
+  },
+  "note": "Scaffold complete: tsconfig excludes *.test.ts; product behavior unchanged from fc1ef89"
+}

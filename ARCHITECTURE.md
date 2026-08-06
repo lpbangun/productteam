@@ -22,19 +22,34 @@ All durable state is plain text so any future runtime can continue.
 ```
 state/
   engagements/<client>/
-    engagement.md      # brief: vision, constraints, repo path
-    contract.json      # frozen benchmark contract (copy of BENCHMARKS.md v1)
-    history.jsonl      # one line per scored run (the benchmark history)
+    engagement.md      # brief: vision, constraints, Repo: sibling path
+    contract.json      # frozen contract + scorer (checks|provider)
+    history.jsonl      # one line per scored run
     runs/iter-N/
-      scores.json      # {area: {score, evidence}}
+      scores.json      # {dimension: {score, evidence}}
       report.md        # reasoning, debate, diff, lessons, org review
 ```
+
+Client product repos are **siblings**, not nested under the harness.
+`engagement.md` points at them with an absolute `Repo:` path.
 
 `history.jsonl` line format:
 
 ```json
 {"ts":"…","iter":0,"kind":"baseline","scores":{"correctness":6.2,"…":0},"overall":6.2,"run":"runs/iter-0"}
 ```
+
+## Scoring seam
+
+Each engagement declares how it is scored in `contract.json`:
+
+| `scorer` | Command | Mechanism |
+|----------|---------|-----------|
+| `checks` | `consult score` → `consult checks` | Deterministic `lib/run-checks.sh` |
+| `provider` | `consult score` → `consult bench run` | LLM via `lib/provider.sh` |
+
+Wrong path refuses honestly. No plugin router — add a third scorer
+only with evidence of need (Constitution).
 
 ## Provider seam
 
@@ -43,11 +58,11 @@ One function, swappable:
 ```sh
 # lib/provider.sh
 provider_ask() {  # $1=prompt  → stdout: model reply
-  "${CONSULT_PROVIDER:-claude}" -p "$1" --output-format text
+  "${CONSULT_PROVIDER:-agent}" -p "$1" --output-format text
 }
 ```
 
-Default provider is the authenticated `claude` CLI — no API keys, no
+Default provider is the authenticated Cursor `agent` CLI — no API keys, no
 mocks. Set `CONSULT_PROVIDER` to any binary that answers a prompt on
 stdout to swap providers. Nothing else in the system knows which
 provider runs.
@@ -67,14 +82,15 @@ Memory       MEMORY.md updated; run report written
 Org-improve  low-risk org fixes applied; rest escalated
 ```
 
-Convergence: every contract area ≥ 9.0, or a non-convergence report
-after 10 iterations.
+Convergence: every contract dimension ≥ 9.0, or a non-convergence report
+after `max_iterations` from that engagement's `contract.json`.
 
 ## What does NOT exist (and why)
 
 - No database — jsonl + markdown are inspectable and diffable.
 - No daemon/server — the org runs when invoked, memory is files.
-- No plugin system — the provider seam is the only extension point.
+- No plugin system — provider + scorer fields are the extension points.
+- No nested `clients/` tree — product repos stay siblings.
 - No config file — one env var (`CONSULT_PROVIDER`), documented here.
 
 Each absence is deliberate; adding any of these requires evidence per

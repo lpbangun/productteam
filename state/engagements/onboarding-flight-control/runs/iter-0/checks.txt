@@ -1,0 +1,49 @@
+
+  Deterministic checks — onboarding-flight-control
+  repo: /home/logani/projects/Product Consulting Harness/clients/onboarding-flight-control
+
+  ✗ readme-exists                            
+  ✗ readme-required-sections                 
+  ✗ walkthrough-covers-maya                  
+  ✗ docs-honest-prototype                    
+  ✗ cross-role-demo-script                   
+  ✗ architecture-notes                       
+  ✗ readme-non-goals-explicit                
+  ✗ dev-script-documented                    
+  ✗ node-version-noted                       
+  ✗ deps-pinned                              [["@vitejs/plugin-react","latest"],["lucide-react","lat
+  ✓ test-script-exists                       vitest run
+  ✓ deps-minimal                             ok
+  ✓ domain-pure                              ok
+  ✗ app-not-monolith                         App.tsx=1417 extras=1
+  ✓ lean-src-tree                            src_files=4
+  ✓ single-derive-support                    count=1
+  ✓ demo-constants-centralized               MAYA_ID_defs=1 STORAGE_KEY_defs=1
+  ✓ home-states-fictional                    ok
+  ✓ topbar-prototype-chip                    ok
+  ✓ copilot-not-ai                           ok
+  ✓ three-role-labels                        ok
+  ✗ build-green                              
+  ✓ typescript-build                         src/domain.test.ts(1,30): error TS2591: Cannot find nam
+  ✗ test-suite-green                         
+  ✓ maya-intro-flow                          pass
+  ✓ initial-handoffs-complete                pass
+  ✗ domain-transitions-generic               
+  ✓ derive-support-seed                      pass
+  ✗ status-signal-consistency                
+  ✓ override-requires-reason                 pass
+  ✗ board-pills-require-reason               
+  ✓ coordinator-signal-matches-domain        pass
+  ✓ home-to-workspace                        pass
+  ✓ role-switcher-three-roles                pass
+  ✓ reset-demo-restores-seed                 pass
+  ✓ a11y-smoke                               pass
+  ✓ no-duplicate-status-meta                 pass
+  ✗ no-dead-seed-fields                      
+  ✗ ci-local-parity                          build or test failed
+  ✗ readme-clone-run-verified                readme, build, or test missing
+
+  overall 4.8  → /home/logani/projects/Product Consulting Harness/state/engagements/onboarding-flight-control/runs/.checks-latest.json
+
+  21 passed · 19 failed
+
