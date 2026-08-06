@@ -1,0 +1,12 @@
+commit fa02bf988cef83af3c6cfe29d8b10d349eee5040
+Author: lpbangun <lpbangun@users.noreply.github.com>
+Date:   Thu Aug 6 08:48:31 2026 +0200
+
+    Require both scenario horizons and unique claim ids in role briefs.
+    
+    Incomplete drafts could ship with only a near-term view or colliding claim ids; tighten validate_brief so private occupational briefs stay time-complete and referentially sound.
+
+ docs/goal-loop.md           |  1 +
+ src/skills_vector/domain.py | 12 ++++++++++++
+ tests/test_domain.py        | 37 +++++++++++++++++++++++++++++++++++++
+ 3 files changed, 50 insertions(+)

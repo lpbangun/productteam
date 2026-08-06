@@ -1,0 +1,9 @@
+{
+  "contract": "skills-vector-v1",
+  "frozen": "20260806T064527Z",
+  "subject": "/home/logani/projects/skills-vector",
+  "target": 8.0,
+  "dimensions": ["correctness","usability","documentation","developer-experience","product-clarity","simplicity"],
+  "source": "BENCHMARK-CONTRACT.md",
+  "skill": "benchmark"
+}

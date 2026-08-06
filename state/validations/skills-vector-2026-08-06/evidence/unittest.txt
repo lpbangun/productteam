@@ -1,0 +1,22 @@
+test_brief_requires_both_scenario_horizons (test_domain.DomainContractTests.test_brief_requires_both_scenario_horizons) ... ok
+test_claim_ids_must_be_unique (test_domain.DomainContractTests.test_claim_ids_must_be_unique) ... ok
+test_claims_require_sources_and_uncertainty (test_domain.DomainContractTests.test_claims_require_sources_and_uncertainty) ... ok
+test_complete_brief_requires_each_output_section (test_domain.DomainContractTests.test_complete_brief_requires_each_output_section) ... ok
+test_high_impact_claim_requires_corroboration_or_disagreement (test_domain.DomainContractTests.test_high_impact_claim_requires_corroboration_or_disagreement) ... ok
+test_missing_source_reference_is_rejected (test_domain.DomainContractTests.test_missing_source_reference_is_rejected) ... ok
+test_non_private_brief_requires_human_approval (test_domain.DomainContractTests.test_non_private_brief_requires_human_approval) ... ok
+test_only_three_roles_can_be_constructed (test_domain.DomainContractTests.test_only_three_roles_can_be_constructed) ... ok
+test_scope_is_us_people_operations_and_talent (test_domain.DomainContractTests.test_scope_is_us_people_operations_and_talent) ... ok
+test_unapproved_evidence_category_is_rejected_at_runtime (test_domain.DomainContractTests.test_unapproved_evidence_category_is_rejected_at_runtime) ... ok
+test_analysis_includes_skeptic_before_forecasting (test_workflow_contract.WorkflowContractTests.test_analysis_includes_skeptic_before_forecasting) ... ok
+test_compiled_graph_executes_fanouts_and_pauses_for_human_review (test_workflow_contract.WorkflowContractTests.test_compiled_graph_executes_fanouts_and_pauses_for_human_review) ... ok
+test_every_module_requires_an_explicit_handler (test_workflow_contract.WorkflowContractTests.test_every_module_requires_an_explicit_handler) ... ok
+test_governed_configuration_cannot_change_outside_human_gate (test_workflow_contract.WorkflowContractTests.test_governed_configuration_cannot_change_outside_human_gate) ... ok
+test_human_review_is_the_final_gate (test_workflow_contract.WorkflowContractTests.test_human_review_is_the_final_gate) ... ok
+test_research_uses_only_approved_evidence_lenses (test_workflow_contract.WorkflowContractTests.test_research_uses_only_approved_evidence_lenses) ... ok
+
+----------------------------------------------------------------------
+Ran 16 tests in 0.666s
+
+OK
+unittest_exit=0

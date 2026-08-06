@@ -1,0 +1,28 @@
+{
+  "contract": "48h-contributor-readiness-v1",
+  "frozen": "20260806T064600Z",
+  "scored_at": "20260806T064900Z",
+  "subject": "/home/logani/projects/48-hour-contributor-readiness-kit",
+  "pr": "https://github.com/lpbangun/48-hour-contributor-readiness-kit/pull/1",
+  "merge_sha": "562a90e722cef97accf9728ca2354d6864748cb3",
+  "target": 8.0,
+  "scores": {
+    "correctness": 9.0,
+    "usability": 8.5,
+    "documentation": 8.5,
+    "developer-experience": 8.5,
+    "product-clarity": 8.5,
+    "simplicity": 9.0,
+    "safety-honesty": 9.0
+  },
+  "overall": 8.8,
+  "evidence": [
+    "npm-test.log",
+    "post-merge-validate.txt",
+    "app/ReadinessKit.tsx",
+    "tests/rendered-html.test.mjs",
+    "AGENTS.md",
+    "README.md"
+  ],
+  "critic": "accept"
+}

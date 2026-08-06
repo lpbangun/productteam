@@ -1,0 +1,34 @@
+{
+  "ts": "2026-08-06",
+  "kind": "validation-baseline",
+  "contract": "ofc-val-2026-08-06",
+  "subject_sha": "dc8297009f01012eeb0499fbfb7b0dd57daaa626",
+  "scores": {
+    "correctness": {
+      "score": 8.0,
+      "evidence": "npm test 15/15 pass; npm run build green @ dc82970. Gap: .github/workflows/deploy-pages.yml builds without npm test — broken domain can still deploy."
+    },
+    "usability": {
+      "score": 8.5,
+      "evidence": "README.md Demo walkthrough (Maya Chen); App.tsx home CTA 'Open interactive demo'; role switcher present."
+    },
+    "documentation": {
+      "score": 8.0,
+      "evidence": "README.md identity/non-goals/architecture present. Gap: clone block uses <this-repo-url> placeholder; deploy docs omit test gate."
+    },
+    "developer-experience": {
+      "score": 7.0,
+      "evidence": "package.json scripts test/build/dev; engines.node >=22; pinned deps. Gap: no PR CI workflow; only deploy-pages.yml on main push (build only)."
+    },
+    "product-clarity": {
+      "score": 9.0,
+      "evidence": "README What it is/is not; App.tsx fictional prototype framing; CopilotDrawer.tsx deterministic demo disclaimer."
+    },
+    "simplicity": {
+      "score": 8.5,
+      "evidence": "Lean src tree post-engagement; App.tsx ~572 lines; no surplus frameworks."
+    }
+  },
+  "overall": 8.2,
+  "chosen_lift": "Add CI that runs npm test + npm run build on pull_request/push, and require npm test before Pages deploy build."
+}

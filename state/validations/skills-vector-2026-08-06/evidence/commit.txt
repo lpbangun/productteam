@@ -1,0 +1,6 @@
+fa02bf988cef83af3c6cfe29d8b10d349eee5040
+fa02bf9 Require both scenario horizons and unique claim ids in role briefs.
+ docs/goal-loop.md           |  1 +
+ src/skills_vector/domain.py | 12 ++++++++++++
+ tests/test_domain.py        | 37 +++++++++++++++++++++++++++++++++++++
+ 3 files changed, 50 insertions(+)

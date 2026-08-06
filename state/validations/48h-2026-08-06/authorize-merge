@@ -1,0 +1,12 @@
+# authorize-merge — 48h-2026-08-06
+
+Authorized to merge PR #1 (consult/safety-guardrail-honesty) with a normal
+merge after gates:
+
+- Local npm test: 4/4 pass (archived in validations npm-test.log)
+- PR mergeable: MERGEABLE
+- statusCheckRollup: empty (no required CI; no failures observed)
+- Scope: safety-honesty copy + test lock only; no vision change
+
+Owner validation agent for frozen Product Consulting Harness client
+validation dated 2026-08-06. Standard gated merge only.

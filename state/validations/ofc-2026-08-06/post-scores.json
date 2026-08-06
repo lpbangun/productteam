@@ -1,0 +1,43 @@
+{
+  "ts": "2026-08-06",
+  "kind": "validation-post-merge",
+  "contract": "ofc-val-2026-08-06",
+  "pr": "https://github.com/lpbangun/onboarding-flight-control/pull/2",
+  "merge_commit": "6a8db8e260a38851f62ec92bcd681d2010a0e75a",
+  "scores": {
+    "correctness": {
+      "score": 9.0,
+      "evidence": "post-merge npm test 15/15; npm run build green @ 6a8db8e; .github/workflows/ci.yml + deploy-pages.yml both run npm test; PR CI CheckRun SUCCESS"
+    },
+    "usability": {
+      "score": 8.5,
+      "evidence": "README Demo walkthrough unchanged; home CTA intact; no UI regression (CI/docs-only diff)"
+    },
+    "documentation": {
+      "score": 8.5,
+      "evidence": "README.md real clone URL; Architecture documents ci.yml + deploy test gate + live Pages URL"
+    },
+    "developer-experience": {
+      "score": 9.0,
+      "evidence": ".github/workflows/ci.yml on pull_request+push main: npm ci, npm test, npm run build, Node 22"
+    },
+    "product-clarity": {
+      "score": 9.0,
+      "evidence": "Vision invariants untouched; fictional framing still in README + CopilotDrawer"
+    },
+    "simplicity": {
+      "score": 9.0,
+      "evidence": "3 files, +33/-3; no new deps; no App/domain churn"
+    }
+  },
+  "overall": 8.8,
+  "baseline_overall": 8.2,
+  "gates": {
+    "npm_test": "pass",
+    "npm_build": "pass",
+    "ci_pr": "pass",
+    "secrets": "none",
+    "vision": "intact",
+    "merge": "authorized-non-force"
+  }
+}

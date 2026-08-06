@@ -1,0 +1,19 @@
+validate_sha=6a8db8e260a38851f62ec92bcd681d2010a0e75a
+ref=HEAD
+ts=2026-08-06T06:51:11Z
+
+> onboarding-flight-control@1.0.0 test
+> vitest run
+
+
+ RUN  v3.2.4 /home/logani/projects/onboarding-flight-control
+
+ ✓ src/contract.test.ts (9 tests) 6ms
+ ✓ src/domain.test.ts (6 tests) 11ms
+
+ Test Files  2 passed (2)
+      Tests  15 passed (15)
+   Start at  08:51:11
+   Duration  380ms (transform 122ms, setup 0ms, collect 171ms, tests 17ms, environment 0ms, prepare 141ms)
+
+6a8db8e Merge pull request #2 from lpbangun/consult/validation-2026-08-06-ci

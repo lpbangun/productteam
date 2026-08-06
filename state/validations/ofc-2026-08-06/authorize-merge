@@ -1,0 +1,16 @@
+# authorize-merge — ofc-2026-08-06 validation
+
+Date: 2026-08-06
+PR: https://github.com/lpbangun/onboarding-flight-control/pull/2
+Branch: consult/validation-2026-08-06-ci
+Contract: ofc-val-2026-08-06
+
+Local gates passed:
+- npm test — 15/15 pass
+- npm run build — green
+- GitHub Actions CI / test-and-build — SUCCESS on PR #2
+- No secrets in diff
+- In vision (CI/docs only; no backend, auth, or real AI)
+- Self-review: state/validations/ofc-2026-08-06/self-review.md
+
+Authorization: owner-approved standard merge commit via consult gh merge.

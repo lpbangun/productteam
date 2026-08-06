@@ -6,6 +6,18 @@ and evidence-linked.
 
 ## Engagements
 
+## Validations (frozen harness)
+
+- **2026-08-06 · harness CONVERGED** harness-apc-v1 iter-5 overall 8.4 ·
+  freeze tip `4c7e226` · report `state/harness-evolution/FINAL-REPORT.md`
+- **OFC** PR https://github.com/lpbangun/onboarding-flight-control/pull/2
+  merged `6a8db8e` · `state/validations/ofc-2026-08-06/`
+- **48h kit** PR https://github.com/lpbangun/48-hour-contributor-readiness-kit/pull/1
+  merged `562a90e` · `state/validations/48h-2026-08-06/`
+- **Skills Vector** PR https://github.com/lpbangun/skills-vector/pull/1
+  OPEN (PR-only) · `state/validations/skills-vector-2026-08-06/`
+
+
 - **onboarding-flight-control** (opened + closed 2026-08-06) — fictional
   People Ops onboarding portfolio demo (React/Vite, localStorage).
   Repo: `/home/logani/projects/onboarding-flight-control` · public

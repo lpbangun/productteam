@@ -1,0 +1,21 @@
+{
+  "contract": "48h-contributor-readiness-v1",
+  "frozen": "20260806T064600Z",
+  "subject": "/home/logani/projects/48-hour-contributor-readiness-kit",
+  "target": 8.0,
+  "dimensions": [
+    "correctness",
+    "usability",
+    "documentation",
+    "developer-experience",
+    "product-clarity",
+    "simplicity",
+    "safety-honesty"
+  ],
+  "source": "BENCHMARK-CONTRACT.md",
+  "skill": "benchmark",
+  "validation": {
+    "commands": ["npm test"],
+    "forbid": ["mocks", "--admin", "force-merge"]
+  }
+}

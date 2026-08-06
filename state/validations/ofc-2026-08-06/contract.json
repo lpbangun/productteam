@@ -1,0 +1,27 @@
+{
+  "contract": "ofc-val-2026-08-06",
+  "frozen": "2026-08-06T06:46:08Z",
+  "tailored": "2026-08-06T06:50:00Z",
+  "subject": "/home/logani/projects/onboarding-flight-control",
+  "public": "https://github.com/lpbangun/onboarding-flight-control",
+  "target": 8.0,
+  "max_changes": 1,
+  "dimensions": [
+    "correctness",
+    "usability",
+    "documentation",
+    "developer-experience",
+    "product-clarity",
+    "simplicity"
+  ],
+  "invariants": [
+    "fictional-people-ops-demo",
+    "no-backend-auth-real-ai",
+    "deterministic-copilot",
+    "localStorage-only"
+  ],
+  "verification": ["npm test", "npm run build"],
+  "source": "BENCHMARK-CONTRACT.md",
+  "skill": "benchmark",
+  "independent_of": "ofc-v1"
+}

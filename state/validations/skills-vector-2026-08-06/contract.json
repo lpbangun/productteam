@@ -1,0 +1,64 @@
+{
+  "contract": "skills-vector-v1",
+  "frozen": "2026-08-06T06:47:00Z",
+  "subject": "/home/logani/projects/skills-vector",
+  "target": 8.0,
+  "dimensions": [
+    "correctness",
+    "usability",
+    "documentation",
+    "developer-experience",
+    "product-clarity",
+    "simplicity"
+  ],
+  "checks": {
+    "correctness": [
+      "unittest-green",
+      "compileall-clean",
+      "brief-requires-claim-kinds",
+      "high-impact-corroboration",
+      "non-private-needs-approval",
+      "brief-requires-both-horizons",
+      "claim-ids-unique"
+    ],
+    "usability": [
+      "scope-errors-named",
+      "missing-evidence-named",
+      "human-approval-error-named"
+    ],
+    "documentation": [
+      "readme-exists",
+      "readme-verify-commands",
+      "goal-loop-guardrails",
+      "readme-non-goals"
+    ],
+    "developer-experience": [
+      "uv-editable-install",
+      "unittest-offline",
+      "no-provider-config-required",
+      "handlers-injected"
+    ],
+    "product-clarity": [
+      "three-roles-only",
+      "us-geography-only",
+      "private-default",
+      "human-review-interrupt",
+      "human-gated-changes-named"
+    ],
+    "simplicity": [
+      "src-two-modules",
+      "deps-langgraph-only",
+      "no-scheduler-persistence-ui",
+      "workflow-edges-declarative"
+    ]
+  },
+  "verification": [
+    "uv venv .venv",
+    "uv pip install --python .venv/bin/python -e .",
+    ".venv/bin/python -m unittest discover -s tests -v",
+    ".venv/bin/python -m compileall -q src tests"
+  ],
+  "source": "BENCHMARK-CONTRACT.md",
+  "status": "PR-only",
+  "do_not_merge": true
+}
