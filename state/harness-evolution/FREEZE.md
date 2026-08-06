@@ -3,7 +3,7 @@
 **Status:** FROZEN for client repository validation  
 **Frozen at:** 2026-08-06T06:45:00Z  
 **Harness commit SHA:** `2cb1a9f478d613559dd38a7f4164f8e6e2c986bf` (main after PR #1)  
-**Plus local iter-5 close artifacts** (to be committed as freeze tip)
+**Freeze tip SHA: `88cdc5e6e05e59769c4e7742cc519797f2ff8089`
 
 ## Benchmark
 
