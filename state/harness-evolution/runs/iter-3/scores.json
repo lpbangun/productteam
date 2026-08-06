@@ -1,0 +1,106 @@
+{
+  "contract": "harness-apc-v1",
+  "iter": 3,
+  "scored_at": "2026-08-06T06:34:01Z",
+  "evaluator": "independent-analyst",
+  "dimensions": {
+    "architecture-simplicity": {
+      "score": 8.0,
+      "evidence": [
+        "lib/run-skill.sh single seam; bin/consult skill → runner (not a parallel control plane)",
+        "skills/{critique,benchmark,design-sprint}/SKILL.md + docs/skills.md justified by product-skills dimension",
+        "AGENTS.md four permanent roles unchanged",
+        "report.md Critic-narrowed scope: skills + runner + smoke/checks + docs only",
+        "Gap vs 9–10: ARCHITECTURE.md documents provider/github/harness-checks seams but omits skills/run-skill.sh"
+      ]
+    },
+    "cli-onboarding": {
+      "score": 8.5,
+      "evidence": [
+        "bin/consult help lists consult skill <name> <target> [out-dir] for /critique|/benchmark|/design-sprint",
+        "README.md Quickstart includes bin/consult skill critique|benchmark|design-sprint <target>",
+        "docs/skills.md table with path + invoke command per skill",
+        "CONSULT_SMOKE_SKIP_CLIENT=1 tests/consult-smoke.sh → all PASS including help lists skill + three SKILL.md present",
+        "Gap vs 9–10: no cold-clone transcript in run dir"
+      ]
+    },
+    "runtime-routing": {
+      "score": 8.5,
+      "evidence": [
+        "Unchanged this iter; prior evidence holds: lib/provider.sh runtime_detect/runtime_default + honest provider_ask",
+        "checks.json runtime-detect + runtime-honest-fail pass",
+        "smoke PASS runtime + runtime --check refuses missing provider"
+      ]
+    },
+    "github-integration": {
+      "score": 7.0,
+      "evidence": [
+        "No github lift this iter (deferred per report scope)",
+        "Prior evidence holds: lib/github.sh + consult gh …; PR #1 real URL; merge refuses without authorize-merge",
+        "checks.json github-seam + merge-refuses-without-auth pass",
+        "Gap blocking 9–10 / still below 8.0 target: authorized merge + post-merge validate not executed"
+      ]
+    },
+    "memory-learning": {
+      "score": 7.0,
+      "evidence": [
+        "docs/learning-schema.md present (learning-schema check pass)",
+        "runs/iter-3/lessons.md present (Expected/Actual/What worked/failed/Change next time)",
+        "MEMORY.md Lessons link harness-evolution iter-1, iter-2, and iter-3 (skills) with path to runs/iter-3/",
+        "history.jsonl prior lines intact; this scoring appends kind=iteration for iter-3",
+        "Gap vs 9–10: report.md lacks org self-review; critic-verdict.md absent — MEMORY update alone does not clear band"
+      ]
+    },
+    "product-judgment": {
+      "score": 7.5,
+      "evidence": [
+        "runs/iter-3/report.md Mode: Directive",
+        "state/harness-evolution/engagement.md Mode: Directive (unchanged this iter)",
+        "examples/challenge-refusal.md + examples/override-risks.md; judgment-examples check pass",
+        "Not 9–10: Directive only; no live Challenge refusal or Override risks artifact this iter"
+      ]
+    },
+    "product-skills": {
+      "score": 9.0,
+      "evidence": [
+        "skills/critique/SKILL.md, skills/benchmark/SKILL.md, skills/design-sprint/SKILL.md all present",
+        "bin/consult skill → lib/run-skill.sh; live re-run wrote critique.md, BENCHMARK-CONTRACT.md+contract.json, design-sprint.md",
+        "runs/iter-3/evidence/skill-critique/critique.md, skill-benchmark/{BENCHMARK-CONTRACT.md,contract.json}, skill-design-sprint/design-sprint.md",
+        "docs/skills.md + README invoke pointers; help lists skill",
+        "checks.json skills-present + skill-critique-runs + skill-benchmark-runs + skill-design-sprint-runs all pass (19/19)",
+        "smoke covers help lists skill + SKILL.md presence (invocation covered by harness-checks)",
+        "Residual vs 10: scaffold/template artifacts (lessons.md); not deep provider-backed audits"
+      ]
+    },
+    "testing-evidence": {
+      "score": 8.5,
+      "evidence": [
+        "tests/consult-smoke.sh exit 0 (re-verified; skill help + presence checks)",
+        "bin/consult harness-checks → checks.json passed 19 failed 0; validation real-commands",
+        "New skill checks map to product-skills objective: skills-present + three *-runs invoke consult skill",
+        "No fixture-only greens observed; live skill re-run produced artifacts",
+        "Gap vs 9–10: autonomy-loop phase completeness still not asserted by suite"
+      ]
+    },
+    "autonomy-loop": {
+      "score": 6.0,
+      "evidence": [
+        "state/harness-evolution/LOOP-SEQUENCE.md documented fixed sequence (no consult evolve CLI)",
+        "iter-3 phase artifacts: report.md, lessons.md, checks.json, evidence/skill-*, scores.json (this file)",
+        "Gap / partial: critic-verdict.md absent; report lacks org self-review; no loop runner command"
+      ]
+    },
+    "safety-discipline": {
+      "score": 8.0,
+      "evidence": [
+        "lock-hashes-pre.txt == live sha256sum of HARNESS-BENCHMARK-CONTRACT.md / contract.json / LOCK.md; git diff on lock files empty (0 bytes)",
+        "harness-checks secrets-scan clean; lock-hashes-stable unchanged",
+        "scores.json authored by independent-analyst (not implementer); no lock file edits by evaluator",
+        "Gap vs 9–10: critic-verdict.md (safety verdict) not yet in run dir"
+      ]
+    }
+  },
+  "overall": 7.8,
+  "void": false,
+  "critical_failures": []
+}

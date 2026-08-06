@@ -1,0 +1,3 @@
+9c373a6faf5792a302af49e391f19a7d63f2fa0d740c3c28616a755dea969345  state/harness-evolution/HARNESS-BENCHMARK-CONTRACT.md
+90cafb76563b03afcf3ca57d855644a806effea0b6821180fd1e659d95986043  state/harness-evolution/contract.json
+bed34510a115e4c0332a321688fc0a3719ac98089dd540c6df88f0510fa4cb4e  state/harness-evolution/LOCK.md

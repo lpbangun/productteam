@@ -1,0 +1,22 @@
+
+  consult — Product Consulting Harness
+
+  Commands
+    consult                     Org status and engagements overview
+    consult judge <client>      Product Judgment mode + mission
+    consult judge <client> set <mode>
+                                Set Guided|Directive|Challenge|Override
+    consult score <client>      Score via the engagement's declared scorer
+    consult bench <client>      Benchmark contract + history + latest scores
+    consult bench <client> run  Provider scoring (scorer=provider only)
+    consult checks <client>     Deterministic checks (scorer=checks only)
+    consult run <client> <n>    Show scores for iteration n
+    consult report <client>     Latest iteration report
+    consult memory              Organizational memory
+    consult org                 Roles, loop, autonomy
+    consult smoke               CLI smoke tests
+    consult help                This text
+
+  State: state/engagements/<client>/ · Client repos: siblings (Repo: path)
+  Judgment: JUDGMENT.md · Provider: agent
+

@@ -1,0 +1,9 @@
+{
+  "contract": "Product Consulting Harness-v1",
+  "frozen": "20260806T063218Z",
+  "subject": "/home/logani/projects/Product Consulting Harness",
+  "target": 8.0,
+  "dimensions": ["correctness","usability","documentation","developer-experience","product-clarity","simplicity"],
+  "source": "BENCHMARK-CONTRACT.md",
+  "skill": "benchmark"
+}

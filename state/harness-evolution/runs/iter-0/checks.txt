@@ -1,0 +1,80 @@
+# iter-0 baseline checks — independent-analyst
+# scored_at: 2026-08-06T06:12:00Z
+# No secrets/tokens recorded (gh token redacted in evidence).
+
+## Inventory
+$ find . -type f ! -path './.git/*' ! -path './state/engagements/*' | sort
+→ state/harness-evolution/runs/iter-0/evidence/inventory.txt
+Key product paths (excluding engagement runs): AGENTS.md ARCHITECTURE.md
+BENCHMARKS.md CONSTITUTION.md JUDGMENT.md MEMORY.md README.md bin/consult
+lib/provider.sh lib/run-checks.sh tests/consult-smoke.sh
+state/harness-evolution/{HARNESS-BENCHMARK-CONTRACT.md,contract.json,LOCK.md}
+docs/ exists but empty.
+
+## CLI help
+$ bin/consult help
+→ evidence/consult-help.txt
+Commands: judge, score, bench, checks, run, report, memory, org, smoke, help.
+No APC: runtime detect, PR/merge/validate, evolve/loop, skills.
+
+## CLI status
+$ bin/consult status
+→ evidence/consult-status.txt
+Lists engagements agcode-learning + onboarding-flight-control.
+
+## Smoke
+$ tests/consult-smoke.sh
+→ evidence/smoke.txt
+Result: all smoke checks passed; smoke_exit=0
+
+## Provider / runtime
+$ cat lib/provider.sh
+Default CONSULT_PROVIDER:-agent; agent|cursor-agent special-case; else "$bin" -p …
+No detection API.
+
+$ CONSULT_PROVIDER=/nonexistent/no-such-bin … provider_ask "hi"
+→ evidence/provider-missing.txt
+stderr: …/lib/provider.sh: line 14: /nonexistent/no-such-bin: No such file or directory
+exit=127
+
+Preflight (prior): evidence/preflight.txt lists agent/claude/codex/opencode/cursor on PATH;
+harness does not expose a runtime-detect command consuming this.
+
+## GitHub
+$ rg -n 'pr create|pr merge|gh pr' bin/consult lib README.md AGENTS.md ARCHITECTURE.md
+→ evidence/github-search.txt (no harness wrappers)
+
+$ gh auth status  (token redacted)
+→ evidence/gh-auth-status.txt
+Logged in as lpbangun; scopes: gist, read:org, repo, workflow.
+Auth alone ≠ github-integration credit without harness path.
+
+## Judgment
+$ bin/consult judge onboarding-flight-control
+→ evidence/judge-show.txt
+Mode: Guided. Challenge/Override documented in JUDGMENT.md; no example Challenge/Override artifact found.
+
+$ bin/consult org
+→ evidence/org.txt
+Loop listed as prose; not executed.
+
+## Skills
+$ find . \( -iname '*critique*' -o -iname '*design-sprint*' -o -name 'SKILL.md' \) ! -path './.git/*'
+→ evidence/skills-search.txt
+None in harness tree.
+
+## docs/
+$ ls -la docs
+→ evidence/docs-listing.txt
+Empty directory.
+
+## Lock / freeze
+$ git diff -- state/harness-evolution/HARNESS-BENCHMARK-CONTRACT.md \
+    state/harness-evolution/contract.json state/harness-evolution/LOCK.md
+→ evidence/lock-diff.txt
+Empty (lock files unmodified by evaluator).
+
+## Validation statement
+All green results above came from real commands against this repo (and gh auth status
+against the live GitHub CLI session). No fixture-only mocks used for scores.
+Client engagement check greens (OFC) were not reused as harness-apc evidence.

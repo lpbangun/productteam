@@ -1,0 +1,108 @@
+{
+  "contract": "harness-apc-v1",
+  "iter": 0,
+  "scored_at": "2026-08-06T06:12:00Z",
+  "evaluator": "independent-analyst",
+  "dimensions": {
+    "architecture-simplicity": {
+      "score": 7.0,
+      "evidence": [
+        "ARCHITECTURE.md (CLI / org / state seams)",
+        "AGENTS.md (four permanent roles)",
+        "bin/consult",
+        "lib/provider.sh",
+        "lib/run-checks.sh",
+        "state/harness-evolution/runs/iter-0/evidence/inventory.txt",
+        "docs/ empty (state/harness-evolution/runs/iter-0/evidence/docs-listing.txt)",
+        "ARCHITECTURE.md provider snippet omits agent special-case present in lib/provider.sh; bin/consult cmd_bench_run display default CONSULT_PROVIDER:-claude vs provider.sh default agent"
+      ]
+    },
+    "cli-onboarding": {
+      "score": 7.0,
+      "evidence": [
+        "bin/consult help → state/harness-evolution/runs/iter-0/evidence/consult-help.txt",
+        "bin/consult status → state/harness-evolution/runs/iter-0/evidence/consult-status.txt",
+        "tests/consult-smoke.sh exit 0 → state/harness-evolution/runs/iter-0/evidence/smoke.txt (smoke_exit=0)",
+        "README.md Quickstart (clone-run path for core commands)",
+        "Gap: help/README lack APC commands (PR lifecycle, runtime detect, evolve loop, skills); docs/ empty"
+      ]
+    },
+    "runtime-routing": {
+      "score": 3.0,
+      "evidence": [
+        "lib/provider.sh (CONSULT_PROVIDER:-agent; thin agent vs else branch)",
+        "README.md / ARCHITECTURE.md document CONSULT_PROVIDER swap",
+        "No consult runtime/detect command; help shows Provider: agent only",
+        "Missing provider: CONSULT_PROVIDER=/nonexistent/no-such-bin → shell exit 127, message 'No such file or directory' (state/harness-evolution/runs/iter-0/evidence/provider-missing.txt) — not a harness-named refusal",
+        "state/harness-evolution/runs/iter-0/evidence/preflight.txt lists runtimes on PATH but harness does not consume it"
+      ]
+    },
+    "github-integration": {
+      "score": 2.0,
+      "evidence": [
+        "rg pr create|pr merge|gh pr over bin/consult lib README.md AGENTS.md ARCHITECTURE.md → no harness wrappers (state/harness-evolution/runs/iter-0/evidence/github-search.txt)",
+        "bin/consult help lists no PR/merge/validate commands",
+        "gh auth present (scopes gist,read:org,repo,workflow) — environment only, not a harness path (state/harness-evolution/runs/iter-0/evidence/gh-auth-status.txt; Token redacted)",
+        "No pr.json / merge SHA / post-merge validate artifact under state/harness-evolution/"
+      ]
+    },
+    "memory-learning": {
+      "score": 3.0,
+      "evidence": [
+        "MEMORY.md exists with dated engagement lessons (client OFC/agcode; no harness-evolution section)",
+        "No learning schema doc/JSON under harness for harness-evolution iterations",
+        "state/harness-evolution/runs/iter-0/lessons.md absent at baseline score time",
+        "history.jsonl for harness-evolution created only as baseline append after this scoring"
+      ]
+    },
+    "product-judgment": {
+      "score": 5.0,
+      "evidence": [
+        "JUDGMENT.md (Guided/Directive/Challenge/Override)",
+        "bin/consult judge onboarding-flight-control → Mode: Guided (state/harness-evolution/runs/iter-0/evidence/judge-show.txt)",
+        "state/engagements/onboarding-flight-control/engagement.md Mode: **Guided**; runs/iter-0|1/report.md cite Mode",
+        "Challenge/Override documented in JUDGMENT.md but no Challenge refusal or Override risks example artifact found",
+        "No mode field for harness-evolution runs"
+      ]
+    },
+    "product-skills": {
+      "score": 1.0,
+      "evidence": [
+        "find for *critique* / *design-sprint* / SKILL.md under harness → none (state/harness-evolution/runs/iter-0/evidence/skills-search.txt)",
+        "README.md and empty docs/ have no invocation pointers for /critique /benchmark /design-sprint",
+        "No skill artifacts under state/harness-evolution/runs/iter-0/"
+      ]
+    },
+    "testing-evidence": {
+      "score": 6.5,
+      "evidence": [
+        "tests/consult-smoke.sh all PASS, smoke_exit=0 (state/harness-evolution/runs/iter-0/evidence/smoke.txt)",
+        "lib/run-checks.sh is client (OFC) scorer path, not harness-apc check suite",
+        "This run archives real command evidence in checks.txt + evidence/ (no fixture-only greens)",
+        "Gap: no harness check suite mapped to harness-apc-v1 objective items"
+      ]
+    },
+    "autonomy-loop": {
+      "score": 3.0,
+      "evidence": [
+        "AGENTS.md describes Inspect→…→Org-improve loop in prose only",
+        "bin/consult org echoes loop phases (state/harness-evolution/runs/iter-0/evidence/org.txt) but does not execute them",
+        "No loop runner / consult evolve (or equivalent) command in bin/consult help",
+        "Client engagements prove manual loop discipline; harness-evolution has no phase runner or completed phase artifact set yet (baseline scoring only)"
+      ]
+    },
+    "safety-discipline": {
+      "score": 6.5,
+      "evidence": [
+        "LOCK.md freeze notice; git diff on lock files empty (state/harness-evolution/runs/iter-0/evidence/lock-diff.txt)",
+        "CONSTITUTION.md escalation table; AGENTS.md never self-scores",
+        "scores.json authored by independent-analyst (not implementer)",
+        "Artifacts under state/harness-evolution/runs/iter-0/evidence/ redact tokens (gh-auth-status.txt)",
+        "Gap: no automated secrets/merge/freeze/scoring-role gates; Critic safety verdict for this iteration not part of Analyst deliverable"
+      ]
+    }
+  },
+  "overall": 4.4,
+  "void": false,
+  "critical_failures": []
+}

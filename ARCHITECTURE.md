@@ -53,19 +53,44 @@ only with evidence of need (Constitution).
 
 ## Provider seam
 
-One function, swappable:
+One module, swappable:
 
 ```sh
 # lib/provider.sh
+runtime_detect   # list agent|claude|codex|opencode|gemini|cursor
+runtime_default  # CONSULT_PROVIDER or first available candidate
 provider_ask() {  # $1=prompt  → stdout: model reply
-  "${CONSULT_PROVIDER:-agent}" -p "$1" --output-format text
+  # routes to active runtime; honest refusal if missing
 }
 ```
 
 Default provider is the authenticated Cursor `agent` CLI — no API keys, no
 mocks. Set `CONSULT_PROVIDER` to any binary that answers a prompt on
-stdout to swap providers. Nothing else in the system knows which
+stdout to swap providers. `bin/consult runtime` prints detection;
+`consult runtime --check` exits non-zero with a named refusal when the
+active provider is missing. Nothing else in the system knows which
 provider runs.
+
+## Harness self-checks
+
+`bin/consult harness-checks` runs `lib/harness-checks.sh` — an objective
+subset for `harness-apc-v1` (smoke, runtime-detect, lock presence/hashes,
+secrets scan, judgment examples, github seam). Client OFC checks stay in
+`lib/run-checks.sh` and are never mixed in.
+
+## GitHub seam
+
+`lib/github.sh` + `bin/consult gh …`:
+
+| Subcommand | Behavior |
+|------------|----------|
+| `preflight` | Auth + permissions; tokens redacted |
+| `pr-create` | Push + `gh pr create` |
+| `status` / `checks` | PR view / checks JSON |
+| `merge` | **Refuses** without authorize-merge file; never `--admin` |
+| `validate` | Post-merge/PR validation artifact |
+
+Authorize file default: `state/harness-evolution/authorize-merge`.
 
 ## The loop, mechanically
 
@@ -92,6 +117,7 @@ after `max_iterations` from that engagement's `contract.json`.
 - No plugin system — provider + scorer fields are the extension points.
 - No nested `clients/` tree — product repos stay siblings.
 - No config file — one env var (`CONSULT_PROVIDER`), documented here.
+- No second runtime module — detection lives in `lib/provider.sh`.
 
 Each absence is deliberate; adding any of these requires evidence per
 the Constitution.

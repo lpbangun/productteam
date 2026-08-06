@@ -1,0 +1,9 @@
+preflight 2026-08-06T06:02:50Z
+gh_user=lpbangun
+scopes=gist,read:org,repo,workflow (from gh auth status)
+runtime_found=agent path=/home/logani/.local/bin/agent
+runtime_found=claude path=/home/logani/.local/bin/claude
+runtime_found=codex path=/home/logani/.local/bin/codex
+runtime_found=opencode path=/home/logani/.opencode/bin/opencode
+runtime_found=cursor path=/home/logani/.local/bin/cursor
+runtime_missing=gemini

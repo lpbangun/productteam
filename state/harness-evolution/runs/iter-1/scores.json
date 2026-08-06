@@ -1,0 +1,112 @@
+{
+  "contract": "harness-apc-v1",
+  "iter": 1,
+  "scored_at": "2026-08-06T06:23:32Z",
+  "evaluator": "independent-analyst",
+  "dimensions": {
+    "architecture-simplicity": {
+      "score": 7.5,
+      "evidence": [
+        "ARCHITECTURE.md documents runtime_detect/runtime_default/provider_ask + harness-checks seam; matches lib/provider.sh and lib/harness-checks.sh",
+        "AGENTS.md four permanent roles unchanged",
+        "bin/consult adds runtime + harness-checks only (no parallel evolve orchestrator — Critic cut)",
+        "report.md diff summary: extend provider.sh rather than new runtime.sh",
+        "New paths justified: docs/learning-schema.md, state/harness-evolution/LOOP-SEQUENCE.md, engagement.md, examples/",
+        "Gap: consult judge still client-engagements only (harness-evolution Mode is a parallel file, not the judge CLI)"
+      ]
+    },
+    "cli-onboarding": {
+      "score": 7.5,
+      "evidence": [
+        "bin/consult help lists runtime + harness-checks; footer points to docs/learning-schema.md",
+        "bin/consult status shows Provider + runtimes: consult runtime",
+        "CONSULT_SMOKE_SKIP_CLIENT=1 tests/consult-smoke.sh → all PASS (incl. help lists runtime/harness-checks, runtime --check)",
+        "README.md Quickstart documents runtime + harness-checks",
+        "Gap: no cold-clone transcript in run dir; APC PR/skills/evolve commands absent from help because unimplemented"
+      ]
+    },
+    "runtime-routing": {
+      "score": 8.5,
+      "evidence": [
+        "lib/provider.sh: runtime_detect, runtime_default, CONSULT_RUNTIME_CANDIDATES, provider_ask honest refusal (exit 127, names missing provider)",
+        "bin/consult runtime lists agent|claude|codex|opencode|gemini|cursor; Active provider line",
+        "CONSULT_PROVIDER=/nonexistent/no-such-bin bin/consult runtime --check → exit 1, 'provider … not found on PATH'",
+        "check id runtime-detect + runtime-honest-fail pass in checks.json (11/11)",
+        "smoke: PASS runtime + PASS runtime --check refuses missing provider",
+        "ARCHITECTURE.md / README.md name supported runtimes + CONSULT_PROVIDER swap",
+        "Residual: routing still thin (agent special-case vs generic -p); bare consult runtime exits 0 even when CONSULT_PROVIDER is a missing path"
+      ]
+    },
+    "github-integration": {
+      "score": 2.0,
+      "evidence": [
+        "rg gh pr|pr create|pr merge over bin/consult lib README.md → no harness wrappers (unchanged from iter-0)",
+        "bin/consult help lists no PR/merge/validate commands",
+        "No pr.json / PR URL / merge SHA / post-merge validate under state/harness-evolution/runs/iter-1/",
+        "Deferred per Critic / report.md Expected lifts"
+      ]
+    },
+    "memory-learning": {
+      "score": 5.0,
+      "evidence": [
+        "docs/learning-schema.md defines per-iter lessons/report/critic-verdict/scores/checks + history.jsonl shape",
+        "state/harness-evolution/runs/iter-1/lessons.md present (Expected/Actual/What worked/failed/Change next time)",
+        "history.jsonl exists (iter-0 baseline line; this scoring appends kind=iteration)",
+        "Gap blocking 6–8: MEMORY.md has no harness-evolution / harness-apc / docs/learning-schema lesson referencing runs/iter-1 (schema requires MEMORY update for band 6–8)",
+        "Gap: critic-verdict.md and dedicated org self-review not yet in run dir at score time"
+      ]
+    },
+    "product-judgment": {
+      "score": 6.5,
+      "evidence": [
+        "state/harness-evolution/engagement.md Mode: **Directive**",
+        "runs/iter-1/report.md cites Mode: Directive and how Critic bound the work list",
+        "examples/challenge-refusal.md + examples/override-risks.md (Challenge/Override example artifacts)",
+        "JUDGMENT.md unchanged modes; harness-checks judgment-examples + harness-engagement-mode pass",
+        "Gap: bin/consult judge harness-evolution → no engagement (Mode not via judge CLI)",
+        "Not 9–10: examples are documented hypotheticals; this iter ran Directive, did not produce a live Challenge refusal in-loop"
+      ]
+    },
+    "product-skills": {
+      "score": 1.0,
+      "evidence": [
+        "find SKILL.md / critique / design-sprint skill entrypoints under harness → none",
+        "No skill artifacts under runs/iter-1/",
+        "Deferred per Critic / report.md"
+      ]
+    },
+    "testing-evidence": {
+      "score": 7.5,
+      "evidence": [
+        "tests/consult-smoke.sh exit 0 (evidence/smoke-fast.txt; re-verified this eval)",
+        "lib/harness-checks.sh + bin/consult harness-checks → 11 passed · 0 failed → checks.json",
+        "checks.json validation: real-commands; suite covers help/smoke/status/runtime/lock/schema/judgment/secrets/provider-seam",
+        "No fixture-only greens observed",
+        "Gap vs 9–10: objective subset only — no checks for github-integration, product-skills, or full autonomy phase set"
+      ]
+    },
+    "autonomy-loop": {
+      "score": 4.5,
+      "evidence": [
+        "state/harness-evolution/LOOP-SEQUENCE.md documents fixed Inspect→…→Stop sequence (no consult evolve — Critic cut)",
+        "iter-1 partial phase artifacts: report.md (debate + diff), lessons.md, checks.json, evidence/",
+        "AGENTS.md loop prose still the role definition; LOOP-SEQUENCE is the executable manual runner doc",
+        "Gap blocking 6–8: no completed full harness-evolution iteration yet (critic-verdict.md absent; no org self-review section; MEMORY not updated; scores authored now by independent evaluator)",
+        "No loop CLI command driving/recording phases"
+      ]
+    },
+    "safety-discipline": {
+      "score": 7.5,
+      "evidence": [
+        "git diff on HARNESS-BENCHMARK-CONTRACT.md / contract.json / LOCK.md empty; lock-hashes-pre.txt == lock-hashes-post.txt == live sha256sum",
+        "harness-checks secrets-scan → clean over state/harness-evolution/runs + MEMORY.md",
+        "scores.json authored by independent-analyst (not Builder/Principal implementer)",
+        "CONSTITUTION escalation posture respected in report (no force-merge, no evolve bloat)",
+        "Gap vs 9–10: no automated merge/authorize gate; Critic safety verdict file not yet written; scoring-role separation is process not an automated check"
+      ]
+    }
+  },
+  "overall": 5.8,
+  "void": false,
+  "critical_failures": []
+}

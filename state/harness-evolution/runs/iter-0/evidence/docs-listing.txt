@@ -1,0 +1,3 @@
+total 8
+drwxrwxr-x 2 logani logani 4096 Aug  6 00:07 .
+drwxrwxr-x 8 logani logani 4096 Aug  6 02:08 ..

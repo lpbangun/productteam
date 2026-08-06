@@ -46,6 +46,16 @@ and evidence-linked.
 
 ## Lessons
 
+- 2026-08-06 · harness-evolution iter-3: first-party skills under
+  `skills/{critique,benchmark,design-sprint}/` via `consult skill`.
+  Evidence: `state/harness-evolution/runs/iter-3/`.
+- 2026-08-06 · harness-evolution iter-2: one `consult gh` seam (not three
+  verbs); merge refuses without authorize-merge; never admin bypass.
+  Real PR: https://github.com/lpbangun/product-consulting-harness/pull/1
+- 2026-08-06 · harness-evolution iter-1: extend `lib/provider.sh` for runtime
+  detect (do not add parallel `runtime.sh`); fold secrets into
+  `harness-checks`; never invoke provider scoring inside smoke refuse tests
+  (hang). Evidence: `state/harness-evolution/runs/iter-1/`.
 - 2026-08-06 · Owner approved: `scorer` field (`checks`|`provider`) +
   `consult score` dispatch with refuse-wrong-path; client repos as
   siblings only (OFC moved to `/home/logani/projects/onboarding-flight-control`).

@@ -1,0 +1,20 @@
+
+  consult smoke
+
+  PASS  help
+  PASS  status
+  PASS  org
+  PASS  memory
+  PASS  judge show
+  PASS  bench
+  PASS  bench contract id
+  PASS  checks
+  PASS  help lists score
+  PASS  ofc refuses provider run
+  PASS  agcode refuses checks
+  PASS  unknown rejects
+  PASS  help lists judge
+
+  all smoke checks passed
+
+smoke_exit=0

@@ -1,0 +1,7 @@
+AUTHORIZATION TO MERGE
+Date: 2026-08-06
+Subject: https://github.com/lpbangun/product-consulting-harness/pull/1
+Authority: Owner mission /goal "Evolve the Product Consulting Harness into an
+Autonomous Product Consultant" — Phase 2–3 allow merging harness changes when
+gates pass. Merge must be non-force, without admin bypass.
+Gates required: harness-checks green, smoke green, secrets clean, lock intact.

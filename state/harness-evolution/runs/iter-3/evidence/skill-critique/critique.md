@@ -1,3 +1,48 @@
+# Product critique — Product Consulting Harness
+
+**Skill:** /critique · **Repo:** /home/logani/projects/Product Consulting Harness · **When:** 20260806T063218Z
+
+## Method
+Structured audit from README + shallow tree. Findings cite paths.
+
+## Product clarity
+README present — skim first 80 lines for identity/audience.
+
+## Target user
+Infer from README "Who" / audience sections; flag if absent.
+
+## UX / navigation / onboarding
+Inspect entry docs and primary UI/docs paths in the tree below.
+
+## Accessibility
+Note whether a11y tests or guidance exist in tree.
+
+## Product direction / friction / priorities / risks
+Prioritize by impact-per-change. Prefer deletion. Do not rewrite vision.
+
+## Tree (depth 2, truncated)
+```
+/home/logani/projects/Product Consulting Harness/MEMORY.md
+/home/logani/projects/Product Consulting Harness/.gitignore
+/home/logani/projects/Product Consulting Harness/README.md
+/home/logani/projects/Product Consulting Harness/lib/run-skill.sh
+/home/logani/projects/Product Consulting Harness/lib/run-checks.sh
+/home/logani/projects/Product Consulting Harness/lib/provider.sh
+/home/logani/projects/Product Consulting Harness/lib/github.sh
+/home/logani/projects/Product Consulting Harness/lib/harness-checks.sh
+/home/logani/projects/Product Consulting Harness/bin/consult
+/home/logani/projects/Product Consulting Harness/docs/learning-schema.md
+/home/logani/projects/Product Consulting Harness/docs/skills.md
+/home/logani/projects/Product Consulting Harness/CONSTITUTION.md
+/home/logani/projects/Product Consulting Harness/BENCHMARKS.md
+/home/logani/projects/Product Consulting Harness/tests/consult-smoke.sh
+/home/logani/projects/Product Consulting Harness/AGENTS.md
+/home/logani/projects/Product Consulting Harness/JUDGMENT.md
+/home/logani/projects/Product Consulting Harness/ARCHITECTURE.md
+```
+
+## README excerpt
+```
 # Product Consulting Harness
 
 A Product Judgment Layer that turns messy product intent into a clear
@@ -77,11 +122,12 @@ Full text: `JUDGMENT.md`.
 | `tests/consult-smoke.sh` | CLI smoke |
 | `state/` | Engagements, scores, history |
 | `state/harness-evolution/` | APC self-improvement (locked `harness-apc-v1`) |
+```
 
-Client products live as **sibling repos**; each brief has `Repo: /absolute/path`
-and `contract.json` declares `scorer: checks|provider`. Use `consult score`.
+## Prioritized recommendations
+1. (Fill from evidence above — highest leverage first)
+2. …
+3. …
 
-## Principles
-
-Delete before adding. Evidence over opinion. Never move the goalposts.
-Client vision is a constraint. Full text in `CONSTITUTION.md`.
+## Evidence rule
+Every recommendation must cite a path from this repo.

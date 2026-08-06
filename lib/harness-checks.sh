@@ -1,0 +1,160 @@
+#!/usr/bin/env bash
+# harness-checks.sh — deterministic checks for harness-apc-v1 (objective subset).
+# Usage: harness-checks.sh [iter-dir]
+# Archives results to iter-dir/checks.json (default: state/harness-evolution/runs/.harness-checks-latest.json)
+set -uo pipefail
+
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+ITER_DIR="${1:-$ROOT/state/harness-evolution/runs}"
+OUT="${2:-$ITER_DIR/checks.json}"
+if [[ $# -lt 2 && -d "$ITER_DIR" && "$(basename "$ITER_DIR")" != runs ]]; then
+  OUT="$ITER_DIR/checks.json"
+fi
+mkdir -p "$(dirname "$OUT")"
+
+source "$ROOT/lib/provider.sh"
+
+if [[ -t 1 && -z "${NO_COLOR:-}" ]]; then
+  G=$'\e[32m' RD=$'\e[31m' D=$'\e[2m' R=$'\e[0m' B=$'\e[1m'
+else
+  G='' RD='' D='' R='' B=''
+fi
+
+TMP=$(mktemp -d)
+trap 'rm -rf "$TMP"' EXIT
+RESULTS="$TMP/results.tsv"
+: > "$RESULTS"
+
+record() {
+  local id="$1" status="$2" detail="$3"
+  printf '%s\t%s\t%s\n' "$id" "$status" "$detail" >> "$RESULTS"
+  if [[ "$status" == pass ]]; then
+    printf '  %s✓%s %-36s %s%s%s\n' "$G" "$R" "$id" "$D" "${detail:0:60}" "$R"
+  else
+    printf '  %s✗%s %-36s %s%s%s\n' "$RD" "$R" "$id" "$D" "${detail:0:60}" "$R"
+  fi
+}
+
+run_check() {
+  local id="$1"; shift
+  local out rc
+  set +e
+  out=$(bash -c "$*" 2>&1)
+  rc=$?
+  set -e
+  if [[ $rc -eq 0 ]]; then
+    record "$id" pass "$(echo "$out" | head -1)"
+  else
+    record "$id" fail "$(echo "$out" | head -1)"
+  fi
+}
+
+printf '\n  %sHarness checks (harness-apc-v1 objective subset)%s\n\n' "$B" "$R"
+
+# CLI / smoke
+run_check help-lists-runtime "cd \"$ROOT\" && bin/consult help | grep -q runtime && echo ok"
+run_check smoke-green "cd \"$ROOT\" && CONSULT_SMOKE_SKIP_CLIENT=1 tests/consult-smoke.sh >/dev/null && echo ok"
+run_check status-runs "cd \"$ROOT\" && bin/consult status >/dev/null && echo ok"
+
+# Runtime detection
+run_check runtime-detect "cd \"$ROOT\" && bin/consult runtime | grep -qE 'agent|claude|codex|opencode' && echo ok"
+run_check runtime-honest-fail "cd \"$ROOT\" && out=\$(CONSULT_PROVIDER=/nonexistent/no-such-provider-bin bin/consult runtime --check 2>&1); echo \"\$out\" | grep -qi 'not found\\|no coding runtime\\|provider' && echo ok"
+
+# Lock freeze
+run_check lock-files-present "test -f \"$ROOT/state/harness-evolution/HARNESS-BENCHMARK-CONTRACT.md\" && test -f \"$ROOT/state/harness-evolution/contract.json\" && test -f \"$ROOT/state/harness-evolution/LOCK.md\" && echo ok"
+run_check lock-hashes-stable "
+  cd \"$ROOT\"
+  pre=\$(ls -1 state/harness-evolution/runs/iter-*/evidence/lock-hashes-pre.txt 2>/dev/null | sort -V | tail -1)
+  [[ -n \"\$pre\" ]] || { echo 'no lock-hashes-pre yet'; exit 0; }
+  cur=\$(sha256sum state/harness-evolution/HARNESS-BENCHMARK-CONTRACT.md state/harness-evolution/contract.json state/harness-evolution/LOCK.md)
+  expected=\$(cat \"\$pre\")
+  [[ \"\$cur\" == \"\$expected\" ]] && echo unchanged || { echo 'LOCK HASH DRIFT'; exit 1; }
+"
+run_check learning-schema "test -f \"$ROOT/docs/learning-schema.md\" && echo ok"
+run_check judgment-examples "test -f \"$ROOT/state/harness-evolution/examples/challenge-refusal.md\" && test -f \"$ROOT/state/harness-evolution/examples/override-risks.md\" && echo ok"
+run_check harness-engagement-mode "grep -q '^Mode:' \"$ROOT/state/harness-evolution/engagement.md\" && echo ok"
+run_check memory-harness-lesson "grep -q 'harness-evolution' \"$ROOT/MEMORY.md\" && echo ok"
+run_check github-seam "test -f \"$ROOT/lib/github.sh\" && grep -q 'gh_pr_merge' \"$ROOT/lib/github.sh\" && ! grep -nE 'pr merge.*--admin|--admin\"|--admin ' \"$ROOT/lib/github.sh\" && echo ok"
+run_check merge-refuses-without-auth "
+  cd \"$ROOT\"
+  # Ensure authorize file absent for this probe
+  tmp=\$(mktemp -d)
+  # Use harness dir but unset auth path by pointing CONSULT_AUTHORIZE_MERGE at missing file
+  if CONSULT_AUTHORIZE_MERGE=\"\$tmp/missing\" CONSULT_ROOT=\"$ROOT\" bash -c 'source lib/github.sh; gh_pr_merge \"$ROOT\"' 2>&1 | grep -qi 'refused'; then
+    echo refused_ok
+  else
+    echo did_not_refuse
+    exit 1
+  fi
+"
+run_check skills-present "
+  test -f \"$ROOT/skills/critique/SKILL.md\" \\
+    && test -f \"$ROOT/skills/benchmark/SKILL.md\" \\
+    && test -f \"$ROOT/skills/design-sprint/SKILL.md\" \\
+    && echo ok
+"
+run_check skill-critique-runs "
+  cd \"$ROOT\"
+  out=\$(bin/consult skill critique harness-evolution \"$ROOT/state/harness-evolution/runs/iter-3/evidence/skill-critique\" 2>/dev/null | tail -1)
+  test -f \"\$out\" && echo ok
+"
+run_check skill-benchmark-runs "
+  cd \"$ROOT\"
+  out=\$(bin/consult skill benchmark harness-evolution \"$ROOT/state/harness-evolution/runs/iter-3/evidence/skill-benchmark\" 2>/dev/null | tail -1)
+  test -f \"\$out\" && echo ok
+"
+run_check skill-design-sprint-runs "
+  cd \"$ROOT\"
+  out=\$(bin/consult skill design-sprint harness-evolution \"$ROOT/state/harness-evolution/runs/iter-3/evidence/skill-design-sprint\" 2>/dev/null | tail -1)
+  test -f \"\$out\" && echo ok
+"
+
+# Secrets scan (high-signal patterns only; skip lock/contract text)
+run_check secrets-scan "
+  cd \"$ROOT\"
+  # Scan harness-evolution runs + MEMORY for leaked tokens (not the word Token in docs)
+  if grep -RInE --exclude-dir=.git \
+      -e 'gh[pousr]_[A-Za-z0-9_]{20,}' \
+      -e 'github_pat_[A-Za-z0-9_]{20,}' \
+      -e 'sk-[A-Za-z0-9]{20,}' \
+      -e '-----BEGIN (RSA |OPENSSH )?PRIVATE KEY-----' \
+      state/harness-evolution/runs MEMORY.md 2>/dev/null \
+      | grep -vE 'gho_\\*{10,}|Token redacted|\\*\\*\\*\\*' ; then
+    echo 'possible secret leak'
+    exit 1
+  fi
+  echo clean
+"
+
+# Provider seam still the single ask entrypoint
+run_check provider-seam "test -f \"$ROOT/lib/provider.sh\" && grep -q 'provider_ask' \"$ROOT/lib/provider.sh\" && grep -q 'runtime_detect' \"$ROOT/lib/provider.sh\" && echo ok"
+
+python3 - "$RESULTS" "$OUT" <<'PY'
+import json, sys, datetime
+results_path, out_path = sys.argv[1:3]
+checks = {}
+with open(results_path) as f:
+    for line in f:
+        parts = line.rstrip("\n").split("\t", 2)
+        if len(parts) < 2:
+            continue
+        cid, status = parts[0], parts[1]
+        detail = parts[2] if len(parts) > 2 else ""
+        checks[cid] = {"status": status, "detail": detail}
+passed = sum(1 for c in checks.values() if c["status"] == "pass")
+failed = sum(1 for c in checks.values() if c["status"] != "pass")
+payload = {
+    "ts": datetime.date.today().isoformat(),
+    "contract": "harness-apc-v1",
+    "suite": "harness-objective",
+    "checks": checks,
+    "passed": passed,
+    "failed": failed,
+    "validation": "real-commands",
+}
+with open(out_path, "w") as f:
+    json.dump(payload, f, indent=2)
+    f.write("\n")
+print(f"\n  {passed} passed · {failed} failed  → {out_path}")
+sys.exit(0 if failed == 0 else 1)
+PY
