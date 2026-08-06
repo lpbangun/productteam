@@ -87,6 +87,27 @@ run_check merge-refuses-without-auth "
     exit 1
   fi
 "
+run_check skills-present "
+  test -f \"$ROOT/skills/critique/SKILL.md\" \\
+    && test -f \"$ROOT/skills/benchmark/SKILL.md\" \\
+    && test -f \"$ROOT/skills/design-sprint/SKILL.md\" \\
+    && echo ok
+"
+run_check skill-critique-runs "
+  cd \"$ROOT\"
+  out=\$(bin/consult skill critique harness-evolution \"$ROOT/state/harness-evolution/runs/iter-3/evidence/skill-critique\" 2>/dev/null | tail -1)
+  test -f \"\$out\" && echo ok
+"
+run_check skill-benchmark-runs "
+  cd \"$ROOT\"
+  out=\$(bin/consult skill benchmark harness-evolution \"$ROOT/state/harness-evolution/runs/iter-3/evidence/skill-benchmark\" 2>/dev/null | tail -1)
+  test -f \"\$out\" && echo ok
+"
+run_check skill-design-sprint-runs "
+  cd \"$ROOT\"
+  out=\$(bin/consult skill design-sprint harness-evolution \"$ROOT/state/harness-evolution/runs/iter-3/evidence/skill-design-sprint\" 2>/dev/null | tail -1)
+  test -f \"\$out\" && echo ok
+"
 
 # Secrets scan (high-signal patterns only; skip lock/contract text)
 run_check secrets-scan "

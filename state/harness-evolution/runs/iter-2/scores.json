@@ -1,0 +1,110 @@
+{
+  "contract": "harness-apc-v1",
+  "iter": 2,
+  "scored_at": "2026-08-06T06:28:17Z",
+  "evaluator": "independent-analyst",
+  "dimensions": {
+    "architecture-simplicity": {
+      "score": 8.0,
+      "evidence": [
+        "ARCHITECTURE.md documents lib/github.sh + consult gh preflight|pr-create|status|checks|merge|validate; authorize-merge gate; no --admin",
+        "AGENTS.md four permanent roles unchanged",
+        "lib/github.sh single seam sourced by bin/consult (not a parallel control plane)",
+        "report.md Critic-narrowed scope: one gated GH workflow + MEMORY/judge nits",
+        "bin/consult help lists gh subcommands under one verb",
+        "Gap: untracked skills/*/SKILL.md stubs exist on disk without consult skill wiring (not claimed this iter; deferred)"
+      ]
+    },
+    "cli-onboarding": {
+      "score": 8.0,
+      "evidence": [
+        "bin/consult help lists consult gh preflight|pr-create|status|checks|merge|validate + harness-checks + runtime",
+        "README.md Quickstart + GitHub section document gh workflow and authorize-merge",
+        "CONSULT_SMOKE_SKIP_CLIENT=1 tests/consult-smoke.sh → all PASS (help lists gh; judge harness-evolution; gh preflight; gh merge refuses without auth)",
+        "bin/consult status / judge harness-evolution runnable",
+        "Gap vs 9–10: no cold-clone transcript in run dir; product-skills commands absent from help (unimplemented)"
+      ]
+    },
+    "runtime-routing": {
+      "score": 8.5,
+      "evidence": [
+        "Unchanged this iter; prior evidence holds: lib/provider.sh runtime_detect/runtime_default + honest provider_ask",
+        "checks.json runtime-detect + runtime-honest-fail pass",
+        "smoke PASS runtime + runtime --check refuses missing provider",
+        "Residual: thin agent-vs-generic routing; bare consult runtime can exit 0 with bad CONSULT_PROVIDER path"
+      ]
+    },
+    "github-integration": {
+      "score": 7.0,
+      "evidence": [
+        "lib/github.sh: gh_preflight, gh_pr_create, gh_pr_status, gh_pr_checks, gh_pr_merge (authorize-merge required; rejects --admin in auth file), gh_pr_validate",
+        "bin/consult gh … wrappers; .last-pr-url = https://github.com/lpbangun/product-consulting-harness/pull/1",
+        "evidence/pr-create.txt + live gh pr view: PR #1 OPEN on lpbangun/product-consulting-harness (real URL, not mock)",
+        "evidence/pr-status.json state OPEN; evidence/gh-preflight.txt auth scopes redacted",
+        "merge without authorize-merge refused (live re-run + checks merge-refuses-without-auth refused_ok)",
+        "Gap blocking 9–10: merge not authorized/executed; reviews=[]; statusCheckRollup=[]; validate not exercised post-merge"
+      ]
+    },
+    "memory-learning": {
+      "score": 7.0,
+      "evidence": [
+        "docs/learning-schema.md present (learning-schema check pass)",
+        "runs/iter-2/lessons.md present (Expected/Actual/What worked/failed/Change next time)",
+        "MEMORY.md Lessons: 2026-08-06 harness-evolution iter-1 (provider.sh / harness-checks / smoke hang) with path to runs/iter-1/",
+        "history.jsonl prior lines intact; this scoring appends kind=iteration for iter-2",
+        "Gap vs 9–10: no org self-review section in report.md; critic-verdict.md absent; MEMORY not yet linking iter-2"
+      ]
+    },
+    "product-judgment": {
+      "score": 7.5,
+      "evidence": [
+        "bin/consult judge harness-evolution → Mode: Directive (live)",
+        "state/harness-evolution/engagement.md Mode: **Directive**",
+        "runs/iter-2/report.md Mode: Directive + Critic-narrowed scope",
+        "examples/challenge-refusal.md + examples/override-risks.md; judgment-examples check pass",
+        "Not 9–10: this iter ran Directive; no live Challenge refusal or Override risks artifact produced in-loop"
+      ]
+    },
+    "product-skills": {
+      "score": 1.0,
+      "evidence": [
+        "report.md Deferred: product-skills (Iter 3)",
+        "bin/consult skill → unknown command (no runnable entry)",
+        "Untracked skills/{critique,benchmark,design-sprint}/SKILL.md stubs only — no artifacts under runs/iter-2/",
+        "README.md has no skill invocation pointer"
+      ]
+    },
+    "testing-evidence": {
+      "score": 8.0,
+      "evidence": [
+        "tests/consult-smoke.sh exit 0 (re-verified; includes gh + judge harness-evolution)",
+        "bin/consult harness-checks → 15 passed · 0 failed; checks.json validation real-commands",
+        "New checks map to APC gaps: github-seam, merge-refuses-without-auth, memory-harness-lesson, lock-hashes-stable",
+        "No fixture-only greens observed; PR evidence is live-repo",
+        "Gap vs 9–10: no product-skills invocation check; autonomy phase completeness not asserted by suite"
+      ]
+    },
+    "autonomy-loop": {
+      "score": 6.0,
+      "evidence": [
+        "state/harness-evolution/LOOP-SEQUENCE.md documented fixed sequence (no consult evolve CLI)",
+        "iter-2 phase artifacts: report.md (diff summary), lessons.md, checks.json, evidence/, scores.json (this file), MEMORY lesson from prior iter",
+        "Gap / partial: critic-verdict.md absent; report lacks org self-review; no loop runner command driving phases",
+        "User/owner posture: autonomy still partial until Critic close + fuller phase set"
+      ]
+    },
+    "safety-discipline": {
+      "score": 8.0,
+      "evidence": [
+        "lock-hashes-pre.txt == live sha256sum of HARNESS-BENCHMARK-CONTRACT.md / contract.json / LOCK.md; git diff on lock files empty (0 bytes)",
+        "harness-checks secrets-scan clean; github-seam asserts no --admin merge path",
+        "gh_pr_merge refuses without authorize-merge; forbids force/admin language in auth file (live exit non-zero)",
+        "scores.json authored by independent-analyst (not implementer)",
+        "Gap vs 9–10: critic-verdict.md (safety verdict) not yet in run dir; scoring-role separation not an automated check"
+      ]
+    }
+  },
+  "overall": 6.9,
+  "void": false,
+  "critical_failures": []
+}

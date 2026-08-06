@@ -103,6 +103,8 @@ cmd_help() {
     consult gh merge [dir] [n]  Merge only if authorize-merge present (no --admin)
     consult gh validate [dir] [ref] [out]
                                 Post-merge/PR validation artifact
+    consult skill <name> <target> [out-dir]
+                                Run /critique|/benchmark|/design-sprint
     consult run <client> <n>    Show scores for iteration n
     consult report <client>     Latest iteration report
     consult memory              Organizational memory
@@ -296,6 +298,14 @@ cmd_score() {
   esac
 }
 
+cmd_skill() {
+  local skill="${1:-}" target="${2:-}" out="${3:-}"
+  [[ -n "$skill" && -n "$target" ]] || die 'usage: consult skill <critique|benchmark|design-sprint> <repo-or-client> [out-dir]'
+  local runner="$ROOT/lib/run-skill.sh"
+  [[ -f "$runner" ]] || die "missing $runner"
+  bash "$runner" "$skill" "$target" "$out"
+}
+
 cmd_gh() {
   local sub="${1:-}"; shift || true
   case "$sub" in
@@ -487,6 +497,9 @@ main() {
     gh)
       [[ $# -ge 1 ]] || die 'usage: consult gh preflight|pr-create|status|checks|merge|validate …'
       cmd_gh "$@" ;;
+    skill)
+      [[ $# -ge 2 ]] || die 'usage: consult skill <critique|benchmark|design-sprint> <target> [out-dir]'
+      cmd_skill "$@" ;;
     judge)
       [[ $# -ge 1 ]] || die 'usage: consult judge <client> [set <mode>]'
       if [[ "${2:-}" == 'set' ]]; then
