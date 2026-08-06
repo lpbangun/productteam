@@ -1,0 +1,68 @@
+{
+  "contract": "harness-apc-v1",
+  "iter": 5,
+  "sequence": "state/harness-evolution/LOOP-SEQUENCE.md",
+  "phases": [
+    {
+      "id": 1,
+      "name": "inspect",
+      "status": "done",
+      "evidence": "bin/consult status + runtime"
+    },
+    {
+      "id": 2,
+      "name": "lock-confirm",
+      "status": "done",
+      "evidence": "runs/iter-5/evidence/lock-hashes-pre.txt"
+    },
+    {
+      "id": 3,
+      "name": "debate",
+      "status": "done",
+      "evidence": "iter-4 critic: memory+autonomy only"
+    },
+    {
+      "id": 4,
+      "name": "implement",
+      "status": "done",
+      "evidence": "org self-reviews + phases.json + schema check"
+    },
+    {
+      "id": 5,
+      "name": "harness-checks",
+      "status": "done",
+      "evidence": "runs/iter-5/checks.json"
+    },
+    {
+      "id": 6,
+      "name": "smoke",
+      "status": "done",
+      "evidence": "CONSULT_SMOKE_SKIP_CLIENT=1"
+    },
+    {
+      "id": 7,
+      "name": "independent-eval",
+      "status": "done",
+      "evidence": "scores.json"
+    },
+    {
+      "id": 8,
+      "name": "critic",
+      "status": "done",
+      "evidence": "critic-verdict.md"
+    },
+    {
+      "id": 9,
+      "name": "memory",
+      "status": "done",
+      "evidence": "lessons.md + MEMORY.md"
+    },
+    {
+      "id": 10,
+      "name": "stop-check",
+      "status": "done",
+      "evidence": "every dim >= 8.0"
+    }
+  ],
+  "stop_conditions": "harness-apc-v1 convergence checklist"
+}

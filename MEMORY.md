@@ -46,6 +46,12 @@ and evidence-linked.
 
 ## Lessons
 
+- 2026-08-06 · harness-evolution iter-5: close memory/autonomy residuals via
+  org self-reviews + phases.json + harness-checks — no new CLI verbs.
+  Evidence: `state/harness-evolution/runs/iter-5/`.
+- 2026-08-06 · harness-evolution iter-4: authorized non-force merge of
+  https://github.com/lpbangun/product-consulting-harness/pull/1 →
+  `2cb1a9f`; post-merge validate archived under runs/iter-4/evidence/.
 - 2026-08-06 · harness-evolution iter-3: first-party skills under
   `skills/{critique,benchmark,design-sprint}/` via `consult skill`.
   Evidence: `state/harness-evolution/runs/iter-3/`.

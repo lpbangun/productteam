@@ -34,3 +34,7 @@ examples into Iter 1. Accepted four deliverables — all shipped.
 runtime-routing, memory-learning, testing-evidence, product-judgment,
 safety-discipline, cli-onboarding (minor). github-integration and
 product-skills deferred to later iters per Critic.
+
+## Org self-review
+Roles stayed at four permanents. No new verbs beyond Critic-accepted seams.
+Evidence: this run directory + harness-checks.

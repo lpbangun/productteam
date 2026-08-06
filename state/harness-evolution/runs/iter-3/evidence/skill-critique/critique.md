@@ -1,6 +1,6 @@
 # Product critique — Product Consulting Harness
 
-**Skill:** /critique · **Repo:** /home/logani/projects/Product Consulting Harness · **When:** 20260806T063218Z
+**Skill:** /critique · **Repo:** /home/logani/projects/Product Consulting Harness · **When:** 20260806T063949Z
 
 ## Method
 Structured audit from README + shallow tree. Findings cite paths.

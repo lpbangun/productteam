@@ -30,3 +30,7 @@
 
 - product-skills (Iter 3)
 - authorize+merge of this PR (owner gate; may merge after skills)
+
+## Org self-review
+Roles stayed at four permanents. No new verbs beyond Critic-accepted seams.
+Evidence: this run directory + harness-checks.

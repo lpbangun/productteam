@@ -1,0 +1,98 @@
+{
+  "ts": "2026-08-06",
+  "contract": "harness-apc-v1",
+  "suite": "harness-objective",
+  "checks": {
+    "help-lists-runtime": {
+      "status": "pass",
+      "detail": "ok"
+    },
+    "smoke-green": {
+      "status": "pass",
+      "detail": "ok"
+    },
+    "status-runs": {
+      "status": "pass",
+      "detail": "ok"
+    },
+    "runtime-detect": {
+      "status": "pass",
+      "detail": "ok"
+    },
+    "runtime-honest-fail": {
+      "status": "pass",
+      "detail": "ok"
+    },
+    "lock-files-present": {
+      "status": "pass",
+      "detail": "ok"
+    },
+    "lock-hashes-stable": {
+      "status": "pass",
+      "detail": "unchanged"
+    },
+    "learning-schema": {
+      "status": "pass",
+      "detail": "ok"
+    },
+    "judgment-examples": {
+      "status": "pass",
+      "detail": "ok"
+    },
+    "harness-engagement-mode": {
+      "status": "pass",
+      "detail": "ok"
+    },
+    "memory-harness-lesson": {
+      "status": "pass",
+      "detail": "ok"
+    },
+    "github-seam": {
+      "status": "pass",
+      "detail": "ok"
+    },
+    "merge-refuses-without-auth": {
+      "status": "pass",
+      "detail": "refused_ok"
+    },
+    "skills-present": {
+      "status": "pass",
+      "detail": "ok"
+    },
+    "skill-critique-runs": {
+      "status": "pass",
+      "detail": "ok"
+    },
+    "skill-benchmark-runs": {
+      "status": "pass",
+      "detail": "ok"
+    },
+    "skill-design-sprint-runs": {
+      "status": "pass",
+      "detail": "ok"
+    },
+    "lessons-closed-iters": {
+      "status": "pass",
+      "detail": "ok"
+    },
+    "phases-artifact": {
+      "status": "pass",
+      "detail": "ok"
+    },
+    "org-self-review-recent": {
+      "status": "pass",
+      "detail": "ok"
+    },
+    "secrets-scan": {
+      "status": "pass",
+      "detail": "clean"
+    },
+    "provider-seam": {
+      "status": "pass",
+      "detail": "ok"
+    }
+  },
+  "passed": 22,
+  "failed": 0,
+  "validation": "real-commands"
+}

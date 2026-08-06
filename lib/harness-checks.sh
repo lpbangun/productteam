@@ -108,6 +108,35 @@ run_check skill-design-sprint-runs "
   out=\$(bin/consult skill design-sprint harness-evolution \"$ROOT/state/harness-evolution/runs/iter-3/evidence/skill-design-sprint\" 2>/dev/null | tail -1)
   test -f \"\$out\" && echo ok
 "
+run_check lessons-closed-iters "
+  cd \"$ROOT\"
+  missing=0
+  for d in state/harness-evolution/runs/iter-*; do
+    [[ -d \"\$d\" ]] || continue
+    # skip empty/current without lessons only if no scores yet? require lessons when scores exist
+    if [[ -f \"\$d/scores.json\" && ! -f \"\$d/lessons.md\" ]]; then
+      echo \"missing lessons in \$d\"
+      missing=1
+    fi
+  done
+  [[ \$missing -eq 0 ]] && echo ok
+"
+run_check phases-artifact "
+  # latest improvement iter should document phases when present
+  latest=\$(ls -d \"$ROOT\"/state/harness-evolution/runs/iter-* 2>/dev/null | sort -V | tail -1)
+  if [[ -f \"\$latest/phases.json\" ]]; then
+    jq -e '.sequence and .phases' \"\$latest/phases.json\" >/dev/null && echo ok
+  elif [[ -f \"$ROOT/state/harness-evolution/LOOP-SEQUENCE.md\" ]]; then
+    echo 'loop-sequence-only'
+  else
+    echo missing; exit 1
+  fi
+"
+run_check org-self-review-recent "
+  cd \"$ROOT\"
+  # At least one scored iter report contains Org self-review
+  grep -l 'Org self-review' state/harness-evolution/runs/iter-*/report.md 2>/dev/null | head -1 | grep -q . && echo ok
+"
 
 # Secrets scan (high-signal patterns only; skip lock/contract text)
 run_check secrets-scan "

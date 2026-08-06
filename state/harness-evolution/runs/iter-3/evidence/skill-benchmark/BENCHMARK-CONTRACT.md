@@ -1,6 +1,6 @@
 # BENCHMARK-CONTRACT — Product Consulting Harness (FROZEN draft)
 
-**Frozen:** 20260806T063218Z · **Subject:** /home/logani/projects/Product Consulting Harness
+**Frozen:** 20260806T063949Z · **Subject:** /home/logani/projects/Product Consulting Harness
 
 Implementers must not amend mid-run. Proposals → proposed-benchmark-changes.md.
 

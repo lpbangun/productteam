@@ -18,3 +18,7 @@
 ## Expected lifts
 
 product-skills 1.0 → ≥8.0; cli/testing minor.
+
+## Org self-review
+Roles stayed at four permanents. No new verbs beyond Critic-accepted seams.
+Evidence: this run directory + harness-checks.

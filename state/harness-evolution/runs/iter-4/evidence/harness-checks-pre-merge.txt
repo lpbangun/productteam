@@ -1,0 +1,24 @@
+
+  Harness checks (harness-apc-v1 objective subset)
+
+  ✓ help-lists-runtime                   ok
+  ✓ smoke-green                          ok
+  ✓ status-runs                          ok
+  ✓ runtime-detect                       ok
+  ✓ runtime-honest-fail                  ok
+  ✓ lock-files-present                   ok
+  ✓ lock-hashes-stable                   unchanged
+  ✓ learning-schema                      ok
+  ✓ judgment-examples                    ok
+  ✓ harness-engagement-mode              ok
+  ✓ memory-harness-lesson                ok
+  ✓ github-seam                          ok
+  ✓ merge-refuses-without-auth           refused_ok
+  ✓ skills-present                       ok
+  ✓ skill-critique-runs                  ok
+  ✓ skill-benchmark-runs                 ok
+  ✓ skill-design-sprint-runs             ok
+  ✓ secrets-scan                         clean
+  ✓ provider-seam                        ok
+
+  19 passed · 0 failed  → state/harness-evolution/runs/iter-4/checks.json

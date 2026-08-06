@@ -1,6 +1,6 @@
 # Design sprint — Product Consulting Harness
 
-**Skill:** /design-sprint · **Repo:** /home/logani/projects/Product Consulting Harness · **When:** 20260806T063218Z
+**Skill:** /design-sprint · **Repo:** /home/logani/projects/Product Consulting Harness · **When:** 20260806T063949Z
 
 ## Problem framing
 What friction blocks users from the product's promised value?

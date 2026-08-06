@@ -1,0 +1,63 @@
+validate_sha=2cb1a9f478d613559dd38a7f4164f8e6e2c986bf
+ref=HEAD
+ts=2026-08-06T06:36:31Z
+no package.json — skipped npm
+2cb1a9f Merge pull request #1 from lpbangun/consult/harness-apc-evolution
+
+  consult smoke
+
+  PASS  help
+  PASS  status
+  PASS  org
+  PASS  memory
+  PASS  judge show
+  PASS  bench
+  PASS  bench contract id
+  PASS  help lists score
+  PASS  help lists runtime
+  PASS  help lists harness-checks
+  PASS  help lists gh
+  PASS  help lists skill
+  PASS  skill critique present
+  PASS  skill benchmark present
+  PASS  skill design-sprint present
+  PASS  runtime
+  PASS  judge harness-evolution
+  PASS  gh preflight
+  PASS  gh merge refuses without auth
+  PASS  runtime --check refuses missing provider
+  PASS  client checks skipped (CONSULT_SMOKE_SKIP_CLIENT)
+  PASS  ofc refuses provider run
+  PASS  agcode refuses checks
+  PASS  unknown rejects
+  PASS  help lists judge
+  PASS  learning schema
+  PASS  challenge example
+  PASS  override example
+
+  all smoke checks passed
+
+
+  Harness checks (harness-apc-v1 objective subset)
+
+  ✓ help-lists-runtime                   ok
+  ✓ smoke-green                          ok
+  ✓ status-runs                          ok
+  ✓ runtime-detect                       ok
+  ✓ runtime-honest-fail                  ok
+  ✓ lock-files-present                   ok
+  ✓ lock-hashes-stable                   unchanged
+  ✓ learning-schema                      ok
+  ✓ judgment-examples                    ok
+  ✓ harness-engagement-mode              ok
+  ✓ memory-harness-lesson                ok
+  ✓ github-seam                          ok
+  ✓ merge-refuses-without-auth           refused_ok
+  ✓ skills-present                       ok
+  ✓ skill-critique-runs                  ok
+  ✓ skill-benchmark-runs                 ok
+  ✓ skill-design-sprint-runs             ok
+  ✓ secrets-scan                         clean
+  ✓ provider-seam                        ok
+
+  19 passed · 0 failed  → state/harness-evolution/runs/iter-4/checks.json
