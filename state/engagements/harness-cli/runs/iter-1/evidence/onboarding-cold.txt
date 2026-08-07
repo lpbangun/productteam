@@ -1,0 +1,18 @@
+
+  Product Consulting Harness — onboarding
+  Nothing is prompted and stdin is never read.
+
+  1. Detect the coding agents here      consult agents
+       agent unknown (/home/logani/.local/bin/agent)  claude 2.1.222 (/home/logani/.local/bin/claude)  codex 0.146.0 (/home/logani/.local/bin/codex)  opencode 1.17.20 (/home/logani/.opencode/bin/opencode)  cursor unknown (/home/logani/.local/bin/cursor)  droid 0.189.0 (/home/logani/.local/bin/droid)  
+  2. Pick the provider for prompts      CONSULT_PROVIDER=<binary>
+       active: agent
+  3. Open an engagement                 state/engagements/<client>/engagement.md
+       present: agcode-learning harness-cli onboarding-flight-control 
+  4. Score that client                  consult score <client>
+       the scorer is declared by the engagement contract.json
+  5. Read scores, history, reasoning    consult bench <client>
+
+  wrote /tmp/tmp.MbwEf5gJtP/ob-cold/config
+
+  Next: consult bench agcode-learning
+

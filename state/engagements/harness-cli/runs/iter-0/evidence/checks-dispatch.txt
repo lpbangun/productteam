@@ -1,0 +1,48 @@
+
+  Deterministic checks — harness-cli
+  repo: /home/logani/.herdr/worktrees/Product Consulting Harness/fix-new-user-tui · scorer: checks
+
+  ✓ readme-exists                            present
+  ✗ readme-required-sections                 missing: What this is
+  ✗ walkthrough-covers-maya                  
+  ✗ docs-honest-prototype                    
+  ✗ cross-role-demo-script                   
+  ✗ architecture-notes                       
+  ✗ readme-non-goals-explicit                
+  ✗ dev-script-documented                    
+  ✗ node-version-noted                       
+  ✗ deps-pinned                              node:internal/modules/cjs/loader:1433
+  ✗ test-script-exists                       node:internal/modules/cjs/loader:1433
+  ✗ deps-minimal                             node:internal/modules/cjs/loader:1433
+  ✓ domain-pure                              grep: src/domain.ts: No such file or directory
+  ✗ app-not-monolith                         bash: line 2: src/App.tsx: No such file or directory
+  ✓ lean-src-tree                            find: ‘src’: No such file or directory
+  ✗ single-derive-support                    grep: src/: No such file or directory
+  ✗ demo-constants-centralized               grep: src/: No such file or directory
+  ✗ home-states-fictional                    grep: src/App.tsx: No such file or directory
+  ✗ topbar-prototype-chip                    grep: src/App.tsx: No such file or directory
+  ✗ copilot-not-ai                           grep: src/App.tsx: No such file or directory
+  ✗ three-role-labels                        grep: src/App.tsx: No such file or directory
+  ✗ build-green                              
+  ✓ typescript-build                         npm error enoent This is related to npm not being able 
+  ✗ test-suite-green                         
+  ✗ maya-intro-flow                          
+  ✗ initial-handoffs-complete                
+  ✗ domain-transitions-generic               
+  ✗ derive-support-seed                      
+  ✗ status-signal-consistency                
+  ✗ override-requires-reason                 
+  ✗ board-pills-require-reason               
+  ✗ coordinator-signal-matches-domain        
+  ✗ home-to-workspace                        
+  ✗ role-switcher-three-roles                
+  ✗ reset-demo-restores-seed                 
+  ✗ a11y-smoke                               
+  ✗ no-duplicate-status-meta                 
+  ✗ no-dead-seed-fields                      
+  ✗ ci-local-parity                          build or test failed
+  ✗ readme-clone-run-verified                readme, build, or test missing
+
+  overall 3.5  → /home/logani/.herdr/worktrees/Product Consulting Harness/fix-new-user-tui/state/engagements/harness-cli/runs/.checks-latest.json
+
+  4 passed · 36 failed

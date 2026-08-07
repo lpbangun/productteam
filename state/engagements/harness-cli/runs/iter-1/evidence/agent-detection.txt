@@ -1,0 +1,20 @@
+
+  Coding agents
+  ● agent     unknown        /home/logani/.local/bin/agent (active)
+  ● claude    2.1.222        /home/logani/.local/bin/claude
+  ● codex     0.146.0        /home/logani/.local/bin/codex
+  ● opencode  unknown        /home/logani/.opencode/bin/opencode
+  ○ gemini    missing · 
+  ● cursor    unknown        /home/logani/.local/bin/cursor
+  ● droid     0.189.0        /home/logani/.local/bin/droid
+  ○ aider     missing · 
+  ○ goose     missing · 
+  ○ crush     missing · 
+  ○ amp       missing · 
+  ○ copilot   missing · 
+  ○ plandex   missing · 
+  ○ qwen      missing · 
+
+  Active provider: agent
+  Catalog: 14 entries · search order PATH then CONSULT_AGENT_DIRS · seam: lib/provider.sh
+

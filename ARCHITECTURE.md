@@ -53,30 +53,29 @@ only with evidence of need (Constitution).
 
 ## Provider seam
 
-One module, swappable:
+One module, swappable (`lib/provider.sh`):
 
-```sh
-# lib/provider.sh
-runtime_detect   # list agent|claude|codex|opencode|gemini|cursor
-runtime_default  # CONSULT_PROVIDER or first available candidate
-provider_ask() {  # $1=prompt  → stdout: model reply
-  # routes to active runtime; honest refusal if missing
-}
-```
+- `AGENT_CATALOG` — single list of known coding agents (≥10)
+- `runtime_detect` / `consult agents [--json]` — PATH then `CONSULT_AGENT_DIRS`
+- `runtime_default` / `provider_ask` — real LLM calls; honest refusal if missing
 
 Default provider is the authenticated Cursor `agent` CLI — no API keys, no
-mocks. Set `CONSULT_PROVIDER` to any binary that answers a prompt on
-stdout to swap providers. `bin/consult runtime` prints detection;
-`consult runtime --check` exits non-zero with a named refusal when the
-active provider is missing. Nothing else in the system knows which
-provider runs.
+mocks. Set `CONSULT_PROVIDER` to swap. `consult agents --check` (alias:
+`consult runtime --check`) exits non-zero when the active provider is missing.
+
+## CLI chrome + first run
+
+- `lib/theme.sh` — sole ANSI source (bold/dim + two accents)
+- `lib/splash.sh` — knowledge-graph splash; `CONSULT_NO_SPLASH=1` skips
+- `lib/onboarding.sh` — `consult onboarding --yes`; state under `CONSULT_STATE_ROOT`
 
 ## Harness self-checks
 
 `bin/consult harness-checks` runs `lib/harness-checks.sh` — an objective
 subset for `harness-apc-v1` (smoke, runtime-detect, lock presence/hashes,
 secrets scan, judgment examples, github seam). Client OFC checks stay in
-`lib/run-checks.sh` and are never mixed in.
+`lib/run-checks.sh` and are never mixed in. Engagement-local runners are
+named by `contract.json` `.checks_runner` (e.g. `lib/harness-cli-checks.sh`).
 
 ## GitHub seam
 

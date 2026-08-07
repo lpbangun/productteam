@@ -1,0 +1,169 @@
+{
+  "contract": "harness-cli-v1",
+  "purpose": "Backs the no-overclaim check: every capability claim the CLI or README makes must map to at least one check id that passes in the same run.",
+  "how_it_is_evaluated": [
+    "A row is ACTIVE when its `marker` string is found in its `source`.",
+    "`source` is a repo-relative file path, or the literal `help` meaning the output of `bin/consult help`.",
+    "An ACTIVE row passes only if every id in `checks` has status pass in this run.",
+    "An INACTIVE row (marker absent) is inert: the claim is not being made, so there is nothing to overclaim. Rows for capabilities the mission intends to add are pre-registered this way so they activate the moment the claim appears."
+  ],
+  "maintenance_rule": "Adding a capability claim to README.md or `consult help` without adding a row here is itself an overclaim. Reviewers should diff this file against README/help changes.",
+  "claims": [
+    {
+      "claim": "The bare CLI gives an org and engagements overview.",
+      "source": "help",
+      "marker": "Org status and engagements overview",
+      "checks": ["status-states-identity", "every-command-exits-zero"]
+    },
+    {
+      "claim": "The CLI detects coding runtimes present on the device.",
+      "source": "README.md",
+      "marker": "detect coding runtimes",
+      "checks": ["detect-command-exists", "detect-covers-known-agents", "detect-no-false-positive"]
+    },
+    {
+      "claim": "`runtime --check` fails when no usable provider exists.",
+      "source": "help",
+      "marker": "--check fails if none",
+      "checks": ["detect-command-exists", "errors-name-the-fix"]
+    },
+    {
+      "claim": "The default provider is the authenticated Cursor agent CLI, swappable via CONSULT_PROVIDER.",
+      "source": "README.md",
+      "marker": "authenticated Cursor `agent` CLI by default",
+      "checks": ["provider-live-answer", "no-hidden-env-requirements"]
+    },
+    {
+      "claim": "No API keys and no mocks are used.",
+      "source": "README.md",
+      "marker": "No API keys. No mocks.",
+      "checks": ["no-mock-provider", "provider-live-answer"]
+    },
+    {
+      "claim": "Engagements with scorer=checks are scored by deterministic contract checks.",
+      "source": "README.md",
+      "marker": "deterministic contract checks",
+      "checks": ["checks-dispatch-routes-engagement", "harness-cli-checks-runner"]
+    },
+    {
+      "claim": "`consult checks` refuses engagements that do not declare scorer=checks.",
+      "source": "help",
+      "marker": "Deterministic checks (scorer=checks only)",
+      "checks": ["checks-dispatch-routes-engagement", "errors-name-the-fix"]
+    },
+    {
+      "claim": "`consult score` routes to whichever scorer the engagement declares.",
+      "source": "help",
+      "marker": "Score via the engagement's declared scorer",
+      "checks": ["core-features-reachable", "every-command-exits-zero"]
+    },
+    {
+      "claim": "`consult bench` shows the frozen contract, history, and latest scores.",
+      "source": "help",
+      "marker": "Benchmark contract + history + latest scores",
+      "checks": ["every-command-exits-zero", "cli-monochrome-chrome"]
+    },
+    {
+      "claim": "Merge is gated on an authorize-merge file and never uses --admin.",
+      "source": "help",
+      "marker": "Merge only if authorize-merge present (no --admin)",
+      "checks": ["errors-name-the-fix", "every-command-exits-zero"]
+    },
+    {
+      "claim": "Three first-party skills are runnable from the CLI.",
+      "source": "help",
+      "marker": "Run /critique|/benchmark|/design-sprint",
+      "checks": [
+        "skill-uses-provider-seam",
+        "skill-critique-live-project-a",
+        "skill-benchmark-live-project-b",
+        "skill-design-sprint-live"
+      ]
+    },
+    {
+      "claim": "Skills are runnable against any target repo from the README quickstart.",
+      "source": "README.md",
+      "marker": "skill critique|benchmark|design-sprint",
+      "checks": ["skill-uses-provider-seam", "skills-outputs-project-specific"]
+    },
+    {
+      "claim": "The CLI ships smoke tests.",
+      "source": "help",
+      "marker": "CLI smoke tests",
+      "checks": ["smoke-green", "scripts-parse-clean"]
+    },
+    {
+      "claim": "Organizational memory and org/roles views are reachable.",
+      "source": "help",
+      "marker": "Organizational memory",
+      "checks": ["core-features-reachable", "every-command-exits-zero"]
+    },
+    {
+      "claim": "Every command shown in help exists and is dispatched.",
+      "source": "help",
+      "marker": "Commands",
+      "checks": ["help-lists-every-command", "unknown-command-honest"]
+    },
+    {
+      "claim": "Documented layout paths resolve on disk.",
+      "source": "README.md",
+      "marker": "## Layout",
+      "checks": ["docs-no-stale-paths", "readme-matches-cli"]
+    },
+    {
+      "claim": "Skills make real provider calls, verified against the engagement tmp projects.",
+      "source": "docs/skills.md",
+      "marker": "real provider calls",
+      "checks": ["docs-skills-live", "skill-uses-provider-seam", "tmp-projects-two-varying"]
+    },
+    {
+      "claim": "A first-run onboarding entry point exists.",
+      "source": "help",
+      "marker": "onboarding",
+      "checks": [
+        "onboarding-command-exists",
+        "onboarding-cold-start",
+        "onboarding-steps-explicit",
+        "onboarding-idempotent",
+        "onboarding-next-action"
+      ]
+    },
+    {
+      "claim": "README documents the first run, including onboarding, splash, and agent detection.",
+      "source": "README.md",
+      "marker": "## First run",
+      "checks": ["readme-onboarding-section", "readme-matches-cli"]
+    },
+    {
+      "claim": "A bounded login/splash animation exists and can be opted out of.",
+      "source": "help",
+      "marker": "splash",
+      "checks": [
+        "splash-command-exists",
+        "splash-graph-nodes-edges",
+        "splash-frames-animate",
+        "splash-bounded-noninteractive",
+        "splash-first-run-hook"
+      ]
+    },
+    {
+      "claim": "The CLI lists every coding agent found on the device, with machine-readable output.",
+      "source": "help",
+      "marker": "consult agents",
+      "checks": [
+        "detect-command-exists",
+        "detect-covers-known-agents",
+        "detect-beyond-path",
+        "detect-no-false-positive",
+        "detect-machine-readable",
+        "detect-versions"
+      ]
+    },
+    {
+      "claim": "The CLI states its non-goals.",
+      "source": "README.md",
+      "marker": "Non-goals",
+      "checks": ["non-goals-visible", "status-states-identity"]
+    }
+  ]
+}

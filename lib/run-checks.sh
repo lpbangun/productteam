@@ -22,11 +22,9 @@ if [[ -f "$EDIR/contract.json" ]]; then
   fi
 fi
 
-if [[ -t 1 && -z "${NO_COLOR:-}" ]]; then
-  G=$'\e[32m' RD=$'\e[31m' D=$'\e[2m' R=$'\e[0m' B=$'\e[1m'
-else
-  G='' RD='' D='' R='' B=''
-fi
+# Shared palette — no local escape literals (cli-theme-single-source).
+# shellcheck source=lib/theme.sh
+source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/theme.sh"
 
 TMPDIR_CHECKS=$(mktemp -d)
 trap 'rm -rf "$TMPDIR_CHECKS"' EXIT

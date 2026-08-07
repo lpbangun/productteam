@@ -1,0 +1,369 @@
+{
+  "contract": "harness-cli-v1",
+  "suite": "harness-cli",
+  "runner": "lib/harness-cli-checks.sh",
+  "ts": "2026-08-07T10:48:35+02:00",
+  "kind": "full",
+  "live_executed": true,
+  "live_checks": [
+    "provider-live-answer",
+    "skill-critique-live-project-a",
+    "skill-benchmark-live-project-b",
+    "skill-design-sprint-live",
+    "skills-outputs-project-specific"
+  ],
+  "checks": {
+    "cli-theme-single-source": {
+      "status": "fail",
+      "detail": "theme defined in 3 files (need exactly 1): bin/consult lib/harness-checks.sh lib/run-checks.sh "
+    },
+    "cli-monochrome-chrome": {
+      "status": "pass",
+      "detail": "all headings survive color stripping in status/help/org/bench; bold+dim+reset defined"
+    },
+    "cli-accent-budget": {
+      "status": "fail",
+      "detail": "4 distinct accent hues (budget 2): \\e[31m \\e[32m \\e[33m \\e[36m "
+    },
+    "cli-no-color-clean": {
+      "status": "pass",
+      "detail": "zero escape sequences under NO_COLOR=1 for all 11 top-level commands"
+    },
+    "cli-plain-pipe-safe": {
+      "status": "fail",
+      "detail": "longest piped line 148 cols (max 100)"
+    },
+    "splash-command-exists": {
+      "status": "fail",
+      "detail": "no splash/login command in consult help"
+    },
+    "splash-graph-nodes-edges": {
+      "status": "fail",
+      "detail": "no splash renderer source found in the CLI surface"
+    },
+    "splash-frames-animate": {
+      "status": "fail",
+      "detail": "no splash renderer source found in the CLI surface"
+    },
+    "splash-bounded-noninteractive": {
+      "status": "fail",
+      "detail": "splash exited 1 no splash opt-out flag or CONSULT_* env var found "
+    },
+    "splash-first-run-hook": {
+      "status": "fail",
+      "detail": "no state-root override (CONSULT_STATE_ROOT|CONSULT_HOME|CONSULT_STATE_DIR) \u2014 first-run cannot be observed"
+    },
+    "onboarding-command-exists": {
+      "status": "fail",
+      "detail": "no onboarding|onboard|init command in consult help"
+    },
+    "onboarding-cold-start": {
+      "status": "fail",
+      "detail": "no documented state-root override seam no documented non-interactive form (flag or CONSULT_* env) cold run exited 127 "
+    },
+    "onboarding-steps-explicit": {
+      "status": "fail",
+      "detail": "no onboarding transcript (cold start did not run)"
+    },
+    "onboarding-idempotent": {
+      "status": "fail",
+      "detail": "no onboarding command to re-run"
+    },
+    "onboarding-next-action": {
+      "status": "fail",
+      "detail": "no onboarding transcript (cold start did not run)"
+    },
+    "detect-command-exists": {
+      "status": "pass",
+      "detail": "consult runtime: 6 rows, one per catalog entry (6), exit 0"
+    },
+    "detect-covers-known-agents": {
+      "status": "fail",
+      "detail": "catalog names 6 agents (need 10) 6 hard-coded agent lists (need exactly 1): bin/consult:147 lib/harness-checks.sh:60 lib/provider.sh:7 lib/provider.sh:13 lib/provider.sh:22 lib/provider.sh:64 "
+    },
+    "detect-beyond-path": {
+      "status": "fail",
+      "detail": "with PATH=/usr/bin:/bin, agent (installed at /home/logani/.local/bin/agent) is not reported found with its path"
+    },
+    "detect-no-false-positive": {
+      "status": "fail",
+      "detail": "reported the non-executable shadow file as found: \u25cf agent /tmp/tmp.xvb4eh6QKt/shadow-path/agent (active) agent not reported missing when only a non-executable file exists: ' \u25cf agent /tmp/tmp.xvb4eh6QKt/shadow-path/agent (active)' "
+    },
+    "detect-machine-readable": {
+      "status": "fail",
+      "detail": "consult runtime --json is not a non-empty JSON array"
+    },
+    "detect-versions": {
+      "status": "fail",
+      "detail": "5 found row(s) show neither a version nor 'unknown' "
+    },
+    "help-lists-every-command": {
+      "status": "fail",
+      "detail": "help/dispatch drift \u2014 phantom in help: none; orphan in dispatch: status "
+    },
+    "every-command-exits-zero": {
+      "status": "pass",
+      "detail": "all 15 dispatch commands exit 0 or refuse by name (evidence/command-exit-table.txt)"
+    },
+    "core-features-reachable": {
+      "status": "fail",
+      "detail": "absent from help: status onboarding splash ; absent from README: status onboarding splash help "
+    },
+    "unknown-command-honest": {
+      "status": "pass",
+      "detail": "unknown command exits 1 and points at consult help"
+    },
+    "no-hidden-env-requirements": {
+      "status": "fail",
+      "detail": "env vars read but undocumented in README/ARCHITECTURE/docs: CONSULT_PR_BODY CONSULT_PR_BRANCH CONSULT_PR_TITLE CONSULT_ROOT CONSULT_RUNTIME_CANDIDATES "
+    },
+    "provider-live-answer": {
+      "status": "pass",
+      "detail": "live reply from agent contains CONSULT-LIVE-OK (evidence/skills/provider-live.txt)"
+    },
+    "tmp-projects-two-varying": {
+      "status": "pass",
+      "detail": "proj-a[JavaScript (Node 20, ESM)/coastal tide forecasting for harbour pilots] vs proj-b[Python (3.11, stdlib only)/greenhouse irrigation scheduling for a commercial tomato nursery]; disjoint source filenames; 54/63 unique guidance terms"
+    },
+    "skill-uses-provider-seam": {
+      "status": "fail",
+      "detail": "lib/run-skill.sh never calls provider_ask \u2014 skills emit templates, not model output"
+    },
+    "skill-critique-live-project-a": {
+      "status": "fail",
+      "detail": "artifact names no runtime binary (reality rule) "
+    },
+    "skill-benchmark-live-project-b": {
+      "status": "fail",
+      "detail": "dimension list is the generic six-item starter, unchanged cites 0 real proj-b paths (need 2) artifact names no runtime binary (reality rule) "
+    },
+    "skill-design-sprint-live": {
+      "status": "fail",
+      "detail": "artifact names no runtime binary (reality rule) "
+    },
+    "skills-outputs-project-specific": {
+      "status": "pass",
+      "detail": "same skill, two projects: Jaccard 0.529, zero cross-project path citations"
+    },
+    "no-mock-provider": {
+      "status": "fail",
+      "detail": "skill artifact(s) name no runtime binary: benchmark-proj-b/BENCHMARK-CONTRACT.md benchmark-proj-b/contract.json critique-proj-a/critique.md critique-proj-b/critique.md design-sprint-proj-a/design-sprint.md "
+    },
+    "readme-matches-cli": {
+      "status": "fail",
+      "detail": "in help but not README: help run score ; in README but not dispatched: none"
+    },
+    "readme-onboarding-section": {
+      "status": "fail",
+      "detail": "first-run section has no copy-pasteable command for: onboarding splash agents|runtime "
+    },
+    "docs-cli-not-tui": {
+      "status": "pass",
+      "detail": "no TUI framing in the product path set; every engagement mention negates it; lib/harness-cli-checks.sh exempt from CLI-surface scans (measurement scaffold)"
+    },
+    "docs-no-stale-paths": {
+      "status": "fail",
+      "detail": "unresolvable repo paths in docs: docs/skills.md:`state/harness-evolution/runs/skills/`"
+    },
+    "docs-skills-live": {
+      "status": "fail",
+      "detail": "docs/skills.md does not state skills make real provider calls does not state there are no mocks does not point at the tmp-project verification "
+    },
+    "smoke-green": {
+      "status": "pass",
+      "detail": "tests/consult-smoke.sh exit 0 (28 checks, CONSULT_SMOKE_SKIP_CLIENT=1 so no sibling repo is built; evidence/smoke.txt)"
+    },
+    "harness-cli-checks-runner": {
+      "status": "pass",
+      "detail": "runner writes 49 ids + dimensions to <iter-dir>/checks.json; failing probe exits 1"
+    },
+    "checks-dispatch-routes-engagement": {
+      "status": "fail",
+      "detail": "output never names contract harness-cli-v1 output contains ofc-v1 check ids (wrong suite) consult score harness-cli does not reach this suite "
+    },
+    "no-new-runtime-deps": {
+      "status": "pass",
+      "detail": "allowlist held; coreutils/POSIX baseline treated as bash (basename,cat,chmod,comm,cp,cut,date,diff,dirname,env,head,ls,mkdir,mktemp,rm,seq,sha256sum,tail,tee,timeout,tr,true,wc); client toolchain confined to run-checks/github (npm)"
+    },
+    "errors-name-the-fix": {
+      "status": "fail",
+      "detail": "refusals missing cause or remedy: missing-engagement(no remedy) "
+    },
+    "scripts-parse-clean": {
+      "status": "pass",
+      "detail": "bash -n clean over 8 scripts; shellcheck not installed (optional)"
+    },
+    "status-states-identity": {
+      "status": "pass",
+      "detail": "identity stated in the first 6 lines: Product Consulting Harness Autonomous product consulting \u00b7 evidence over opinion \u00b7 dele"
+    },
+    "non-goals-visible": {
+      "status": "fail",
+      "detail": "no explicit non-goals in consult help or org no explicit non-goals in README.md "
+    },
+    "engagement-scope-explicit": {
+      "status": "pass",
+      "detail": "engagement.md keeps in/out-of-scope, names the CLI, excludes sibling products"
+    },
+    "no-overclaim": {
+      "status": "fail",
+      "detail": "16 active claim(s); unbacked: 'detect coding runtimes' -> detect-covers-known-agents=fail; 'detect coding runtimes' -> detect-no-false-positive=fail; '--check fails if none' -> errors-name-the-fix=fail; 'authenticated Cursor `agent` CLI by default' -> no-hidden-env-requirements=fail; 'No API keys. No mocks.' -> no-mock-provider=fail; 'deterministic contract checks' -> checks-dispatch-routes-engagement=fail (+13 more)"
+    }
+  },
+  "passed": 15,
+  "failed": 34,
+  "skipped": 0,
+  "skip_note": "Skipped LIVE checks are recorded status=fail with skipped=true, per the frozen runner contract in checks/CHECK-CATALOG.md. A run with any skip is kind=partial and cannot converge.",
+  "id_coverage": {
+    "expected": 49,
+    "recorded": 49,
+    "missing": [],
+    "unexpected": []
+  },
+  "dimensions": {
+    "visual-cli-clarity": {
+      "passed": 2,
+      "total": 5,
+      "gates": [
+        "cli-no-color-clean",
+        "cli-plain-pipe-safe"
+      ],
+      "gates_ok": false,
+      "failed_ids": [
+        "cli-theme-single-source",
+        "cli-accent-budget",
+        "cli-plain-pipe-safe"
+      ],
+      "score": 4.0
+    },
+    "splash-animation": {
+      "passed": 0,
+      "total": 5,
+      "gates": [
+        "splash-command-exists",
+        "splash-bounded-noninteractive"
+      ],
+      "gates_ok": false,
+      "failed_ids": [
+        "splash-command-exists",
+        "splash-graph-nodes-edges",
+        "splash-frames-animate",
+        "splash-bounded-noninteractive",
+        "splash-first-run-hook"
+      ],
+      "score": 2.0
+    },
+    "onboarding-ease": {
+      "passed": 0,
+      "total": 5,
+      "gates": [
+        "onboarding-command-exists",
+        "onboarding-cold-start"
+      ],
+      "gates_ok": false,
+      "failed_ids": [
+        "onboarding-command-exists",
+        "onboarding-cold-start",
+        "onboarding-steps-explicit",
+        "onboarding-idempotent",
+        "onboarding-next-action"
+      ],
+      "score": 2.0
+    },
+    "agent-detection": {
+      "passed": 1,
+      "total": 6,
+      "gates": [
+        "detect-command-exists",
+        "detect-no-false-positive"
+      ],
+      "gates_ok": false,
+      "failed_ids": [
+        "detect-covers-known-agents",
+        "detect-beyond-path",
+        "detect-no-false-positive",
+        "detect-machine-readable",
+        "detect-versions"
+      ],
+      "score": 2.0
+    },
+    "feature-reachability": {
+      "passed": 2,
+      "total": 5,
+      "gates": [
+        "help-lists-every-command",
+        "every-command-exits-zero"
+      ],
+      "gates_ok": false,
+      "failed_ids": [
+        "help-lists-every-command",
+        "core-features-reachable",
+        "no-hidden-env-requirements"
+      ],
+      "score": 4.0
+    },
+    "skills-llm-reality": {
+      "passed": 3,
+      "total": 8,
+      "gates": [
+        "provider-live-answer",
+        "skill-uses-provider-seam",
+        "no-mock-provider"
+      ],
+      "gates_ok": false,
+      "failed_ids": [
+        "skill-uses-provider-seam",
+        "skill-critique-live-project-a",
+        "skill-benchmark-live-project-b",
+        "skill-design-sprint-live",
+        "no-mock-provider"
+      ],
+      "score": 4.0
+    },
+    "documentation": {
+      "passed": 1,
+      "total": 5,
+      "gates": [
+        "readme-matches-cli",
+        "docs-no-stale-paths"
+      ],
+      "gates_ok": false,
+      "failed_ids": [
+        "readme-matches-cli",
+        "readme-onboarding-section",
+        "docs-no-stale-paths",
+        "docs-skills-live"
+      ],
+      "score": 2.0
+    },
+    "developer-experience": {
+      "passed": 4,
+      "total": 6,
+      "gates": [
+        "smoke-green",
+        "harness-cli-checks-runner"
+      ],
+      "gates_ok": true,
+      "failed_ids": [
+        "checks-dispatch-routes-engagement",
+        "errors-name-the-fix"
+      ],
+      "score": 7.0
+    },
+    "product-clarity": {
+      "passed": 2,
+      "total": 4,
+      "gates": [
+        "no-overclaim"
+      ],
+      "gates_ok": false,
+      "failed_ids": [
+        "non-goals-visible",
+        "no-overclaim"
+      ],
+      "score": 4.0
+    }
+  },
+  "overall": 3.4,
+  "validation": "real-commands"
+}

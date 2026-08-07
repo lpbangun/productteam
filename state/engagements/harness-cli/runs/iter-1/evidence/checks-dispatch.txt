@@ -1,0 +1,10 @@
+
+  Deterministic checks — harness-cli
+  contract harness-cli-v1 · runner lib/harness-cli-checks.sh
+
+  This suite scores this CLI and drives `consult checks harness-cli` itself,
+  so running it from here would recurse. Run the suite directly:
+
+    bash lib/harness-cli-checks.sh state/engagements/harness-cli/runs/iter-N
+
+  no recorded run yet under state/engagements/harness-cli/runs/

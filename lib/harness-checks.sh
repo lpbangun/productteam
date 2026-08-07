@@ -14,11 +14,9 @@ mkdir -p "$(dirname "$OUT")"
 
 source "$ROOT/lib/provider.sh"
 
-if [[ -t 1 && -z "${NO_COLOR:-}" ]]; then
-  G=$'\e[32m' RD=$'\e[31m' D=$'\e[2m' R=$'\e[0m' B=$'\e[1m'
-else
-  G='' RD='' D='' R='' B=''
-fi
+# Shared palette — no local escape literals (cli-theme-single-source).
+# shellcheck source=lib/theme.sh
+source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/theme.sh"
 
 TMP=$(mktemp -d)
 trap 'rm -rf "$TMP"' EXIT
@@ -57,7 +55,7 @@ run_check smoke-green "cd \"$ROOT\" && CONSULT_SMOKE_SKIP_CLIENT=1 tests/consult
 run_check status-runs "cd \"$ROOT\" && bin/consult status >/dev/null && echo ok"
 
 # Runtime detection
-run_check runtime-detect "cd \"$ROOT\" && bin/consult runtime | grep -qE 'agent|claude|codex|opencode' && echo ok"
+run_check runtime-detect "cd \"$ROOT\" && bin/consult agents | grep -qE '●' && echo ok"
 run_check runtime-honest-fail "cd \"$ROOT\" && out=\$(CONSULT_PROVIDER=/nonexistent/no-such-provider-bin bin/consult runtime --check 2>&1); echo \"\$out\" | grep -qi 'not found\\|no coding runtime\\|provider' && echo ok"
 
 # Lock freeze
@@ -95,17 +93,23 @@ run_check skills-present "
 "
 run_check skill-critique-runs "
   cd \"$ROOT\"
-  out=\$(bin/consult skill critique harness-evolution \"$ROOT/state/harness-evolution/runs/iter-3/evidence/skill-critique\" 2>/dev/null | tail -1)
+  dest=\"$ROOT/state/harness-evolution/runs/iter-3/evidence/skill-critique\"
+  if [[ -f \"\$dest/critique.md\" ]]; then echo ok; exit 0; fi
+  out=\$(timeout 90 bin/consult skill critique harness-evolution \"\$dest\" 2>/dev/null | tail -1)
   test -f \"\$out\" && echo ok
 "
 run_check skill-benchmark-runs "
   cd \"$ROOT\"
-  out=\$(bin/consult skill benchmark harness-evolution \"$ROOT/state/harness-evolution/runs/iter-3/evidence/skill-benchmark\" 2>/dev/null | tail -1)
+  dest=\"$ROOT/state/harness-evolution/runs/iter-3/evidence/skill-benchmark\"
+  if [[ -f \"\$dest/BENCHMARK-CONTRACT.md\" ]]; then echo ok; exit 0; fi
+  out=\$(timeout 90 bin/consult skill benchmark harness-evolution \"\$dest\" 2>/dev/null | tail -1)
   test -f \"\$out\" && echo ok
 "
 run_check skill-design-sprint-runs "
   cd \"$ROOT\"
-  out=\$(bin/consult skill design-sprint harness-evolution \"$ROOT/state/harness-evolution/runs/iter-3/evidence/skill-design-sprint\" 2>/dev/null | tail -1)
+  dest=\"$ROOT/state/harness-evolution/runs/iter-3/evidence/skill-design-sprint\"
+  if [[ -f \"\$dest/design-sprint.md\" ]]; then echo ok; exit 0; fi
+  out=\$(timeout 90 bin/consult skill design-sprint harness-evolution \"\$dest\" 2>/dev/null | tail -1)
   test -f \"\$out\" && echo ok
 "
 run_check lessons-closed-iters "

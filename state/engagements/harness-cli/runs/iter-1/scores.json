@@ -1,0 +1,49 @@
+{
+  "ts": "2026-08-07",
+  "iter": 1,
+  "kind": "iteration",
+  "contract": "harness-cli-v1",
+  "scorer": "checks",
+  "live_executed": true,
+  "scores": {
+    "visual-cli-clarity": {
+      "score": 9.5,
+      "evidence": "checks.json: 5/5 pass; gates_ok=True; failed=none"
+    },
+    "splash-animation": {
+      "score": 9.5,
+      "evidence": "checks.json: 5/5 pass; gates_ok=True; failed=none"
+    },
+    "onboarding-ease": {
+      "score": 9.5,
+      "evidence": "checks.json: 5/5 pass; gates_ok=True; failed=none"
+    },
+    "agent-detection": {
+      "score": 9.5,
+      "evidence": "checks.json: 6/6 pass; gates_ok=True; failed=none"
+    },
+    "feature-reachability": {
+      "score": 9.5,
+      "evidence": "checks.json: 5/5 pass; gates_ok=True; failed=none"
+    },
+    "skills-llm-reality": {
+      "score": 9.5,
+      "evidence": "checks.json: 8/8 pass; gates_ok=True; failed=none"
+    },
+    "documentation": {
+      "score": 9.5,
+      "evidence": "checks.json: 5/5 pass; gates_ok=True; failed=none"
+    },
+    "developer-experience": {
+      "score": 9.5,
+      "evidence": "checks.json: 6/6 pass; gates_ok=True; failed=none"
+    },
+    "product-clarity": {
+      "score": 9.5,
+      "evidence": "checks.json: 4/4 pass; gates_ok=True; failed=none"
+    }
+  },
+  "overall": 9.5,
+  "converged": true,
+  "source_checks": "runs/iter-1/checks.json"
+}

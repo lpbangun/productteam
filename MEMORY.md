@@ -6,6 +6,12 @@ and evidence-linked.
 
 ## Engagements
 
+- **harness-cli** (opened + closed 2026-08-07) — Product Consulting Harness
+  **CLI** (not JobOS). Mode: Directive · Contract: harness-cli-v1 · Scorer: checks.
+  Baseline 3.4 → **9.5** in 1 iteration; all 9 dims ≥9.5; 49/49 checks live.
+  CONVERGED. Evidence: `state/engagements/harness-cli/`. Mis-scope note: an
+  early turn targeted JobOS; owner corrected to CLI-only before baseline.
+
 ## Validations (frozen harness)
 
 - **2026-08-06 · harness CONVERGED** harness-apc-v1 iter-5 overall 8.4 ·

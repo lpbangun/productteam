@@ -1,0 +1,48 @@
+{
+  "ts": "2026-08-07",
+  "iter": 0,
+  "kind": "baseline",
+  "contract": "harness-cli-v1",
+  "scorer": "checks",
+  "live_executed": true,
+  "scores": {
+    "visual-cli-clarity": {
+      "score": 4.0,
+      "evidence": "checks.json: 2/5 pass; gates_ok=False; failed=cli-theme-single-source,cli-accent-budget,cli-plain-pipe-safe"
+    },
+    "splash-animation": {
+      "score": 2.0,
+      "evidence": "checks.json: 0/5 pass; gates_ok=False; failed=splash-command-exists,splash-graph-nodes-edges,splash-frames-animate,splash-bounded-noninteractive,splash-first-run-hook"
+    },
+    "onboarding-ease": {
+      "score": 2.0,
+      "evidence": "checks.json: 0/5 pass; gates_ok=False; failed=onboarding-command-exists,onboarding-cold-start,onboarding-steps-explicit,onboarding-idempotent,onboarding-next-action"
+    },
+    "agent-detection": {
+      "score": 2.0,
+      "evidence": "checks.json: 1/6 pass; gates_ok=False; failed=detect-covers-known-agents,detect-beyond-path,detect-no-false-positive,detect-machine-readable,detect-versions"
+    },
+    "feature-reachability": {
+      "score": 4.0,
+      "evidence": "checks.json: 2/5 pass; gates_ok=False; failed=help-lists-every-command,core-features-reachable,no-hidden-env-requirements"
+    },
+    "skills-llm-reality": {
+      "score": 4.0,
+      "evidence": "checks.json: 3/8 pass; gates_ok=False; failed=skill-uses-provider-seam,skill-critique-live-project-a,skill-benchmark-live-project-b,skill-design-sprint-live,no-mock-provider"
+    },
+    "documentation": {
+      "score": 2.0,
+      "evidence": "checks.json: 1/5 pass; gates_ok=False; failed=readme-matches-cli,readme-onboarding-section,docs-no-stale-paths,docs-skills-live"
+    },
+    "developer-experience": {
+      "score": 7.0,
+      "evidence": "checks.json: 4/6 pass; gates_ok=True; failed=checks-dispatch-routes-engagement,errors-name-the-fix"
+    },
+    "product-clarity": {
+      "score": 4.0,
+      "evidence": "checks.json: 2/4 pass; gates_ok=False; failed=non-goals-visible,no-overclaim"
+    }
+  },
+  "overall": 3.4,
+  "source_checks": "runs/iter-0/checks.json"
+}
