@@ -50,13 +50,13 @@ run_check() {
 printf '\n  %sHarness checks (harness-apc-v1 objective subset)%s\n\n' "$B" "$R"
 
 # CLI / smoke
-run_check help-lists-runtime "cd \"$ROOT\" && bin/consult help | grep -q runtime && echo ok"
+run_check help-lists-runtime "cd \"$ROOT\" && bin/productteam help | grep -q runtime && echo ok"
 run_check smoke-green "cd \"$ROOT\" && CONSULT_SMOKE_SKIP_CLIENT=1 tests/consult-smoke.sh >/dev/null && echo ok"
-run_check status-runs "cd \"$ROOT\" && bin/consult status >/dev/null && echo ok"
+run_check status-runs "cd \"$ROOT\" && bin/productteam status >/dev/null && echo ok"
 
 # Runtime detection
-run_check runtime-detect "cd \"$ROOT\" && bin/consult agents | grep -qE '●' && echo ok"
-run_check runtime-honest-fail "cd \"$ROOT\" && out=\$(CONSULT_PROVIDER=/nonexistent/no-such-provider-bin bin/consult runtime --check 2>&1); echo \"\$out\" | grep -qi 'not found\\|no coding runtime\\|provider' && echo ok"
+run_check runtime-detect "cd \"$ROOT\" && bin/productteam agents | grep -qE '●' && echo ok"
+run_check runtime-honest-fail "cd \"$ROOT\" && out=\$(CONSULT_PROVIDER=/nonexistent/no-such-provider-bin bin/productteam runtime --check 2>&1); echo \"\$out\" | grep -qi 'not found\\|no coding runtime\\|provider' && echo ok"
 
 # Lock freeze
 run_check lock-files-present "test -f \"$ROOT/state/harness-evolution/HARNESS-BENCHMARK-CONTRACT.md\" && test -f \"$ROOT/state/harness-evolution/contract.json\" && test -f \"$ROOT/state/harness-evolution/LOCK.md\" && echo ok"
@@ -95,21 +95,21 @@ run_check skill-critique-runs "
   cd \"$ROOT\"
   dest=\"$ROOT/state/harness-evolution/runs/iter-3/evidence/skill-critique\"
   if [[ -f \"\$dest/critique.md\" ]]; then echo ok; exit 0; fi
-  out=\$(timeout 90 bin/consult skill critique harness-evolution \"\$dest\" 2>/dev/null | tail -1)
+  out=\$(timeout 90 bin/productteam skill critique harness-evolution \"\$dest\" 2>/dev/null | tail -1)
   test -f \"\$out\" && echo ok
 "
 run_check skill-benchmark-runs "
   cd \"$ROOT\"
   dest=\"$ROOT/state/harness-evolution/runs/iter-3/evidence/skill-benchmark\"
   if [[ -f \"\$dest/BENCHMARK-CONTRACT.md\" ]]; then echo ok; exit 0; fi
-  out=\$(timeout 90 bin/consult skill benchmark harness-evolution \"\$dest\" 2>/dev/null | tail -1)
+  out=\$(timeout 90 bin/productteam skill benchmark harness-evolution \"\$dest\" 2>/dev/null | tail -1)
   test -f \"\$out\" && echo ok
 "
 run_check skill-design-sprint-runs "
   cd \"$ROOT\"
   dest=\"$ROOT/state/harness-evolution/runs/iter-3/evidence/skill-design-sprint\"
   if [[ -f \"\$dest/design-sprint.md\" ]]; then echo ok; exit 0; fi
-  out=\$(timeout 90 bin/consult skill design-sprint harness-evolution \"\$dest\" 2>/dev/null | tail -1)
+  out=\$(timeout 90 bin/productteam skill design-sprint harness-evolution \"\$dest\" 2>/dev/null | tail -1)
   test -f \"\$out\" && echo ok
 "
 run_check lessons-closed-iters "

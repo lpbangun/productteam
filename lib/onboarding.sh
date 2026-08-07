@@ -2,7 +2,7 @@
 #
 # Non-interactive by design: nothing is prompted and stdin is never read, so
 # the same command behaves identically in a terminal, a script and CI.
-# `consult onboarding` previews; `consult onboarding --yes` (or
+# `productteam onboarding` previews; `productteam onboarding --yes` (or
 # CONSULT_NONINTERACTIVE=1) writes. Everything it writes lives under
 # CONSULT_STATE_ROOT and is byte-identical on every re-run, so repeating
 # onboarding is always safe.
@@ -26,15 +26,15 @@ onboarding_run() { # $1=1 to write, anything else to preview
   printf '\n  %sProduct Consulting Harness — onboarding%s\n' "${B:-}" "${R:-}"
   printf '  %sNothing is prompted and stdin is never read.%s\n\n' "${D:-}" "${R:-}"
 
-  printf '  1. Detect the coding agents here      %sconsult agents%s\n' "${B:-}" "${R:-}"
+  printf '  1. Detect the coding agents here      %sproductteam agents%s\n' "${B:-}" "${R:-}"
   printf '       %s%s%s\n' "${D:-}" "$present" "${R:-}"
   printf '  2. Pick the provider for prompts      %sCONSULT_PROVIDER=<binary>%s\n' "${B:-}" "${R:-}"
   printf '       %sactive: %s%s\n' "${D:-}" "${prov:-none yet}" "${R:-}"
   printf '  3. Open an engagement                 %sstate/engagements/<client>/engagement.md%s\n' "${B:-}" "${R:-}"
   printf '       %spresent: %s%s\n' "${D:-}" "${engagements:-none yet}" "${R:-}"
-  printf '  4. Score that client                  %sconsult score <client>%s\n' "${B:-}" "${R:-}"
+  printf '  4. Score that client                  %sproductteam score <client>%s\n' "${B:-}" "${R:-}"
   printf '       %sthe scorer is declared by the engagement contract.json%s\n' "${D:-}" "${R:-}"
-  printf '  5. Read scores, history, reasoning    %sconsult bench <client>%s\n\n' "${B:-}" "${R:-}"
+  printf '  5. Read scores, history, reasoning    %sproductteam bench <client>%s\n\n' "${B:-}" "${R:-}"
 
   if [[ "$apply" == 1 ]]; then
     mkdir -p "$STATE_ROOT"
@@ -50,5 +50,5 @@ onboarding_run() { # $1=1 to write, anything else to preview
     printf '  %spreview only — nothing written. Apply with --yes%s\n' "${D:-}" "${R:-}"
   fi
 
-  printf '\n  %sNext: consult bench %s%s\n\n' "${B:-}" "$(onboarding_first_client)" "${R:-}"
+  printf '\n  %sNext: productteam bench %s%s\n\n' "${B:-}" "$(onboarding_first_client)" "${R:-}"
 }

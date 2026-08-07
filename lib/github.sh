@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 # github.sh — gated GitHub workflow helpers for the harness.
-# Sourced by bin/consult. No --admin. No force. Merge requires authorize-merge.
+# Sourced by bin/productteam. No --admin. No force. Merge requires authorize-merge.
 # Functions: gh_preflight, gh_pr_create, gh_pr_status, gh_pr_checks, gh_pr_merge, gh_pr_validate.
 
 _gh() {
-  command -v gh >/dev/null 2>&1 || { printf 'consult: gh not found on PATH\n' >&2; return 127; }
+  command -v gh >/dev/null 2>&1 || { printf 'productteam: gh not found on PATH\n' >&2; return 127; }
   gh "$@"
 }
 
@@ -27,7 +27,7 @@ gh_preflight() {
 
 gh_pr_create() {
   local dir; dir=$(_gh_repo_dir "${1:-}")
-  local title="${CONSULT_PR_TITLE:-consult: improvement}"
+  local title="${CONSULT_PR_TITLE:-productteam: improvement}"
   local body_file="${CONSULT_PR_BODY:-}"
   local branch="${CONSULT_PR_BRANCH:-}"
   (
@@ -81,27 +81,27 @@ gh_pr_merge() {
   if [[ -z "$auth" ]]; then
     local cand
     for cand in \
-      "$dir/.consult-authorize-merge" \
+      "$dir/.productteam-authorize-merge" \
       "${CONSULT_ROOT:-}/state/harness-evolution/authorize-merge"
     do
       [[ -f "$cand" ]] && auth="$cand" && break
     done
   fi
   if [[ -z "$auth" || ! -f "$auth" ]]; then
-    printf 'consult: merge refused — missing authorize-merge file.\n' >&2
+    printf 'productteam: merge refused — missing authorize-merge file.\n' >&2
     printf 'Create state/harness-evolution/authorize-merge (or set CONSULT_AUTHORIZE_MERGE)\n' >&2
     printf 'with an explicit owner authorization note. Force/admin merge is forbidden.\n' >&2
     return 2
   fi
   if grep -qiE '(^|[^-])--admin|force-merge|force push|bypass checks' "$auth"; then
-    printf 'consult: merge refused — authorize file must not request force/admin bypass.\n' >&2
+    printf 'productteam: merge refused — authorize file must not request force/admin bypass.\n' >&2
     return 2
   fi
   (
     cd "$dir"
     local args=(pr merge --merge)
     [[ -n "$pr" ]] && args+=("$pr")
-    printf 'consult: merging with authorization from %s (non-force)\n' "$auth" >&2
+    printf 'productteam: merging with authorization from %s (non-force)\n' "$auth" >&2
     _gh "${args[@]}"
   )
 }

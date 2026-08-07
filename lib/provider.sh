@@ -1,7 +1,7 @@
 # Provider + runtime seam — the only place the system knows which model runs.
 # Default: the authenticated Cursor `agent` CLI (headless). No API keys, no mocks.
 # Swap by setting CONSULT_PROVIDER to any binary that answers a prompt on
-# stdout:  CONSULT_PROVIDER=mytool bin/consult bench <client> run
+# stdout:  CONSULT_PROVIDER=mytool bin/productteam bench <client> run
 #
 # Detection rules (documented in README "Agent detection"):
 #   1. $PATH decides first. A file on PATH carrying a catalog name but no
@@ -103,11 +103,11 @@ runtime_default() {
 provider_ask() { # $1=prompt  $2=cwd (optional)
   local prompt="$1" cwd="${2:-$PWD}" bin base
   bin="$(runtime_default)" || {
-    printf 'consult: no coding agent found. Run `consult agents` for the catalog, install one, or set CONSULT_PROVIDER=<binary>.\n' >&2
+    printf 'productteam: no coding agent found. Run `productteam agents` for the catalog, install one, or set CONSULT_PROVIDER=<binary>.\n' >&2
     return 127
   }
   runtime_have "$bin" || {
-    printf 'consult: provider %s is not a usable executable. Run `consult agents`, or set CONSULT_PROVIDER=<binary>.\n' "$bin" >&2
+    printf 'productteam: provider %s is not a usable executable. Run `productteam agents`, or set CONSULT_PROVIDER=<binary>.\n' "$bin" >&2
     return 127
   }
   base=$(basename "$bin")

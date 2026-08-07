@@ -11,7 +11,7 @@ Vision: Product Consulting Harness — CLI-first product judgment layer; evidenc
 
 ## Mission
 
-Turn `bin/consult` into a **fully clean chatbot-style CLI** in the spirit of
+Turn `bin/productteam` into a **fully clean chatbot-style CLI** in the spirit of
 Grok Build / Droid / OpenCode: black-and-white terminal chrome with sparse
 accent colors, OpenCode/Droid-style first-run onboarding, a short login/splash
 animation that draws a knowledge-graph of computer-headed human nodes and
@@ -24,7 +24,7 @@ non-convergence report.
 
 ## Scope (explicit)
 
-- **In scope:** Product Consulting Harness CLI (`bin/consult`, `lib/`, docs,
+- **In scope:** Product Consulting Harness CLI (`bin/productteam`, `lib/`, docs,
   smoke/checks, skills invocation, onboarding, splash, agent detection UX).
 - **Out of scope:** JobOS / Job App / any sibling product TUI or redesign.
   Do not change JobOS repos.

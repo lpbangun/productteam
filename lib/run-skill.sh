@@ -13,9 +13,9 @@ SKILL="${1:-}"
 TARGET="${2:-}"
 OUT="${3:-}"
 
-die() { printf 'consult skill: %s\n' "$1" >&2; exit 1; }
+die() { printf 'productteam skill: %s\n' "$1" >&2; exit 1; }
 
-[[ -n "$SKILL" && -n "$TARGET" ]] || die "usage: consult skill <critique|benchmark|design-sprint> <repo-or-client> [out-dir]"
+[[ -n "$SKILL" && -n "$TARGET" ]] || die "usage: productteam skill <critique|benchmark|design-sprint> <repo-or-client> [out-dir]"
 
 case "$SKILL" in
   critique|benchmark|design-sprint) ;;
@@ -41,7 +41,7 @@ fi
 
 TS=$(date -u +%Y%m%dT%H%M%SZ)
 RUNTIME=$(runtime_default 2>/dev/null || true)
-[[ -n "$RUNTIME" ]] || die "no coding runtime found — run consult agents, install one, or set CONSULT_PROVIDER"
+[[ -n "$RUNTIME" ]] || die "no coding runtime found — run productteam agents, install one, or set CONSULT_PROVIDER"
 
 if [[ -z "$OUT" ]]; then
   OUT="$ROOT/state/harness-evolution/runs/skills/${SKILL}-${TS}"
@@ -170,4 +170,4 @@ EOF
     ;;
 esac
 
-printf 'consult skill: wrote artifacts under %s (runtime=%s)\n' "$OUT" "$RUNTIME" >&2
+printf 'productteam skill: wrote artifacts under %s (runtime=%s)\n' "$OUT" "$RUNTIME" >&2

@@ -18,7 +18,7 @@ Turn a vague request or product problem into a bounded improvement plan.
 ## Invoke
 
 ```sh
-bin/consult skill design-sprint <repo-or-client> [out-dir]
+bin/productteam skill design-sprint <repo-or-client> [out-dir]
 ```
 
 Writes `design-sprint.md` under `out-dir`.

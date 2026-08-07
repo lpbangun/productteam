@@ -9,9 +9,9 @@
 # and it never reads stdin. Frames are animated only on a colour-capable TTY;
 # in a pipe, in CI, or under NO_COLOR exactly one static frame is printed.
 #
-# Skip it entirely with CONSULT_NO_SPLASH=1 or `consult splash --no-splash`.
+# Skip it entirely with CONSULT_NO_SPLASH=1 or `productteam splash --no-splash`.
 # Dump every frame as plain text with CONSULT_SPLASH_DUMP=1,
-# CONSULT_SPLASH_FRAMES=all, or `consult splash --frames`.
+# CONSULT_SPLASH_FRAMES=all, or `productteam splash --frames`.
 
 SPLASH_FRAME_COUNT=3
 SPLASH_FRAME_DELAY=0.12

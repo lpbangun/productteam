@@ -20,7 +20,7 @@ Audit a product repository with evidence-backed, prioritized recommendations.
 ## Invoke
 
 ```sh
-bin/consult skill critique <repo-or-client> [out-dir]
+bin/productteam skill critique <repo-or-client> [out-dir]
 ```
 
 Writes `critique.md` (and optional JSON summary) under `out-dir`

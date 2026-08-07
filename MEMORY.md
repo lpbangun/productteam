@@ -168,3 +168,5 @@ and evidence-linked.
      path.
   The org recommends option 2 or 3 but will not apply either without
   owner sign-off (Constitution: product-behavior change = escalate).
+
+- **2026-08-07** · CLI command renamed `consult` → `productteam` (`bin/consult` remains a shim).

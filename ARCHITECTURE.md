@@ -6,7 +6,7 @@ Three layers, each replaceable at its seam:
 
 ```
 ┌──────────────────────────────────────────────┐
-│ CLI (bin/consult)          — inspect, run    │
+│ CLI (bin/productteam)          — inspect, run    │
 ├──────────────────────────────────────────────┤
 │ Org loop (AGENTS.md roles) — judge, decide   │
 ├──────────────────────────────────────────────┤
@@ -45,8 +45,8 @@ Each engagement declares how it is scored in `contract.json`:
 
 | `scorer` | Command | Mechanism |
 |----------|---------|-----------|
-| `checks` | `consult score` → `consult checks` | Deterministic `lib/run-checks.sh` |
-| `provider` | `consult score` → `consult bench run` | LLM via `lib/provider.sh` |
+| `checks` | `productteam score` → `productteam checks` | Deterministic `lib/run-checks.sh` |
+| `provider` | `productteam score` → `productteam bench run` | LLM via `lib/provider.sh` |
 
 Wrong path refuses honestly. No plugin router — add a third scorer
 only with evidence of need (Constitution).
@@ -56,22 +56,22 @@ only with evidence of need (Constitution).
 One module, swappable (`lib/provider.sh`):
 
 - `AGENT_CATALOG` — single list of known coding agents (≥10)
-- `runtime_detect` / `consult agents [--json]` — PATH then `CONSULT_AGENT_DIRS`
+- `runtime_detect` / `productteam agents [--json]` — PATH then `CONSULT_AGENT_DIRS`
 - `runtime_default` / `provider_ask` — real LLM calls; honest refusal if missing
 
 Default provider is the authenticated Cursor `agent` CLI — no API keys, no
-mocks. Set `CONSULT_PROVIDER` to swap. `consult agents --check` (alias:
-`consult runtime --check`) exits non-zero when the active provider is missing.
+mocks. Set `CONSULT_PROVIDER` to swap. `productteam agents --check` (alias:
+`productteam runtime --check`) exits non-zero when the active provider is missing.
 
 ## CLI chrome + first run
 
 - `lib/theme.sh` — sole ANSI source (bold/dim + two accents)
 - `lib/splash.sh` — knowledge-graph splash; `CONSULT_NO_SPLASH=1` skips
-- `lib/onboarding.sh` — `consult onboarding --yes`; state under `CONSULT_STATE_ROOT`
+- `lib/onboarding.sh` — `productteam onboarding --yes`; state under `CONSULT_STATE_ROOT`
 
 ## Harness self-checks
 
-`bin/consult harness-checks` runs `lib/harness-checks.sh` — an objective
+`bin/productteam harness-checks` runs `lib/harness-checks.sh` — an objective
 subset for `harness-apc-v1` (smoke, runtime-detect, lock presence/hashes,
 secrets scan, judgment examples, github seam). Client OFC checks stay in
 `lib/run-checks.sh` and are never mixed in. Engagement-local runners are
@@ -79,7 +79,7 @@ named by `contract.json` `.checks_runner` (e.g. `lib/harness-cli-checks.sh`).
 
 ## GitHub seam
 
-`lib/github.sh` + `bin/consult gh …`:
+`lib/github.sh` + `bin/productteam gh …`:
 
 | Subcommand | Behavior |
 |------------|----------|

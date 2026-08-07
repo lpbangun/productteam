@@ -3,12 +3,12 @@
 # Run from repo root: tests/consult-smoke.sh
 set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-C="$ROOT/bin/consult"
+C="$ROOT/bin/productteam"
 fail=0
 ok() { printf '  PASS  %s\n' "$1"; }
 bad() { printf '  FAIL  %s\n' "$1"; fail=1; }
 
-printf '\n  consult smoke\n\n'
+printf '\n  productteam smoke\n\n'
 
 "$C" help >/dev/null && ok 'help' || bad 'help'
 "$C" status >/dev/null && ok 'status' || bad 'status'
@@ -21,8 +21,8 @@ if grep -q 'ofc-v1' <<<"$bench_out"; then ok 'bench contract id'; else bad 'benc
 "$C" help | grep -q 'score' && ok 'help lists score' || bad 'help lists score'
 "$C" help | grep -q 'runtime' && ok 'help lists runtime' || bad 'help lists runtime'
 "$C" help | grep -q 'harness-checks' && ok 'help lists harness-checks' || bad 'help lists harness-checks'
-"$C" help | grep -q 'consult gh' && ok 'help lists gh' || bad 'help lists gh'
-"$C" help | grep -q 'consult skill' && ok 'help lists skill' || bad 'help lists skill'
+"$C" help | grep -q 'productteam gh' && ok 'help lists gh' || bad 'help lists gh'
+"$C" help | grep -q 'productteam skill' && ok 'help lists skill' || bad 'help lists skill'
 [[ -f "$ROOT/skills/critique/SKILL.md" ]] && ok 'skill critique present' || bad 'skill critique present'
 [[ -f "$ROOT/skills/benchmark/SKILL.md" ]] && ok 'skill benchmark present' || bad 'skill benchmark present'
 [[ -f "$ROOT/skills/design-sprint/SKILL.md" ]] && ok 'skill design-sprint present' || bad 'skill design-sprint present'
@@ -30,7 +30,7 @@ if grep -q 'ofc-v1' <<<"$bench_out"; then ok 'bench contract id'; else bad 'benc
 "$C" judge harness-evolution >/dev/null && ok 'judge harness-evolution' || bad 'judge harness-evolution'
 "$C" gh preflight "$ROOT" >/dev/null && ok 'gh preflight' || bad 'gh preflight'
 # merge without auth must refuse
-if CONSULT_AUTHORIZE_MERGE=/tmp/consult-no-auth-$$ "$C" gh merge "$ROOT" >/dev/null 2>&1; then
+if CONSULT_AUTHORIZE_MERGE=/tmp/productteam-no-auth-$$ "$C" gh merge "$ROOT" >/dev/null 2>&1; then
   bad 'gh merge refuses without auth'
 else
   ok 'gh merge refuses without auth'

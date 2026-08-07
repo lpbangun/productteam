@@ -2,9 +2,9 @@
 
 | Skill | Path | Command |
 |-------|------|---------|
-| /critique | `skills/critique/SKILL.md` | `bin/consult skill critique <target>` |
-| /benchmark | `skills/benchmark/SKILL.md` | `bin/consult skill benchmark <target>` |
-| /design-sprint | `skills/design-sprint/SKILL.md` | `bin/consult skill design-sprint <target>` |
+| /critique | `skills/critique/SKILL.md` | `bin/productteam skill critique <target>` |
+| /benchmark | `skills/benchmark/SKILL.md` | `bin/productteam skill benchmark <target>` |
+| /design-sprint | `skills/design-sprint/SKILL.md` | `bin/productteam skill design-sprint <target>` |
 
 Skills make real provider calls through `lib/provider.sh` (`provider_ask`).
 There are no mocks: if the provider is missing or fails, the skill refuses
@@ -21,7 +21,7 @@ Two guided dummy projects under `tmp-projects` exercise project-specific output:
 - `state/engagements/harness-cli/tmp-projects/proj-b` (Python · irrigation)
 
 ```sh
-bin/consult skill critique   state/engagements/harness-cli/tmp-projects/proj-a
-bin/consult skill benchmark  state/engagements/harness-cli/tmp-projects/proj-b
-bin/consult skill design-sprint state/engagements/harness-cli/tmp-projects/proj-a
+bin/productteam skill critique   state/engagements/harness-cli/tmp-projects/proj-a
+bin/productteam skill benchmark  state/engagements/harness-cli/tmp-projects/proj-b
+bin/productteam skill design-sprint state/engagements/harness-cli/tmp-projects/proj-a
 ```

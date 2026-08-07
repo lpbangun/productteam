@@ -3,11 +3,11 @@
   "purpose": "Backs the no-overclaim check: every capability claim the CLI or README makes must map to at least one check id that passes in the same run.",
   "how_it_is_evaluated": [
     "A row is ACTIVE when its `marker` string is found in its `source`.",
-    "`source` is a repo-relative file path, or the literal `help` meaning the output of `bin/consult help`.",
+    "`source` is a repo-relative file path, or the literal `help` meaning the output of `bin/productteam help`.",
     "An ACTIVE row passes only if every id in `checks` has status pass in this run.",
     "An INACTIVE row (marker absent) is inert: the claim is not being made, so there is nothing to overclaim. Rows for capabilities the mission intends to add are pre-registered this way so they activate the moment the claim appears."
   ],
-  "maintenance_rule": "Adding a capability claim to README.md or `consult help` without adding a row here is itself an overclaim. Reviewers should diff this file against README/help changes.",
+  "maintenance_rule": "Adding a capability claim to README.md or `productteam help` without adding a row here is itself an overclaim. Reviewers should diff this file against README/help changes.",
   "claims": [
     {
       "claim": "The bare CLI gives an org and engagements overview.",
@@ -46,19 +46,19 @@
       "checks": ["checks-dispatch-routes-engagement", "harness-cli-checks-runner"]
     },
     {
-      "claim": "`consult checks` refuses engagements that do not declare scorer=checks.",
+      "claim": "`productteam checks` refuses engagements that do not declare scorer=checks.",
       "source": "help",
       "marker": "Deterministic checks (scorer=checks only)",
       "checks": ["checks-dispatch-routes-engagement", "errors-name-the-fix"]
     },
     {
-      "claim": "`consult score` routes to whichever scorer the engagement declares.",
+      "claim": "`productteam score` routes to whichever scorer the engagement declares.",
       "source": "help",
       "marker": "Score via the engagement's declared scorer",
       "checks": ["core-features-reachable", "every-command-exits-zero"]
     },
     {
-      "claim": "`consult bench` shows the frozen contract, history, and latest scores.",
+      "claim": "`productteam bench` shows the frozen contract, history, and latest scores.",
       "source": "help",
       "marker": "Benchmark contract + history + latest scores",
       "checks": ["every-command-exits-zero", "cli-monochrome-chrome"]
@@ -149,7 +149,7 @@
     {
       "claim": "The CLI lists every coding agent found on the device, with machine-readable output.",
       "source": "help",
-      "marker": "consult agents",
+      "marker": "productteam agents",
       "checks": [
         "detect-command-exists",
         "detect-covers-known-agents",

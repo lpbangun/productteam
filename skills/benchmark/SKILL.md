@@ -17,7 +17,7 @@ Define what “better” means **before** implementation and freeze it for the r
 ## Invoke
 
 ```sh
-bin/consult skill benchmark <repo-or-client> [out-dir]
+bin/productteam skill benchmark <repo-or-client> [out-dir]
 ```
 
 Writes `BENCHMARK-CONTRACT.md` + `contract.json` under `out-dir`.

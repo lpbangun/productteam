@@ -33,8 +33,8 @@ Change mid-engagement only with a dated note in the run report.
 CLI:
 
 ```sh
-bin/consult judge <client>           # show active mode + mission
-bin/consult judge <client> set <mode>
+bin/productteam judge <client>           # show active mode + mission
+bin/productteam judge <client> set <mode>
 ```
 
 ## Temporary specialists (not permanent workers)

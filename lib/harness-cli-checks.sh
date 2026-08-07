@@ -3,7 +3,7 @@
 #
 # Usage:  bash lib/harness-cli-checks.sh [iter-dir]
 #
-# Scores the Product Consulting Harness CLI itself (bin/consult + lib/ + docs +
+# Scores the Product Consulting Harness CLI itself (bin/productteam + lib/ + docs +
 # tests) against the 49 frozen check ids in
 # state/engagements/harness-cli/checks/CHECK-CATALOG.md. Writes
 # <iter-dir>/checks.json and exits 0 only when every check passed.
@@ -22,7 +22,7 @@
 set -uo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-CONSULT="$ROOT/bin/consult"
+CONSULT="$ROOT/bin/productteam"
 ENG="$ROOT/state/engagements/harness-cli"
 CONTRACT_JSON="$ENG/contract.json"
 CLAIM_MAP="$ENG/checks/claim-map.json"
@@ -211,7 +211,7 @@ in_docs() { grep -qF -- "$1" "${DOCS_SET[@]}" 2>/dev/null; }
 help_out() { NO_COLOR=1 "$CONSULT" help 2>/dev/null | strip_ansi; }
 
 help_tokens() {
-  help_out | sed -nE 's/^[[:space:]]*consult[[:space:]]+([a-z][a-z0-9-]*).*/\1/p' | sort -u
+  help_out | sed -nE 's/^[[:space:]]*productteam[[:space:]]+([a-z][a-z0-9-]*).*/\1/p' | sort -u
 }
 
 dispatch_tokens() {
@@ -221,7 +221,7 @@ dispatch_tokens() {
 }
 
 readme_tokens() {
-  sed -nE 's@.*bin/consult[[:space:]]+([a-z][a-z0-9-]*).*@\1@p' "$ROOT/README.md" | sort -u
+  sed -nE 's@.*bin/productteam[[:space:]]+([a-z][a-z0-9-]*).*@\1@p' "$ROOT/README.md" | sort -u
 }
 
 # Known coding-agent name lexicon. Used to find *declared agent lists* in
@@ -362,7 +362,7 @@ splash_optout() {
 
 # Run the CLI with an isolated state root when the seam exists, so cold-start
 # probes never touch the invoking user's real state.
-isolated() { # $1=state dir, rest = consult args
+isolated() { # $1=state dir, rest = productteam args
   local dir="$1"; shift
   mkdir -p "$dir"
   local var; var=$(state_root_var 2>/dev/null || true)
@@ -425,7 +425,7 @@ chk_cli_monochrome_chrome() {
   NO_COLOR=1 timeout 60 "$CONSULT" org    </dev/null 2>&1 | strip_ansi > "$TMP/m-org"
   NO_COLOR=1 timeout 60 "$CONSULT" bench harness-cli </dev/null 2>&1 | strip_ansi > "$TMP/m-bench"
   _need status "$TMP/m-status" 'Product Consulting Harness'
-  _need help   "$TMP/m-help"   'Commands' 'consult help'
+  _need help   "$TMP/m-help"   'Commands' 'productteam help'
   _need org    "$TMP/m-org"    'Loop' 'Autonomy'
   _need bench  "$TMP/m-bench"  'Benchmark' 'Contract'
   # Monochrome primitives must exist, so structure never depends on hue.
@@ -480,13 +480,13 @@ for f in "${CLI_SURFACE[@]}"; do
 done
 
 chk_splash_command_exists() {
-  help_out | grep -qE 'consult[[:space:]]+(splash|login)' \
-    || { echo 'no splash/login command in consult help'; return 1; }
-  local cmd; cmd=$(help_out | sed -nE 's/^[[:space:]]*consult[[:space:]]+(splash|login).*/\1/p' | head -1)
+  help_out | grep -qE 'productteam[[:space:]]+(splash|login)' \
+    || { echo 'no splash/login command in productteam help'; return 1; }
+  local cmd; cmd=$(help_out | sed -nE 's/^[[:space:]]*productteam[[:space:]]+(splash|login).*/\1/p' | head -1)
   isolated "$TMP/sp-exists" "$cmd" > "$TMP/splash-exists" 2>&1
   local rc=$?
-  (( rc == 0 )) || { echo "consult $cmd exited $rc"; return 1; }
-  echo "consult $cmd listed in help and exits 0"
+  (( rc == 0 )) || { echo "productteam $cmd exited $rc"; return 1; }
+  echo "productteam $cmd listed in help and exits 0"
 }
 
 chk_splash_graph_nodes_edges() {
@@ -589,7 +589,7 @@ chk_splash_first_run_hook() {
 # ═════════════════════════════════════════════════════════════════════
 
 onboarding_cmd() {
-  help_out | sed -nE 's/^[[:space:]]*consult[[:space:]]+(onboarding|onboard|init).*/\1/p' | head -1
+  help_out | sed -nE 's/^[[:space:]]*productteam[[:space:]]+(onboarding|onboard|init).*/\1/p' | head -1
 }
 
 # Cold-start transcript is produced once and reused by three checks.
@@ -611,10 +611,10 @@ onboard_run() { # $1=state dir → transcript on stdout
 
 chk_onboarding_command_exists() {
   local cmd; cmd=$(onboarding_cmd)
-  [[ -n "$cmd" ]] || { echo "no onboarding|onboard|init command in consult help"; return 1; }
-  grep -qE "consult[[:space:]]+$cmd\b" "$ROOT/README.md" \
-    || { echo "consult $cmd is in help but not in README.md"; return 1; }
-  echo "consult $cmd present in help and README.md"
+  [[ -n "$cmd" ]] || { echo "no onboarding|onboard|init command in productteam help"; return 1; }
+  grep -qE "productteam[[:space:]]+$cmd\b" "$ROOT/README.md" \
+    || { echo "productteam $cmd is in help but not in README.md"; return 1; }
+  echo "productteam $cmd present in help and README.md"
 }
 
 chk_onboarding_cold_start() {
@@ -648,7 +648,7 @@ detect-agents|detect|agents? (found|present)|runtimes?
 choose-provider|provider|CONSULT_PROVIDER
 first-engagement|engagement|client
 first-score|score|bench|checks
-next-command|consult [a-z]
+next-command|productteam [a-z]
 TOPICS
   [[ -z "$missing" ]] || { echo "$n steps but topics not covered: $missing"; return 1; }
   echo "$n numbered steps covering agents, provider, engagement, score, next command"
@@ -676,11 +676,11 @@ chk_onboarding_idempotent() {
 chk_onboarding_next_action() {
   [[ -s "$ONBOARD_TRANSCRIPT" ]] || { echo 'no onboarding transcript (cold start did not run)'; return 1; }
   local last
-  last=$(grep -oE 'consult [a-z][a-z0-9-]*( [A-Za-z0-9._/-]+)?' "$ONBOARD_TRANSCRIPT" | tail -1)
-  [[ -n "$last" ]] || { echo 'final output names no concrete consult command'; return 1; }
+  last=$(grep -oE 'productteam [a-z][a-z0-9-]*( [A-Za-z0-9._/-]+)?' "$ONBOARD_TRANSCRIPT" | tail -1)
+  [[ -n "$last" ]] || { echo 'final output names no concrete productteam command'; return 1; }
   # shellcheck disable=SC2086
   local out rc
-  out=$(NO_COLOR=1 timeout 120 "$CONSULT" ${last#consult } </dev/null 2>&1); rc=$?
+  out=$(NO_COLOR=1 timeout 120 "$CONSULT" ${last#productteam } </dev/null 2>&1); rc=$?
   if (( rc == 0 )); then
     echo "next action '$last' exits 0"
     return 0
@@ -700,7 +700,7 @@ chk_onboarding_next_action() {
 detect_cmd() {
   local c
   for c in agents runtime; do
-    help_out | grep -qE "consult[[:space:]]+$c\b" && { printf '%s' "$c"; return 0; }
+    help_out | grep -qE "productteam[[:space:]]+$c\b" && { printf '%s' "$c"; return 0; }
   done
   return 1
 }
@@ -717,21 +717,21 @@ detect_rows() { # $1=stripped output file → row count
 }
 
 chk_detect_command_exists() {
-  local c; c=$(detect_cmd) || { echo 'neither consult agents nor consult runtime is listed in help'; return 1; }
+  local c; c=$(detect_cmd) || { echo 'neither productteam agents nor productteam runtime is listed in help'; return 1; }
   local f="$TMP/detect-$c"
   NO_COLOR=1 timeout 60 "$CONSULT" "$c" </dev/null 2>&1 | strip_ansi > "$f"
   local rc=${PIPESTATUS[0]}
   cp "$f" "$EVID/agent-detection.txt"
-  (( rc == 0 )) || { echo "consult $c exited $rc"; return 1; }
+  (( rc == 0 )) || { echo "productteam $c exited $rc"; return 1; }
   local rows size
   rows=$(detect_rows "$f")
   size=$(catalog_entries | grep -c . || true)
   (( size > 0 )) || { echo 'no agent catalog list found in lib/provider.sh'; return 1; }
-  (( rows == size )) || { echo "consult $c printed $rows rows for a $size-entry catalog"; return 1; }
+  (( rows == size )) || { echo "productteam $c printed $rows rows for a $size-entry catalog"; return 1; }
   local missing='' n
   while read -r n; do grep -qF "$n" "$f" || missing+="$n "; done < <(catalog_entries)
   [[ -z "$missing" ]] || { echo "catalog entries absent from output: $missing"; return 1; }
-  echo "consult $c: $rows rows, one per catalog entry ($size), exit 0"
+  echo "productteam $c: $rows rows, one per catalog entry ($size), exit 0"
 }
 
 chk_detect_covers_known_agents() {
@@ -792,13 +792,13 @@ chk_detect_machine_readable() {
   local f="$TMP/detect.json"
   NO_COLOR=1 timeout 60 "$CONSULT" "$c" --json </dev/null > "$f" 2>"$TMP/detect.json.err"
   local rc=$?
-  (( rc == 0 )) || { echo "consult $c --json exited $rc: $(head -1 "$TMP/detect.json.err")"; return 1; }
+  (( rc == 0 )) || { echo "productteam $c --json exited $rc: $(head -1 "$TMP/detect.json.err")"; return 1; }
   jq -e 'type == "array" and length > 0' "$f" >/dev/null 2>&1 \
-    || { echo "consult $c --json is not a non-empty JSON array"; return 1; }
+    || { echo "productteam $c --json is not a non-empty JSON array"; return 1; }
   jq -e 'all(.[]; has("name") and has("status") and has("path"))' "$f" >/dev/null 2>&1 \
     || { echo 'JSON objects lack name/status/path'; return 1; }
   cp "$f" "$EVID/agents.json"
-  echo "consult $c --json: $(jq -r 'length' "$f") objects with name/status/path"
+  echo "productteam $c --json: $(jq -r 'length' "$f") objects with name/status/path"
 }
 
 chk_detect_versions() {
@@ -847,7 +847,7 @@ safe_args() {
 chk_every_command_exits_zero() {
   local table="$EVID/command-exit-table.txt" cmd args out rc bad=''
   : > "$table"
-  # `consult harness-checks` regenerates artifacts under a hard-coded closed
+  # `productteam harness-checks` regenerates artifacts under a hard-coded closed
   # iteration path (lib/harness-checks.sh:98-109) regardless of the iter dir it
   # is given. Exercising the command is required here; rewriting a closed
   # iteration's evidence is not, so it is snapshotted and put back.
@@ -882,15 +882,15 @@ chk_every_command_exits_zero() {
 chk_core_features_reachable() {
   local missing_help='' missing_readme='' t
   for t in status judge score checks bench report memory org gh skill smoke onboarding splash help; do
-    help_out | grep -qE "consult[[:space:]]+$t\b" || missing_help+="$t "
-    grep -qE "consult[[:space:]]+$t\b" "$ROOT/README.md" || missing_readme+="$t "
+    help_out | grep -qE "productteam[[:space:]]+$t\b" || missing_help+="$t "
+    grep -qE "productteam[[:space:]]+$t\b" "$ROOT/README.md" || missing_readme+="$t "
   done
   # agents/runtime counts as one feature satisfied by either name.
-  if ! help_out | grep -qE 'consult[[:space:]]+(agents|runtime)\b'; then missing_help+='agents|runtime '; fi
-  if ! grep -qE "consult[[:space:]]+(agents|runtime)\b" "$ROOT/README.md"; then missing_readme+='agents|runtime '; fi
+  if ! help_out | grep -qE 'productteam[[:space:]]+(agents|runtime)\b'; then missing_help+='agents|runtime '; fi
+  if ! grep -qE "productteam[[:space:]]+(agents|runtime)\b" "$ROOT/README.md"; then missing_readme+='agents|runtime '; fi
   [[ -z "$missing_help$missing_readme" ]] \
     || { echo "absent from help: ${missing_help:-none}; absent from README: ${missing_readme:-none}"; return 1; }
-  echo 'all 15 core features present in both consult help and README.md'
+  echo 'all 15 core features present in both productteam help and README.md'
 }
 
 chk_unknown_command_honest() {
@@ -898,7 +898,7 @@ chk_unknown_command_honest() {
   out=$(NO_COLOR=1 timeout 30 "$CONSULT" notacommand </dev/null 2>&1); rc=$?
   (( rc != 0 )) || { echo 'unknown command exited 0'; return 1; }
   grep -qiE 'help|did you mean' <<<"$out" || { echo "message suggests nothing: $(head -1 <<<"$out")"; return 1; }
-  echo "unknown command exits $rc and points at consult help"
+  echo "unknown command exits $rc and points at productteam help"
 }
 
 chk_no_hidden_env_requirements() {
@@ -1273,9 +1273,9 @@ chk_checks_dispatch_routes_engagement() {
   grep -qE 'maya-intro-flow|ofc-v1' <<<"$out" && why+='output contains ofc-v1 check ids (wrong suite) '
   local score_out
   score_out=$(NO_COLOR=1 timeout 180 "$CONSULT" score harness-cli </dev/null 2>&1 | strip_ansi)
-  grep -qF 'harness-cli-v1' <<<"$score_out" || why+='consult score harness-cli does not reach this suite '
+  grep -qF 'harness-cli-v1' <<<"$score_out" || why+='productteam score harness-cli does not reach this suite '
   [[ -z "$why" ]] || { echo "$why"; return 1; }
-  echo 'consult checks|score harness-cli both run the harness-cli-v1 suite'
+  echo 'productteam checks|score harness-cli both run the harness-cli-v1 suite'
 }
 
 chk_no_new_runtime_deps() {
@@ -1307,7 +1307,7 @@ tsort tty uname unexpand uniq wc who xargs yes
 AGENTS = set("agent cursor cursor-agent claude codex opencode gemini".split())
 # A client product's own toolchain is not a harness dependency, but it may only
 # be invoked from the client-facing check/validation paths. Anywhere else (e.g.
-# bin/consult) it would be a real new dependency and is reported as such.
+# bin/productteam) it would be a real new dependency and is reported as such.
 CLIENT_TOOLCHAIN = set("npm npx node yarn pnpm".split())
 CLIENT_PATHS = ("lib/run-checks.sh", "lib/github.sh")
 
@@ -1385,7 +1385,7 @@ chk_errors_name_the_fix() {
     out=$("$@" </dev/null 2>&1)
     local cause=0 remedy=0
     grep -qiE 'unknown|missing|not found|no |refus|cannot|failed|invalid' <<<"$out" && cause=1
-    grep -qE 'consult [a-z]|install|Install|[Cc]reate|set CONSULT|CONSULT_[A-Z_]+|usage:|try:' <<<"$out" && remedy=1
+    grep -qE 'productteam [a-z]|install|Install|[Cc]reate|set CONSULT|CONSULT_[A-Z_]+|usage:|try:' <<<"$out" && remedy=1
     (( cause )) || bad+="$label(no cause) "
     (( remedy )) || bad+="$label(no remedy) "
   }
@@ -1432,7 +1432,7 @@ chk_non_goals_visible() {
   cli=$( { help_out; NO_COLOR=1 timeout 60 "$CONSULT" org </dev/null 2>&1 | strip_ansi; } )
   readme=$(cat "$ROOT/README.md")
   local pat='non-goal|not a |is not |does not|deliberately not|no daemon|no database|no plugin|what it is not|does NOT exist'
-  grep -qiE "$pat" <<<"$cli"    || why+='no explicit non-goals in consult help or org '
+  grep -qiE "$pat" <<<"$cli"    || why+='no explicit non-goals in productteam help or org '
   grep -qiE "$pat" <<<"$readme" || why+='no explicit non-goals in README.md '
   [[ -z "$why" ]] || { echo "$why"; return 1; }
   echo 'non-goals stated both in the CLI (help/org) and README.md'
@@ -1513,7 +1513,7 @@ run_one() { # $1=id
 }
 
 printf '\n  %sharness-cli-v1 — 49 deterministic checks%s\n' "$B" "$R"
-printf '  %ssubject: bin/consult + lib/ + docs/ + tests/ · iter dir: %s%s\n' \
+printf '  %ssubject: bin/productteam + lib/ + docs/ + tests/ · iter dir: %s%s\n' \
   "$D" "${ITER_DIR#"$ROOT"/}" "$R"
 [[ "$SKIP_LIVE" == 1 ]] && printf '  %sCONSULT_SKIP_LIVE=1 — live checks recorded as fail/skipped; run is partial%s\n' "$D" "$R"
 printf '\n'
