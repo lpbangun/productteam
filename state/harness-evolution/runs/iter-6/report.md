@@ -43,3 +43,35 @@ No daemon, database, mock provider, permanent worker, third accent hue, or secon
 ## Org self-review
 
 Parallel Builders were useful for four independent seams, while the Principal owned interfaces and integration. The Advisor independently created the benchmark and ran final suites through the real Codex runtime. Critic review caught two paper-green defects after deterministic checks passed; preserving the Critic gate was necessary. No new permanent worker is justified.
+
+## Operability mission addendum
+
+The owner-directed operability mission also converged in one mission iteration
+(maximum three), with Builds 1–4 completed strictly in order:
+
+1. Workspace isolation — 5/5 Advisor PASS; Critic ACCEPT-WITH-NITS.
+2. Judgment gates — 5/5 Advisor PASS; eight real mode refusal/pass paths.
+3. Inspect pack and escalations — 5/5 Advisor PASS; seven real lifecycle paths.
+4. Role envelope and inspection — 5/5 Advisor PASS; Critic
+   ACCEPT-WITH-NITS, no blockers.
+
+The additive diff introduces `lib/workspace.sh`, `lib/judgment-gate.sh`,
+`lib/engagement-state.sh`, and `lib/role-envelope.sh`; wires their lifecycle,
+gate, pause/resume, inspect, sealed-input, role-status, Analyst-score, and
+Critic-close contracts through `bin/productteam`; and retains `bin/consult` as
+the compatibility shim. The integrated operability harness records 50 passed,
+0 failed in `checks.json`. Build-specific benchmark, debate, decision, Builder,
+Advisor, Critic, and command evidence lives beside this report.
+
+The `Fix/New-User-TUI` visual commit is the base of
+`Upgrade/basic-funcionalities`; the operability changes are committed on the
+destination branch. No daemon, database, plugin router, RAG layer, mock
+provider, swarm/bus, or second orchestrator was added.
+
+### Operability org self-review
+
+Principal / Analyst / Builder / Critic remains the permanent organization.
+Advisor was a temporary benchmark/evaluation label. Plain JSON plus one library
+per state seam kept continuation inspectable without adding a control plane.
+Early unbounded Builder prompts caused avoidable no-edit attempts; future role
+requests must lead with exact files, symbols, and acceptance boundaries.

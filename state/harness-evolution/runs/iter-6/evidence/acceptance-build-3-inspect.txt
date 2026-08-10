@@ -1,0 +1,2 @@
+
+  Inspect pack regenerated from files: /home/logani/.herdr/worktrees/Product Consulting Harness/upgrade-basic-funcionalities/state/harness-evolution/inspect-pack.json

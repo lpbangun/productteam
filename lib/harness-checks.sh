@@ -49,6 +49,90 @@ run_check() {
 
 printf '\n  %sHarness checks (harness-apc-v1 objective subset)%s\n\n' "$B" "$R"
 
+# Workspace isolation (real temporary git repo + detached worktree; no mocks).
+workspace_probe=$(cd "$ROOT" && tests/workspace-smoke.sh 2>&1)
+workspace_probe_rc=$?
+for spec in \
+  'workspace-default-isolated:PASS workspace-default-isolated' \
+  'workspace-lifecycle-cli:PASS workspace-lifecycle' \
+  'workspace-dirty-refusal:PASS workspace-dirty-refusal' \
+  'workspace-dirty-escape-evidence:PASS workspace-dirty-escape-evidence' \
+  'workspace-safe-remove:PASS workspace-safe-remove'
+do
+  id=${spec%%:*}
+  marker=${spec#*:}
+  if grep -qF "$marker" <<<"$workspace_probe" && { [[ "$id" != workspace-safe-remove ]] || (( workspace_probe_rc == 0 )); }; then
+    record "$id" pass real-git-worktree
+  else
+    record "$id" fail "${workspace_probe//$'\n'/; }"
+  fi
+done
+
+# Judgment gates (real temporary CLI engagements; no fixtures, no mocks).
+gate_probe=$(cd "$ROOT" && tests/judgment-gate-smoke.sh 2>&1)
+gate_probe_rc=$?
+for spec in \
+  'gate-guided-refuse:PASS gate-guided-refuse' \
+  'gate-guided-pass:PASS gate-guided-pass' \
+  'gate-directive-refuse:PASS gate-directive-refuse' \
+  'gate-directive-pass:PASS gate-directive-pass' \
+  'gate-challenge-refuse:PASS gate-challenge-refuse' \
+  'gate-challenge-alternative:PASS gate-challenge-alternative' \
+  'gate-override-refuse:PASS gate-override-refuse' \
+  'gate-override-pass:PASS gate-override-pass'
+do
+  id=${spec%%:*}
+  marker=${spec#*:}
+  if grep -qF "$marker" <<<"$gate_probe" && { [[ "$id" != gate-override-pass ]] || (( gate_probe_rc == 0 )); }; then
+    record "$id" pass real-cli-engagement
+  else
+    record "$id" fail "${gate_probe//$'\n'/; }"
+  fi
+done
+
+# Escalation continuity + inspect pack (real temporary CLI engagements).
+escalation_probe=$(cd "$ROOT" && tests/escalation-smoke.sh 2>&1)
+escalation_probe_rc=$?
+for spec in \
+  'escalation-block-state:PASS escalation-block-state' \
+  'escalation-pauses-progress:PASS escalation-pauses-progress' \
+  'escalation-resume-refuse:PASS escalation-resume-refuse' \
+  'escalation-resume-authorized:PASS escalation-resume-authorized' \
+  'escalation-memory-continuation:PASS escalation-memory-continuation' \
+  'inspect-pack-regenerable:PASS inspect-pack-regenerable' \
+  'inspect-pack-missing-honest:PASS inspect-pack-missing-honest'
+do
+  id=${spec%%:*}
+  marker=${spec#*:}
+  if (( escalation_probe_rc == 0 )) && grep -qF "$marker" <<<"$escalation_probe"; then
+    record "$id" pass real-cli-continuation
+  else
+    record "$id" fail "${escalation_probe//$'\n'/; }"
+  fi
+done
+
+# Role envelope (real authenticated provider + real temporary git engagement).
+role_probe=$(cd "$ROOT" && tests/role-envelope-smoke.sh 2>&1)
+role_probe_rc=$?
+for spec in \
+  'role-invoke-provider-seam:PASS role-invoke-provider-seam' \
+  'role-builder-seal-refusal:PASS role-builder-seal-refusal' \
+  'role-builder-seal-mismatch:PASS role-builder-seal-mismatch' \
+  'role-envelope-request-result-manifest:PASS role-envelope-request-result-manifest' \
+  'role-score-no-analyst-stamp:PASS role-score-no-analyst-stamp' \
+  'role-close-no-critic:PASS role-close-no-critic' \
+  'role-implementer-evaluator-rejected:PASS role-implementer-evaluator-rejected' \
+  'role-status-file-derived:PASS role-status-file-derived'
+do
+  id=${spec%%:*}
+  marker=${spec#*:}
+  if (( role_probe_rc == 0 )) && grep -qF "$marker" <<<"$role_probe"; then
+    record "$id" pass real-provider-envelope
+  else
+    record "$id" fail "${role_probe//$'\n'/; }"
+  fi
+done
+
 # CLI / smoke
 run_check help-lists-runtime "cd \"$ROOT\" && bin/productteam help | grep -q runtime && echo ok"
 run_check smoke-green "cd \"$ROOT\" && CONSULT_SMOKE_SKIP_CLIENT=1 tests/consult-smoke.sh >/dev/null && echo ok"

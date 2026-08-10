@@ -1,0 +1,135 @@
+{
+  "artifact": "build-2-advisor-verdict.json",
+  "scope": "Build 2 — judgment gates (mission-benchmark.md §6)",
+  "verdict": "PASS",
+  "verdict_rule": "5 pointers × their checks, all PASS → Build 2 PASS (mission-benchmark.md §6.4 Final verdict)",
+  "audited_by": "Independent Advisor (Build2Acceptance) — independent of Builder",
+  "audited_at": "2026-08-10",
+  "head": "1f6f17e",
+  "tree": "upgrade-basic-funcionalities",
+  "pointer_results": {
+    "1_all_four_modes_bind_implement": {
+      "result": "PASS",
+      "evidence": [
+        "G1.1: `bin/consult help | grep -qi 'gate'` → match, grep exit 0; help lists `consult gate <client> status|implement|select|direct|challenge|override` (evidence/acceptance-build-2-help.txt)",
+        "G1.2: tests/judgment-gate-smoke.sh drives real CLI against temporary real engagements: Guided refuse-until-selection → pass after select; Directive refuse-until-direct → pass after direct; Challenge refuse harmful → pass only after selecting the safer alternative; Override refuse (empty risk / tampered non-waiver) → pass after full override (exit 0, evidence/acceptance-build-2-gate-smoke.txt)",
+        "Each mode's decision recorded in durable gate state (selection.json / directive.json / challenge.json / override.json) with mode + decision + ts"
+      ]
+    },
+    "2_required_gates_durable_files": {
+      "result": "PASS",
+      "evidence": [
+        "G2.1: per-engagement `judgment/*.json` plain files contain mode + decision + timestamp; live harness-evolution engagement: state/harness-evolution/judgment/directive.json = {mode: Directive, ts: 2026-08-10T06:59:04Z, direction, risks, decision: allowed}",
+        "G2.2: `bin/consult gate harness-evolution status` run twice → byte-identical JSON decision (diff of jq -S outputs empty); later session re-derives decision from files alone"
+      ]
+    },
+    "3_override_risks_non_waivers": {
+      "result": "PASS",
+      "evidence": [
+        "G3.1: `gate <client> override 'ship anyway' '' …` refuses (non-zero), grep 'non-empty' in output, and `override.json` is NOT written (smoke asserts `[[ ! -f …/override.json ]]`)",
+        "G3.2: full override writes durable file; smoke jq asserts `.risks | length == 1`, risk value, `.critic_record`, `.evidence_record`, and `.non_waivers.{critic,evidence,frozen_contract} == true`; tampering frozen_contract → false flips status to refused with 'non-waivable' (no re-write)"
+      ]
+    },
+    "4_machine_status": {
+      "result": "PASS",
+      "evidence": [
+        "G4.1: `bin/consult gate harness-evolution status` exits 0 and emits valid JSON with client, mode (Directive), allowed, decision, reason, bound_direction, artifact, artifact_ts, required, present (evidence/acceptance-build-2-status.txt)",
+        "G4.2: smoke asserts status JSON after Challenge refusal: `.mode == \"Challenge\" and .allowed == false and .decision == \"refused\"`; status reflects last durable decision without chat"
+      ]
+    },
+    "5_per_mode_refuse_and_pass_paths": {
+      "result": "PASS",
+      "evidence": [
+        "G5.1: `bin/consult harness-checks state/harness-evolution/runs/iter-6` exit 0; checks.json records exactly the 8 required gate ids, all pass: gate-guided-refuse, gate-guided-pass, gate-directive-refuse, gate-directive-pass, gate-challenge-refuse, gate-challenge-alternative, gate-override-refuse, gate-override-pass (evidence/acceptance-build-2-harness-checks.txt)",
+        "Every mode has ≥1 automated refuse and ≥1 automated pass path exercised on the real gate (smoke markers PASS gate-guided-refuse/pass, gate-directive-refuse/pass, gate-challenge-refuse/alternative, gate-override-refuse/pass)"
+      ]
+    }
+  },
+  "per_mode_refuse_pass_evidence": {
+    "Guided": {
+      "refuse": "gate-guided-refuse — implement before selection refuses with 'no selection recorded for <client>' (exit non-zero)",
+      "pass": "gate-guided-pass — select <direction> then implement passes; status allowed=true, bound_direction matches selection"
+    },
+    "Directive": {
+      "refuse": "gate-directive-refuse — implement before direct refuses with 'no directive recorded for <client>' (exit non-zero)",
+      "pass": "gate-directive-pass — direct <direction> [risks] then implement passes; status allowed=true, directive_present/direction_present/decision_present/risks_recorded all true"
+    },
+    "Challenge": {
+      "refuse": "gate-challenge-refuse — implement of the harmful path always refused ('challenged harmful path'); status decision=refused, selection_matches=false",
+      "pass": "gate-challenge-alternative — select must equal safer_alternative exactly (selection.json direction == safer_alternative), then implement of the alternative passes; status selection_matches=true, bound_direction=safer alternative"
+    },
+    "Override": {
+      "refuse": "gate-override-refuse — empty risk refuses and records nothing; tampered non-waiver (frozen_contract=false) refuses with 'non-waivable' and no re-write; status non_waivers_present=false, decision=refused",
+      "pass": "gate-override-pass — override <direction> <risk> <critic-record> <evidence-record> then implement passes; durable file records risks + non_waivers.{critic,evidence,frozen_contract}=true"
+    }
+  },
+  "suite_exits": {
+    "judgment_gate_smoke": {
+      "command": "tests/judgment-gate-smoke.sh",
+      "exit": 0,
+      "artifact": "evidence/acceptance-build-2-gate-smoke.txt",
+      "output_summary": "PASS gate-guided-refuse / gate-guided-pass / gate-directive-refuse / gate-directive-pass / gate-challenge-refuse / gate-challenge-alternative / gate-override-refuse / gate-override-pass; 'gate smoke: all 8 gate paths exercised'"
+    },
+    "consult_smoke": {
+      "command": "CONSULT_SMOKE_SKIP_CLIENT=1 bin/consult smoke",
+      "exit": 0,
+      "artifact": "evidence/acceptance-build-2-smoke.txt",
+      "output_summary": "all smoke checks passed (incl. 'help lists gate', workspace isolation real-worktree refuse/pass)"
+    },
+    "harness_checks": {
+      "command": "bin/consult harness-checks state/harness-evolution/runs/iter-6",
+      "exit": 0,
+      "artifact": "evidence/acceptance-build-2-harness-checks.txt",
+      "output_summary": "35 passed · 0 failed → state/harness-evolution/runs/iter-6/checks.json; all 8 gate-* ids pass with detail real-cli-engagement"
+    },
+    "gate_status": {
+      "command": "bin/consult gate harness-evolution status",
+      "exit": 0,
+      "artifact": "evidence/acceptance-build-2-status.txt",
+      "output_summary": "valid JSON: client=harness-evolution, mode=Directive, allowed=true, decision=allowed, artifact=…/state/harness-evolution/judgment/directive.json, artifact_ts=2026-08-10T06:59:04Z"
+    },
+    "help_discoverability": {
+      "command": "bin/consult help | grep -qi 'gate'",
+      "exit": 0,
+      "artifact": "evidence/acceptance-build-2-help.txt",
+      "output_summary": "gate surface listed in help; grep exit 0"
+    }
+  },
+  "gate_check_ids": [
+    "gate-guided-refuse",
+    "gate-guided-pass",
+    "gate-directive-refuse",
+    "gate-directive-pass",
+    "gate-challenge-refuse",
+    "gate-challenge-alternative",
+    "gate-override-refuse",
+    "gate-override-pass"
+  ],
+  "gate_check_ids_status": "all 8 present in iter-6/checks.json with status=pass, detail=real-cli-engagement; 0 failed checks in suite",
+  "durable_status_proof": {
+    "live_engagement": "state/harness-evolution/engagement.md Mode: **Directive** (unchanged during audit)",
+    "durable_file": "state/harness-evolution/judgment/directive.json — {mode: Directive, ts: 2026-08-10T06:59:04Z, direction: 'Make unattended multi-iteration consulting operable under the Constitution', risks: ['Keep builds ordered and avoid a second orchestrator'], decision: allowed}",
+    "status_json_agrees": "gate status decision 'allowed' and bound_direction exactly match directive.json fields",
+    "re_derivation": "two consecutive status invocations produced byte-identical JSON (diff empty)"
+  },
+  "frozen_guard": {
+    "status": "OK",
+    "detail": "git status --short on HARNESS-BENCHMARK-CONTRACT.md, contract.json, LOCK.md, FREEZE.md, FREEZE-SHA.txt, engagement.md, LOOP-SEQUENCE.md, authorize-merge shows no modifications. state/harness-evolution/judgment/ is untracked (Build 2 implementation artifact, not on the §0 frozen list). Pre-existing regenerated artifacts (iter-3 skill scaffolds, onboarding-flight-control .checks-latest.json + check-*/workspace.json) were already modified before this audit (identical paths in pre- and post-run status); my runs added no new side effects.",
+    "temporary_engagements": "judgment-gate-smoke.sh uses state/engagements/gate-smoke-$$ and cleans up on exit; 0 gate-smoke-* dirs remain"
+  },
+  "honest_limits": [
+    "Per-mission constraint, provider scoring (`bench … run`) is never invoked — no provider present; suites run real CLI paths with CONSULT_SMOKE_SKIP_CLIENT=1 (client checks skipped, not mocked).",
+    "G3.1 empty-risk refusal was exercised as `override 'ship anyway' '' 'critic/record' 'evidence/record'` (empty risk with non-empty direction); the literal audit form `override ''` also refuses (usage die, non-zero) but the durable-no-write assertion was proven on the shipped smoke form.",
+    "This verdict covers Build 2 (§6) only; Build 1 verdicts (§2–§5) are not re-scored; Builds 3–4 untouched per mission constraints.",
+    "No formatters or linters run (explicitly skipped per mission §6.5).",
+    "Gate state was not changed by the audit: only read-only `status` was invoked against harness-evolution; all mutations ran in temporary engagements that were removed."
+  ],
+  "evidence_artifacts": [
+    "state/harness-evolution/runs/iter-6/evidence/acceptance-build-2-gate-smoke.txt",
+    "state/harness-evolution/runs/iter-6/evidence/acceptance-build-2-smoke.txt",
+    "state/harness-evolution/runs/iter-6/evidence/acceptance-build-2-harness-checks.txt",
+    "state/harness-evolution/runs/iter-6/evidence/acceptance-build-2-status.txt",
+    "state/harness-evolution/runs/iter-6/evidence/acceptance-build-2-help.txt",
+    "state/harness-evolution/runs/iter-6/checks.json"
+  ]
+}

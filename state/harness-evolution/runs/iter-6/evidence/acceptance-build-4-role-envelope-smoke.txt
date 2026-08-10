@@ -1,0 +1,9 @@
+PASS role-invoke-provider-seam
+PASS role-builder-seal-refusal
+PASS role-builder-seal-mismatch
+PASS role-close-no-critic
+PASS role-implementer-evaluator-rejected
+PASS role-score-no-analyst-stamp
+PASS role-envelope-request-result-manifest
+PASS role-status-file-derived
+PASS role-authorship-happy-path

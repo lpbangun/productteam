@@ -64,6 +64,37 @@ and evidence-linked.
 
 ## Lessons
 
+- 2026-08-10 · operability mission iter-6 Build 2: `consult gate` now
+  re-derives implementability from engagement `judgment/*.json`. Guided
+  needs selection; Directive a durable direction; Challenge refuses the
+  harmful path and permits only its selected safer alternative; Override
+  requires risks plus critic/evidence/frozen-contract non-waivers. Eight
+  real CLI refuse/pass paths passed; active Directive gate points to the
+  owner mission. Evidence: `state/harness-evolution/runs/iter-6/`.
+- 2026-08-10 - operability mission iter-6 Build 3: `consult escalation` now
+  persists blocked/resolved state, pauses all progress paths, requires separate
+  owner authorization for resume, consumes it, and appends continuation memory.
+  `consult inspect` regenerates an honest file-only pack with missing markers
+  and path-safe score/lesson discovery. Seven lifecycle markers pass; Advisor
+  5/5 PASS; Critic ACCEPT-WITH-NITS, no blockers. Evidence:
+  `state/harness-evolution/runs/iter-6/`.
+- 2026-08-10 · operability mission iter-6 Build 4: `productteam role`
+  invokes Analyst/Builder/Critic through the existing provider seam with
+  write-once Builder seals and hash-indexed request/result/manifest envelopes.
+  Analyst-stamped scores reject self-evaluation; close requires Critic evidence.
+  File-derived status reports asked/ran/produced without chat. Fast-forwarded
+  `Fix/New-User-TUI` and ported all four operability seams to the visual
+  `bin/productteam` surface while retaining `bin/consult` compatibility.
+  Advisor 5/5 PASS; Critic ACCEPT-WITH-NITS; integrated harness 50/50.
+  Evidence: `state/harness-evolution/runs/iter-6/`.
+- 2026-08-10 · operability mission iter-6 Build 1: all score/check paths
+  now resolve a detached client worktree through `lib/workspace.sh`; the
+  owner's live `Repo:` tree is never a fallback. Dirty reuse refuses by
+  client name unless `--allow-dirty <reason>` is explicit and archived.
+  `workspace <client> ensure|status|remove` plus run-dir path/SHA/dirty
+  evidence lets the next session continue from files. Advisor: 5/5 PASS;
+  Critic: ACCEPT-WITH-NITS. Evidence:
+  `state/harness-evolution/runs/iter-6/`.
 - 2026-08-06 · harness-evolution iter-5: close memory/autonomy residuals via
   org self-reviews + phases.json + harness-checks — no new CLI verbs.
   Evidence: `state/harness-evolution/runs/iter-5/`.

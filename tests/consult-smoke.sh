@@ -57,11 +57,46 @@ if "$C" notacommand >/dev/null 2>&1; then bad 'unknown rejects'; else ok 'unknow
 
 # help mentions judgment modes
 if "$C" help | grep -q 'judge'; then ok 'help lists judge'; else bad 'help lists judge'; fi
+if "$C" help | grep -q 'gate <client> status|implement'; then ok 'help lists gate'; else bad 'help lists gate'; fi
+
+# Build 3 surface: escalation lifecycle + file-derived inspect
+if "$C" help | grep -q 'escalation <client> block'; then ok 'help lists escalation'; else bad 'help lists escalation'; fi
+if "$C" help | grep -q 'resume <id> <token>'; then ok 'help lists resume'; else bad 'help lists resume'; fi
+if "$C" help | grep -q 'inspect <client>'; then ok 'help lists inspect'; else bad 'help lists inspect'; fi
+"$C" escalation onboarding-flight-control status >/dev/null && ok 'escalation status' || bad 'escalation status'
+# Escalation status on a client with no escalation state is a valid machine payload (exit 0).
+esc_status=$("$C" escalation onboarding-flight-control status)
+if jq -e '.missing == true and .paused == false and (.open | type) == "array"' <<<"$esc_status" >/dev/null; then
+  ok 'escalation status missing honesty'
+else
+  bad 'escalation status missing honesty'
+fi
+# Full real block → refuse → authorized resume lifecycle lives in escalation-smoke.sh
+if "$ROOT/tests/escalation-smoke.sh" >/dev/null; then
+  ok 'escalation real lifecycle (block/refuse/resume/inspect)'
+else
+  bad 'escalation real lifecycle (block/refuse/resume/inspect)'
+fi
+
+# Build 4 surface: status is file-derived and never invokes a provider.
+if "$C" help | grep -q 'role <client> invoke'; then ok 'help lists role'; else bad 'help lists role'; fi
+role_status=$("$C" role onboarding-flight-control status)
+if jq -e '.asked == [] and .ran == [] and .produced == [] and (.missing | length) == 3' <<<"$role_status" >/dev/null; then
+  ok 'role status missing honesty'
+else
+  bad 'role status missing honesty'
+fi
 
 # learning schema + judgment examples
 [[ -f "$ROOT/docs/learning-schema.md" ]] && ok 'learning schema' || bad 'learning schema'
 [[ -f "$ROOT/state/harness-evolution/examples/challenge-refusal.md" ]] && ok 'challenge example' || bad 'challenge example'
 [[ -f "$ROOT/state/harness-evolution/examples/override-risks.md" ]] && ok 'override example' || bad 'override example'
+
+if "$ROOT/tests/workspace-smoke.sh" >/dev/null; then
+  ok 'workspace isolation real-worktree refuse/pass'
+else
+  bad 'workspace isolation real-worktree refuse/pass'
+fi
 
 if (( fail == 0 )); then
   printf '\n  all smoke checks passed\n\n'

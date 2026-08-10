@@ -1,0 +1,9 @@
+{
+  "mode": "Directive",
+  "ts": "2026-08-10T06:59:04Z",
+  "direction": "Make unattended multi-iteration consulting operable under the Constitution",
+  "risks": [
+    "Keep builds ordered and avoid a second orchestrator"
+  ],
+  "decision": "allowed"
+}

@@ -1,0 +1,41 @@
+$ bin/consult smoke
+
+  consult smoke
+
+  PASS  help
+  PASS  status
+  PASS  org
+  PASS  memory
+  PASS  judge show
+  PASS  bench
+  PASS  bench contract id
+  PASS  help lists score
+  PASS  help lists runtime
+  PASS  help lists harness-checks
+  PASS  help lists gh
+  PASS  help lists skill
+  PASS  skill critique present
+  PASS  skill benchmark present
+  PASS  skill design-sprint present
+  PASS  runtime
+  PASS  judge harness-evolution
+  PASS  gh preflight
+  PASS  gh merge refuses without auth
+  PASS  runtime --check refuses missing provider
+Preparing worktree (detached HEAD 6a8db8e)
+HEAD is now at 6a8db8e Merge pull request #2 from lpbangun/consult/validation-2026-08-06-ci
+  PASS  checks
+  PASS  ofc refuses provider run
+  PASS  agcode refuses checks
+  PASS  unknown rejects
+  PASS  help lists judge
+  PASS  learning schema
+  PASS  challenge example
+  PASS  override example
+Preparing worktree (detached HEAD dc786a4)
+HEAD is now at dc786a4 initial
+  PASS  workspace isolation real-worktree refuse/pass
+
+  all smoke checks passed
+
+exit=0

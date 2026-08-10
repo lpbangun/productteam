@@ -1,0 +1,19 @@
+{
+  "client": "harness-evolution",
+  "mode": "Directive",
+  "allowed": true,
+  "decision": "allowed",
+  "reason": "implement allowed",
+  "bound_direction": "Make unattended multi-iteration consulting operable under the Constitution",
+  "artifact": "/home/logani/.herdr/worktrees/Product Consulting Harness/upgrade-basic-funcionalities/state/harness-evolution/judgment/directive.json",
+  "artifact_ts": "2026-08-10T06:59:04Z",
+  "required": {
+    "directive.json": "direction + decision (+ risks array, may be empty)"
+  },
+  "present": {
+    "directive_present": true,
+    "direction_present": true,
+    "decision_present": true,
+    "risks_recorded": true
+  }
+}

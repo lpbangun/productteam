@@ -17,3 +17,21 @@
 ## Durable rule
 
 A loading UI is correct only if it preserves provider bytes and exit status on success and failure. A deterministic benchmark may report criterion passes, but must not report convergence until every required live artifact is present and validated.
+
+## Operability addendum
+
+- Exact owner acceptance pointers must remain the source of truth; early
+  paraphrases drifted from lifecycle and per-run evidence requirements.
+- Real temporary Git repositories/worktrees proved isolation and dirty refusal
+  without fixtures or mocks.
+- Read-only gate, pause, score, and close predicates make continuation
+  derivable from files rather than chat.
+- Real mode and escalation smoke caught stale cross-mode artifacts, predicate
+  asymmetry, JSON-shape errors, and shell grouping bugs that syntax checks
+  missed.
+- Resume tokens are opaque correlation receipts, not authentication; a separate
+  exact owner authorization artifact is required and consumed.
+- Branch operations must name source, destination, and final worktree first.
+  Here, `Fix/New-User-TUI` is ported into `Upgrade/basic-funcionalities`.
+- Regenerable inspect packs and temporary engagement workspaces are local
+  outputs; durable run evidence and role envelopes belong in the iteration.

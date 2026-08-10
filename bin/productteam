@@ -29,6 +29,10 @@ source "$ROOT/lib/onboarding.sh"
 source "$ROOT/lib/activity.sh"
 source "$ROOT/lib/repl.sh"
 source "$ROOT/lib/render.sh"
+source "$ROOT/lib/workspace.sh"
+source "$ROOT/lib/judgment-gate.sh"
+source "$ROOT/lib/engagement-state.sh"
+source "$ROOT/lib/role-envelope.sh"
 
 score_color() { # $1=score → accent for the score, or nothing in between
   if awk -v s="$1" 'BEGIN{exit !(s>=9)}'; then printf '%s' "$G"
@@ -100,6 +104,60 @@ engagement_scorer() { # engagement dir → checks|provider
   printf 'provider'
 }
 
+nonblank() { [[ "$1" == *[![:space:]]* ]]; }
+parse_allow_dirty() {
+  local reason=''
+  while (( $# )); do
+    case "$1" in
+      --allow-dirty)
+        [[ $# -ge 2 && -n "$2" ]] || die '--allow-dirty requires a non-empty reason'
+        reason="$2"; shift 2 ;;
+      *) die "unknown option '$1' (expected --allow-dirty <reason>)" ;;
+    esac
+  done
+  printf '%s' "$reason"
+}
+
+parse_score_args() {
+  SCORE_ITER=''
+  SCORE_DIRTY_REASON=''
+  while (( $# )); do
+    case "$1" in
+      --iter)
+        [[ $# -ge 2 && "$2" =~ ^[0-9]+$ ]] || die '--iter requires a non-negative integer'
+        SCORE_ITER="$2"; shift 2 ;;
+      --allow-dirty)
+        [[ $# -ge 2 && -n "$2" ]] || die '--allow-dirty requires a non-empty reason'
+        SCORE_DIRTY_REASON="$2"; shift 2 ;;
+      *) die "unknown score option '$1' (expected --iter <n> or --allow-dirty <reason>)" ;;
+    esac
+  done
+  [[ -n "$SCORE_ITER" ]] || die 'scoring requires --iter <n> to bind the Analyst stamp'
+}
+
+cmd_workspace() {
+  local c="$1" action="$2" d
+  shift 2
+  d=$(client_dir "$c")
+  case "$action" in
+    ensure)
+      local reason snapshot
+      reason=$(parse_allow_dirty "$@")
+      snapshot=$(workspace_ensure "$c" "$d" "$reason") || exit $?
+      printf '%s\n' "$snapshot"
+      ;;
+    status)
+      (( $# == 0 )) || die 'usage: productteam workspace <client> status'
+      workspace_snapshot "$c" "$d" ''
+      ;;
+    remove)
+      (( $# == 0 )) || die 'usage: productteam workspace <client> remove'
+      workspace_remove "$c" "$d"
+      ;;
+    *) die 'usage: productteam workspace <client> ensure|status|remove' ;;
+  esac
+}
+
 cmd_help() {
   local prov
   prov="$(runtime_default 2>/dev/null || echo '(none)')"
@@ -118,10 +176,26 @@ cmd_help() {
     productteam judge <client>      Product Judgment mode + mission
     productteam judge <client> set <mode>
                                 Set Guided|Directive|Challenge|Override
-    productteam score <client>      Score via the engagement's declared scorer
+    productteam gate <client> status|implement|select|direct|challenge|override
+                                Durable judgment decisions + machine status
+    productteam workspace <client> ensure|status|remove
+                                Isolated client worktree lifecycle
+    productteam escalation <client> block <id> <summary> <option> [option...]
+    productteam escalation <client> status|resume <id> <token>
+                                Durable owner block and authorized continuation
+    productteam inspect <client> [out]
+                                Regenerate the file-derived inspect pack
+    productteam role <client> invoke <Analyst|Builder|Critic> <iter> [task]
+    productteam role <client> seal <iter> <input-file>
+    productteam role <client> status [iter] | close <iter>
+                                Single-turn roles, sealed input, authorship gates
+    productteam score <client> --iter <n>
+                                Score via the declared scorer + Analyst stamp
     productteam bench <client>      Benchmark contract + history + latest scores
-    productteam bench <client> run  Provider scoring (scorer=provider only)
-    productteam checks <client>     Deterministic checks (scorer=checks only)
+    productteam bench <client> run --iter <n>
+                                Provider scoring with authorship gate
+    productteam checks <client> [--allow-dirty <reason>]
+                                Deterministic checks in isolated workspace
     productteam harness-checks [iter-dir]
                                 Objective harness-apc checks + secrets scan
     productteam gh preflight [dir]  GitHub auth + permissions (tokens redacted)
@@ -347,6 +421,66 @@ cmd_judge_set() {
   printf '\n  %sMode set to %s%s for %s\n\n' "$G" "$mode" "$R" "$c"
 }
 
+cmd_gate() {
+  local c="$1" action="$2" d; shift 2
+  d=$(client_dir "$c"); [[ -f "$d/engagement.md" ]] || die "missing $d/engagement.md"
+  local mode; mode=$(judgment_mode "$d")
+  case "$action" in
+    status) (($# == 0)) || die 'usage: productteam gate <client> status'; judgment_status "$c" "$d" ;;
+    implement)
+      (($# <= 1)) || die 'usage: productteam gate <client> implement [direction]'
+      local want="${1:-}" refusal block_reason
+      block_reason=$(progress_blocked_reason "$d"); [[ -z "$block_reason" ]] || die "$block_reason"
+      [[ -n "$want" ]] || want=$(judgment_bound_direction "$d" "$mode")
+      refusal=$(judgment_implement_refusal "$d" "$mode" "$want"); [[ -z "$refusal" ]] || die "$refusal"
+      printf '\n  %sGate: %s implement allowed%s\n\n' "$G" "$c" "$R" ;;
+    select) (($# == 1 || $# == 2)) || die 'usage: productteam gate <client> select <direction> [selected-by]'; [[ "$mode" == Guided || "$mode" == Challenge ]] || die "mode is $mode — select requires Guided or Challenge"; judgment_write_selection "$d" "$1" "${2:-principal}" >/dev/null ;;
+    direct)
+      (($# >= 1)) || die 'usage: productteam gate <client> direct <direction> [risk...]'
+      [[ "$mode" == Directive ]] || die "mode is $mode — direct requires Directive"
+      nonblank "$1" || die 'directive direction must be non-blank'
+      judgment_write_directive "$d" "$1" "${@:2}" >/dev/null ;;
+    override)
+      (($# == 4)) || die 'usage: productteam gate <client> override <direction> <risk> <critic-record> <evidence-record>'
+      nonblank "$1" && nonblank "$2" && nonblank "$3" && nonblank "$4" || die 'override direction, risk, critic record, and evidence record must be non-empty'
+      [[ "$mode" == Override ]] || die "mode is $mode — override requires Override"
+      judgment_write_override "$d" "$1" "$2" "$3" "$4" >/dev/null ;;
+    challenge) (($# == 3)) || die 'usage: productteam gate <client> challenge <harmful> <safer> <evidence>'; [[ "$mode" == Challenge ]] || die "mode is $mode — challenge requires Challenge"; judgment_write_challenge "$d" "$1" "$2" "$3" >/dev/null ;;
+    *) die 'usage: productteam gate <client> status|implement|select|direct|challenge|override …' ;;
+  esac
+}
+
+cmd_escalation() {
+  local c="$1" action="$2" d; shift 2; d=$(client_dir "$c")
+  case "$action" in
+    block) (($# >= 3)) || die 'usage: productteam escalation <client> block <id> <summary> <option> [option...]'; escalation_block "$c" "$d" "$1" "$2" "${@:3}" ;;
+    status) (($# == 0)) || die 'usage: productteam escalation <client> status'; escalation_status "$c" "$d" ;;
+    resume) (($# == 2)) || die 'usage: productteam escalation <client> resume <id> <token>'; escalation_resume "$c" "$d" "$1" "$2" ;;
+    *) die 'usage: productteam escalation <client> block|status|resume …' ;;
+  esac
+}
+
+cmd_inspect() {
+  local c="$1" out="${2:-}" d; d=$(client_dir "$c"); [[ -n "$out" ]] || out="$d/inspect-pack.json"
+  inspect_write_pack "$c" "$d" "$out" >/dev/null
+  printf '\n  %sInspect pack regenerated:%s %s\n\n' "$B" "$R" "$out"
+}
+
+cmd_role() {
+  local c="$1" action="$2" d; shift 2; d=$(client_dir "$c")
+  case "$action" in
+    seal) (($# == 2)) || die 'usage: productteam role <client> seal <iter> <input-file>'; local seal; seal=$(role_seal "$d" "$1" "$2" "${CONSULT_ROLE_IDENTITY:-principal}") || die "$seal"; printf '\n  %sBuilder input sealed:%s %s\n\n' "$B" "$R" "$seal" ;;
+    invoke)
+      (($# >= 2)) || die 'usage: productteam role <client> invoke <Analyst|Builder|Critic> <iter> [task]'
+      local role="$1" iter="$2" task=''; shift 2; role=$(role_name "$role") || die 'role must be Analyst, Builder, or Critic'
+      if [[ "$role" == Builder ]]; then (($# == 0)) || die 'Builder task is the sealed input'; else (($# == 1)) || die "usage: productteam role <client> invoke $role <iter> <task>"; task="$1"; fi
+      role_invoke "$c" "$d" "$role" "$iter" "$task" ;;
+    status) (($# <= 1)) || die 'usage: productteam role <client> status [iter]'; role_status "$c" "$d" "${1:-}" ;;
+    close) (($# == 1)) || die 'usage: productteam role <client> close <iter>'; local close; close=$(role_close "$d" "$1") || die "$close"; printf '\n  %sIteration closed:%s %s\n\n' "$B" "$R" "$close" ;;
+    *) die 'usage: productteam role <client> seal|invoke|status|close …' ;;
+  esac
+}
+
 # An engagement whose subject is this repo cannot be checked from inside this
 # CLI: its suite drives `productteam checks <client>` itself, so calling the suite
 # here would recurse. Route to it by name and show the last recorded run.
@@ -367,7 +501,10 @@ checks_self_route() { # $1=client $2=engagement dir $3=runner (repo-relative)
 }
 
 cmd_checks() {
-  local c="$1" d; d=$(client_dir "$c")
+  local c="$1"; shift
+  local d; d=$(client_dir "$c")
+  local block_reason; block_reason=$(progress_blocked_reason "$d")
+  [[ -z "$block_reason" ]] || die "$block_reason"
   local scorer; scorer=$(engagement_scorer "$d")
   [[ "$scorer" == checks ]] || die "engagement '$c' uses scorer=$scorer — use: productteam score $c (or productteam bench $c run)"
   local cid rel repo
@@ -395,12 +532,15 @@ cmd_checks() {
 }
 
 cmd_score() {
-  local c="$1" d; d=$(client_dir "$c")
+  local c="$1"; shift
+  local d; d=$(client_dir "$c")
+  parse_score_args "$@"
+  local refusal; refusal=$(role_stamp_refusal "$d" "$SCORE_ITER")
+  [[ -z "$refusal" ]] || die "$refusal"
   local scorer; scorer=$(engagement_scorer "$d")
-  printf '\n  %sScoring %s via scorer=%s%s\n' "$B" "$c" "$scorer" "$R"
   case "$scorer" in
-    checks)   cmd_checks "$c" ;;
-    provider) cmd_bench_run "$c" ;;
+    checks) cmd_checks "$c" ;;
+    provider) cmd_bench_run "$c" --iter "$SCORE_ITER" ;;
     *) die "unknown scorer '$scorer' in $d/contract.json (expected checks|provider)" ;;
   esac
 }
@@ -566,19 +706,22 @@ cmd_report() {
 }
 
 cmd_bench_run() {
-  local c="$1" d; d=$(client_dir "$c")
+  local c="$1"; shift
+  local d; d=$(client_dir "$c")
+  parse_score_args "$@"
+  local n="$SCORE_ITER" refusal
+  refusal=$(role_stamp_refusal "$d" "$n"); [[ -z "$refusal" ]] || die "$refusal"
   local scorer; scorer=$(engagement_scorer "$d")
   [[ "$scorer" == provider ]] || die "engagement '$c' uses scorer=$scorer — use: productteam score $c (or productteam checks $c)"
   [[ -f "$d/engagement.md" ]] || die "missing $d/engagement.md (brief with Repo: path)"
-  local repo; repo=$(awk -F': ' '/^Repo:/{print $2; exit}' "$d/engagement.md")
-  [[ -d "$repo" ]] || die "client repo not found: $repo"
-
-  local n=0 last; last=$(latest_run "$d")
-  [[ -n "$last" ]] && n=$(( ${last#iter-} + 1 ))
-  local kind='iteration'; (( n == 0 )) && kind='baseline'
-  local rd="$d/runs/iter-$n"; mkdir -p "$rd"
-
-  printf '\n  %sScoring %s — iter %s (%s)%s\n' "$B" "$c" "$n" "$kind" "$R"
+  local snapshot repo
+  snapshot=$(workspace_ensure "$c" "$d" "$SCORE_DIRTY_REASON") || exit $?
+  repo=$(jq -r '.path' <<<"$snapshot")
+  local kind='iteration' rd="$d/runs/iter-$n"
+  [[ -e "$rd/scores.json" ]] && die "scores already exist for role iter $n: $rd/scores.json"
+  mkdir -p "$rd"
+  workspace_write_evidence "$snapshot" "$rd/workspace.json" score
+  printf '\n  %sScoring %s — role iter %s (%s)%s\n' "$B" "$c" "$n" "$kind" "$R"
   printf '  %sProvider: %s · repo: %s%s\n' "$D" "${CONSULT_PROVIDER:-$(runtime_default 2>/dev/null || echo none)}" "$repo" "$R"
   printf '  %sThe Analyst is inspecting the client…%s\n\n' "$D" "$R"
 
@@ -622,14 +765,16 @@ areas = ["correctness","simplicity","maintainability","usability","educational-q
 scores = {a: {"score": round(float(obj["scores"][a]["score"]), 1),
               "evidence": str(obj["scores"][a].get("evidence", "")).strip()[:300]} for a in areas}
 overall = round(sum(s["score"] for s in scores.values()) / len(scores), 1)
+evaluator, stamp = sys.argv[4], sys.argv[5]
 json.dump({"ts": datetime.date.today().isoformat(), "iter": iter_n, "kind": kind,
+           "evaluator": evaluator, "analyst_stamp": stamp,
            "scores": scores, "overall": overall}, open(out, "w"), indent=2)
-' "$rd/scores.json" "$n" "$kind"; then
+' "$rd/scores.json" "$n" "$kind" "$(jq -r '.identity' "$(role_stamp_path "$d" "$n")")" "$(role_stamp_path "$d" "$n")"; then
     printf '%s\n' "$reply" > "$rd/raw-provider-output.txt"
     die "provider returned no parseable contract JSON (raw output kept in $rd/raw-provider-output.txt)"
   fi
 
-  jq -c '{ts, iter, kind, overall, scores}' "$rd/scores.json" >> "$d/history.jsonl"
+  jq -c '{ts, iter, kind, evaluator, analyst_stamp, overall, scores}' "$rd/scores.json" >> "$d/history.jsonl"
   local ov; ov=$(jq -r '.overall' "$rd/scores.json")
   printf '  %sRecorded iter %s — overall %s%s\n' "$B" "$n" "$(score_color "$ov")" "$ov"
   printf '  %s%s%s\n\n' "$D" "$rd/scores.json" "$R"
@@ -666,15 +811,30 @@ main() {
       else
         cmd_judge "$1"
       fi ;;
+    workspace|worktree)
+      [[ $# -ge 2 ]] || die 'usage: productteam workspace <client> ensure|status|remove'
+      cmd_workspace "$@" ;;
+    gate)
+      [[ $# -ge 2 ]] || die 'usage: productteam gate <client> status|implement|select|direct|challenge|override …'
+      cmd_gate "$@" ;;
+    escalation)
+      [[ $# -ge 2 ]] || die 'usage: productteam escalation <client> block|status|resume …'
+      cmd_escalation "$@" ;;
+    inspect)
+      [[ $# -ge 1 ]] || die 'usage: productteam inspect <client> [out]'
+      cmd_inspect "$@" ;;
+    role)
+      [[ $# -ge 2 ]] || die 'usage: productteam role <client> seal|invoke|status|close …'
+      cmd_role "$@" ;;
     score)
-      [[ $# -ge 1 ]] || die 'usage: productteam score <client>'
-      cmd_score "$1" ;;
+      [[ $# -ge 1 ]] || die 'usage: productteam score <client> --iter <n>'
+      cmd_score "$@" ;;
     checks)
-      [[ $# -ge 1 ]] || die 'usage: productteam checks <client>'
-      cmd_checks "$1" ;;
+      [[ $# -ge 1 ]] || die 'usage: productteam checks <client> [--allow-dirty <reason>]'
+      cmd_checks "$@" ;;
     bench)
-      [[ $# -ge 1 ]] || die 'usage: productteam bench <client> [run]'
-      if [[ "${2:-}" == 'run' ]]; then cmd_bench_run "$1"; else cmd_bench "$1"; fi ;;
+      [[ $# -ge 1 ]] || die 'usage: productteam bench <client> [run --iter <n>]'
+      if [[ "${2:-}" == 'run' ]]; then cmd_bench_run "$1" "${@:3}"; else cmd_bench "$1"; fi ;;
     run)
       [[ $# -ge 2 ]] || die 'usage: productteam run <client> <iter>'
       cmd_run_detail "$1" "$2" ;;

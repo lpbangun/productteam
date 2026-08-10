@@ -32,10 +32,15 @@ bin/productteam splash [--frames]
 bin/productteam agents [--json] [--check]
 bin/productteam runtime          # alias of agents
 bin/productteam judge <client>   # mode + mission (also: harness-evolution)
-bin/productteam score <client>   # score via engagement scorer
+bin/productteam gate <client> status|implement|select|direct|challenge|override
+bin/productteam workspace <client> ensure|status|remove
+bin/productteam escalation <client> block|status|resume
+bin/productteam inspect <client>
+bin/productteam role <client> seal|invoke|status|close
+bin/productteam score <client> --iter <n>   # Analyst-stamped score
 bin/productteam checks <client>  # deterministic contract checks
 bin/productteam bench <client>   # scores + history
-bin/productteam bench <client> run  # provider scoring (scorer=provider only)
+bin/productteam bench <client> run --iter <n>
 bin/productteam run <client> <n> # scores for iteration n
 bin/productteam report <client>  # latest iteration reasoning
 bin/productteam harness-checks   # harness-apc objective checks + secrets scan
@@ -45,6 +50,8 @@ bin/productteam memory           # durable lessons
 bin/productteam org              # roles + autonomy
 bin/productteam smoke            # CLI smoke tests
 bin/productteam skill critique|benchmark|design-sprint <target>
+
+# `bin/consult` remains a compatibility shim to `bin/productteam`.
 ```
 
 Provider: authenticated Cursor `agent` CLI by default (`CONSULT_PROVIDER` to swap).
@@ -81,6 +88,26 @@ Learning artifacts: `docs/learning-schema.md` · harness evolution under
 | `CONSULT_ROOT` | Set by the CLI to the harness root (exported for child scripts) |
 | `CONSULT_SMOKE_SKIP_CLIENT` | Skip sibling-client checks inside smoke |
 | `NO_COLOR` | Disable ANSI accents |
+## Isolated client workspaces
+
+`score`, `checks`, and provider benchmark runs never use the `Repo:` working
+tree directly. They ensure a detached worktree under
+`tmp/workspaces/<client>` and persist its source/path/SHA in the engagement's
+`workspace.json`. `workspace status` emits live machine-readable JSON;
+`workspace remove` removes only a clean worktree.
+
+A dirty isolated worktree refuses scoring/checks with
+`workspace-dirty: <client>`. The only reuse escape is explicit and recorded:
+`--allow-dirty '<reason>'`. Each provider score stores `workspace.json` beside
+its scores; each deterministic check stores the same path/SHA/dirty evidence
+in a unique `runs/check-*/workspace.json`. The live owner tree is never the
+fallback. `CONSULT_WORKSPACE_ROOT` may relocate worktrees without changing the
+plain-file metadata seam.
+
+`ensure` reuses the existing detached checkout; it does not reset it to a newer
+source `HEAD`. To refresh, remove the clean workspace and ensure it again. If a
+workspace directory was deleted outside the CLI, run `git -C <Repo> worktree
+prune`, then `workspace <client> ensure` to repair the registration.
 
 ## Product Judgment modes
 
@@ -92,6 +119,105 @@ Learning artifacts: `docs/learning-schema.md` · harness evolution under
 | **Override** | Follow an explicit decision; document concerns |
 
 Full text: `JUDGMENT.md`.
+
+## Judgment gates
+
+The four modes bind implementation through **durable files** under the
+engagement: `state/engagements/<client>/judgment/` (selection, directive,
+challenge, override). `consult gate <client> …` is the read-mostly gate:
+
+```sh
+bin/consult gate <client> status                                   # machine JSON
+bin/consult gate <client> implement [<direction>]                  # allow/refuse
+bin/consult gate <client> select <direction> [selected-by]         # Guided or Challenge safer alternative
+bin/consult gate <client> direct <direction> [risk...]             # Directive only
+bin/consult gate <client> challenge <harmful> <safer> <evidence>   # Challenge only
+bin/consult gate <client> override <direction> <risk> <critic-record> <evidence-record>
+```
+
+The current `Mode:` line in `engagement.md` is the sole authority: each verb
+works only in its mode, stale files from other modes are ignored, and a
+missing/unknown mode refuses. `implement` without an argument uses the mode's
+bound direction (Guided/Directive/Override `.direction`; Challenge
+`.safer_alternative`); an explicit direction must equal the bound one.
+
+| Mode | Implement requires | Refuses |
+|------|--------------------|---------|
+| Guided | `judgment/selection.json` with non-empty `direction` + `selected_by` | no selection yet; wrong direction |
+| Directive | `judgment/directive.json` with `direction` + `decision` (`risks` may be empty) | no durable directive |
+| Challenge | `judgment/challenge.json` (`harmful`, `safer_alternative`, `evidence`) **and** `selection.json` matching the safer alternative | the challenged harmful path always; incomplete challenge |
+| Override | `judgment/override.json`: exact direction, non-empty `risks`, `critic_record`, `evidence_record`, and `non_waivers.{critic,evidence,frozen_contract}=true` | empty risks; missing/false non-waivers |
+
+Writers persist `mode`, `ts`, and the decision atomically (tmp + rename).
+`status` emits valid JSON (`client`, `mode`, `allowed`, `decision`, `reason`,
+`bound_direction`, `artifact`, `artifact_ts`, plus required/present data) and
+always exits 0 — a later session re-derives the same decision from the files
+alone. Override **never waives the contract**: the non-waiver booleans are
+required and there is no waiver channel. Builder role invocation consumes this
+same read-only `implement` predicate after pause and seal checks.
+
+## Escalations and file-state continuation
+
+```sh
+bin/consult escalation <client> block <id> <summary> <option> [option...]
+bin/consult escalation <client> status
+bin/consult escalation <client> resume <id> <resume-token>
+bin/consult inspect <client>
+```
+
+`block` writes one entry in engagement `escalations.json` and an active
+`pause.json`. The same predicate then refuses `checks`, provider scoring, and
+`gate … implement`, naming the blocking files. Options and the resume token are
+durable; the token correlates state but is not authorization.
+
+The owner must manually create `authorize-resume.json`; the CLI never creates
+it:
+
+```json
+{"id":"owner-1","token":"<resume-token>","authorized_by":"owner","decision":"selected option"}
+```
+
+`resume` requires exact id/token matching and non-empty owner/decision fields.
+It marks the escalation resolved, stamps pause resumed and authorization
+consumed, writes `continuation.json`, and appends a pointer to `MEMORY.md`.
+Tests relocate only the MEMORY target with `CONSULT_MEMORY_FILE`.
+
+`inspect` regenerates `inspect-pack.json` from engagement files: mode/gate,
+scores and `history.jsonl`, escalation/pause state, latest lessons pointer,
+continuation, and `next_suggested_action`. Missing sources are explicit
+`missing:true` objects plus entries in `missing`; the pack never fills gaps from
+chat.
+
+## Role envelopes and authorship gates
+
+```sh
+bin/consult role <client> seal <iter> <builder-input-file>
+bin/consult role <client> invoke Analyst <iter> '<single-turn task>'
+bin/consult role <client> invoke Builder <iter>
+bin/consult role <client> invoke Critic <iter> '<single-turn task>'
+bin/consult role <client> status [iter]
+bin/consult role <client> close <iter>
+bin/consult score <client> --iter <iter>
+```
+
+Each invoke is one `provider_ask` call in the isolated client worktree. It
+writes an atomic `request.json`, `result.json`, and hash-indexed `manifest.json`
+under `roles/iter-N/<Role>/attempt-N/`, including honest failure envelopes.
+`status` reads only those files and returns byte-stable `asked`, `ran`,
+`produced`, and `missing` arrays; it never reads chat or live process state.
+
+Builder input is write-once per iteration. `seal` records the input file path
+and SHA-256; Builder re-hashes and reads those exact bytes, refusing missing or
+changed input before the provider call. It also composes the active pause and
+judgment gates. The seal proves input integrity, not identity or authorization.
+
+A successful Analyst envelope writes `Analyst/stamp.json`, bound to its result
+hash and `CONSULT_ROLE_IDENTITY` (default `analyst`). Provider score publication
+requires `--iter N` and that exact iteration's valid stamp. Score and close
+refuse when the successful Builder identity equals the Analyst identity. Close
+also requires a successful Critic envelope, then writes `roles/iter-N/close.json`.
+The same authenticated provider may execute each role; role identity, not the
+provider binary name, enforces separation.
 
 ## How an engagement runs
 
@@ -126,11 +252,19 @@ Full text: `JUDGMENT.md`.
 | `lib/provider.sh` | Provider detection, session cycling, and ask seam |
 | `lib/onboarding.sh` | First-run onboarding |
 | `lib/github.sh` | Gated PR/merge/validate helpers (no `--admin`) |
+| `lib/workspace.sh` | Isolated worktree lifecycle, dirty gate, provenance |
+| `lib/judgment-gate.sh` | Durable per-mode judgment gates + machine status |
+| `lib/engagement-state.sh` | Escalation pause/resume + file-derived inspect |
+| `lib/role-envelope.sh` | Sealed single-turn roles + authorship gates |
 | `lib/run-checks.sh` | Deterministic checks (`scorer=checks`) |
 | `lib/harness-checks.sh` | Harness-apc objective checks + secrets scan |
 | `lib/harness-cli-checks.sh` | harness-cli-v1 check suite |
 | `lib/run-skill.sh` | Skills via real `provider_ask` |
 | `tests/consult-smoke.sh` | CLI smoke |
+| `tests/workspace-smoke.sh` | Real-worktree isolation refusal/pass probe |
+| `tests/judgment-gate-smoke.sh` | Real-CLI judgment gate refuse/pass probe |
+| `tests/escalation-smoke.sh` | Real block/authorize/resume/inspect probe |
+| `tests/role-envelope-smoke.sh` | Real-provider seal/envelope/authorship probe |
 | `state/` | Engagements, scores, history, and plain-file CLI sessions |
 | `state/harness-evolution/` | APC self-improvement (locked `harness-apc-v1`) |
 

@@ -1,0 +1,170 @@
+{
+  "artifact": "build-4-advisor-verdict.json",
+  "scope": "Build 4 — role envelope: invoke + status, sealed Builder input, request/result/manifest evidence, authorship close/score gates (mission-benchmark.md §8)",
+  "verdict": "PASS",
+  "verdict_rule": "5 pointers × their checks, all PASS → Build 4 PASS (mission-benchmark.md §8.4 Final verdict)",
+  "audited_by": "Independent Advisor (Build4Acceptance) — independent of Builder",
+  "audited_at": "2026-08-10",
+  "head": "1f6f17e",
+  "tree": "upgrade-basic-funcionalities",
+  "pointer_results": {
+    "1_role_invoke_and_status_over_provider_seam": {
+      "result": "PASS",
+      "evidence": [
+        "R1.1: `bin/consult help | grep -qi role` → match; help lists `consult role <client> seal|invoke|status|close` (acceptance-build-4-smoke.txt 'PASS help lists role')",
+        "R1.2: real single-turn Analyst invoke over the existing seam: `bin/consult runtime --check` exit 0 (agent active, /home/logani/.local/bin/agent); `CONSULT_ROLE_IDENTITY=auditor bin/consult role b4-audit-<pid> invoke Analyst 0 'Return exactly AUDIT_ANALYST_OK.'` exit 0, provider reply 'AUDIT_ANALYST_OK', real detached worktree prepared (HEAD 2fd43ff); request.json + result.json + manifest.json written under roles/iter-0/Analyst/attempt-1 with role=Analyst, provider=agent, timestamps, exit=0; sole model entry point is provider_ask (lib/provider.sh:47; callsites bin/consult:744 and lib/role-envelope.sh:177 — no new ask function, no mock provider binary)",
+        "R1.3: `CONSULT_PROVIDER=/nonexistent/no-such-provider bin/consult role <client> invoke Analyst 9 'x'` → exit 127, refusal 'provider /nonexistent/no-such-provider failed with exit 127', complete failed envelope written (roles/iter-9/Analyst/attempt-1 with request/result/manifest, result.exit != 0, refusal_reason contains 'provider') — smoke marker 'PASS role-invoke-provider-seam'",
+        "R1.4: `bin/consult role <client> status [iter]` emits valid machine JSON {client, iter, artifact_root, asked[], ran[], produced[], missing[]} derived from envelope files; missing honesty proven on a fresh engagement (missing lists all three roles' attempt-*/manifest.json paths); smoke marker 'PASS role-status-file-derived'"
+      ]
+    },
+    "2_per_iteration_sealed_builder_input": {
+      "result": "PASS",
+      "evidence": [
+        "R2.1: Builder invoke without seal refuses and names the seal: 'missing sealed Builder input: …/roles/iter-0/Builder/seal.json (envelope …/attempt-1)' exit 1; refusal itself enveloped (result.json exit=1, refusal_reason contains 'missing sealed Builder input') — smoke marker 'PASS role-builder-seal-refusal'",
+        "R2.2: seal is write-once and content-addressed: `role seal 0 <input>` exit 0 writes seal.json {role:Builder, iter:0, input_path, input_sha256:4d8e9e79…, sealed_by, sealed_at, write_once:true}; second seal refuses 'already sealed' exit 1 — smoke marker 'PASS role-builder-seal-mismatch' (seal-twice step)",
+        "R2.3: sealed unchanged input allows Builder invoke (exit 0, reply 'AUDIT_BUILDER_OK'); Builder invoke also respects the Build 2 implement gate (judgment_implement_refusal consulted in role_invoke before provider work) and refuses before provider when progress is blocked",
+        "R2.4: tampered input after seal refuses: appended 'tampered' to the sealed file → 'sealed Builder input hash mismatch: <input> (seal <path>)' exit 1; seal hash 4d8e9e79… verified equal to sha256 of the original pre-tamper content — smoke marker 'PASS role-builder-seal-mismatch'"
+      ]
+    },
+    "3_request_result_manifest_evidence": {
+      "result": "PASS",
+      "evidence": [
+        "R3.1: Analyst, Builder, and Critic each leave request.json + result.json + manifest.json under roles/iter-0/<Role>/attempt-N/; every manifest records role, provider, requested_at, ran_at, exit, request_sha256, result_sha256; sha256sum of request.json and result.json re-verified against manifest for all three roles (Analyst attempt-1, Builder attempt-2 success, Critic attempt-1 — all MATCH); refused attempts also carry complete verified envelopes (Builder attempt-3 exit=1 hashes MATCH) — smoke marker 'PASS role-envelope-request-result-manifest'",
+        "R3.2: `bin/consult role <client> status 0` re-derives the envelope inventory from files alone in fresh CLI processes: asked/ran/produced each enumerate the three roles; two consecutive invocations byte-identical (cmp empty); produced[] carries request_sha256/result_sha256 matching the manifest files"
+      ]
+    },
+    "4_close_score_authorship_gates": {
+      "result": "PASS",
+      "evidence": [
+        "R4.1: scores without an Analyst stamp are invalid: `bench <client> run --iter 3` (no stamp) → exit 1, 'error: scores invalid: missing Analyst stamp …/roles/iter-3/Analyst/stamp.json' — refusal names the missing stamp; smoke marker 'PASS role-score-no-analyst-stamp'",
+        "R4.2: close refuses without a Critic envelope: iter 7 with valid Analyst stamp but no Critic → exit 1, 'error: cannot close: missing complete Critic envelope under …/roles/iter-7/Critic'; smoke marker 'PASS role-close-no-critic' (close 0 refused before Critic existed)",
+        "R4.3: implementer = evaluator rejected: iter 6 with CONSULT_ROLE_IDENTITY=same for both Analyst and Builder → `score --iter 6` exit 1 'scores invalid: implementer = evaluator (same) for iter 6' and `close 6` exit 1 same message; smoke marker 'PASS role-implementer-evaluator-rejected'",
+        "R4.4: happy path: distinct identities (Builder=implementer, Analyst=auditor, Critic=reviewer) → `bench run --iter 0` exit 0 (overall 6.4, scores.json evaluator=auditor, analyst_stamp bound to roles/iter-0/Analyst/stamp.json, 9 areas), `role close 0` exit 0 writing close.json {decision:closed, implementer_identity:implementer, evaluator_identity:auditor, critic_manifest_sha256, analyst_stamp_sha256}; smoke marker 'PASS role-authorship-happy-path'"
+      ]
+    },
+    "5_file_derived_status_and_proofs": {
+      "result": "PASS",
+      "evidence": [
+        "R5.1: status answers asked/ran/produced exclusively from request/result/manifest files: asked[] = {role, identity, provider, task, input_ref, input_sha256, at, request}, ran[] = {role, identity, provider, exit, refusal_reason, output_sha256, at, result}, produced[] = {role, identity, provider, exit, request_sha256, result_sha256, manifest, result}; JSON contains no chat/transcript/conversation/process references (grep -qiE 'chat|transcript|conversation|process' → no match); two consecutive status invocations with unchanged files byte-identical (cmp empty) — smoke marker 'PASS role-status-file-derived'",
+        "R5.2: automated real-CLI checks cover the refusal and authorship gates: tests/role-envelope-smoke.sh exit 0 with all 8 required markers (role-invoke-provider-seam, role-builder-seal-refusal, role-builder-seal-mismatch, role-envelope-request-result-manifest, role-score-no-analyst-stamp, role-close-no-critic, role-implementer-evaluator-rejected, role-status-file-derived) plus role-authorship-happy-path; `bin/consult harness-checks state/harness-evolution/runs/iter-6` exit 0 — 50 passed · 0 failed; iter-6/checks.json records all 8 role-* ids status=pass detail=real-provider-envelope",
+        "R5.3: prohibition audit — `find state -iname '*chat*' -o -iname '*transcript*'` → 0 paths; `grep -rniE 'daemon|message bus|swarm|auto-orchestrat' bin/ lib/ tests/` → only prose in the smoke fixture README ('It has no daemon, database, or runtime service'), no machinery; provider_ask remains the sole model entry point (definition lib/provider.sh:47; callsites bin/consult:744, lib/role-envelope.sh:177); bin/ contains only consult — no second orchestrator"
+      ]
+    }
+  },
+  "suite_exits": {
+    "role_envelope_smoke": {
+      "command": "tests/role-envelope-smoke.sh",
+      "exit": 0,
+      "artifact": "state/harness-evolution/runs/iter-6/evidence/acceptance-build-4-role-envelope-smoke.txt",
+      "output_summary": "PASS role-invoke-provider-seam / role-builder-seal-refusal / role-builder-seal-mismatch / role-close-no-critic / role-implementer-evaluator-rejected / role-score-no-analyst-stamp / role-envelope-request-result-manifest / role-status-file-derived / role-authorship-happy-path (9 lines, exit 0)"
+    },
+    "consult_smoke": {
+      "command": "CONSULT_SMOKE_SKIP_CLIENT=1 bin/consult smoke",
+      "exit": 0,
+      "artifact": "state/harness-evolution/runs/iter-6/evidence/acceptance-build-4-smoke.txt",
+      "output_summary": "all smoke checks passed; includes 'PASS help lists role' and 'PASS role status missing honesty'; skip marker 'client checks skipped (CONSULT_SMOKE_SKIP_CLIENT)' present"
+    },
+    "harness_checks": {
+      "command": "bin/consult harness-checks state/harness-evolution/runs/iter-6",
+      "exit": 0,
+      "artifact": "state/harness-evolution/runs/iter-6/evidence/acceptance-build-4-harness-checks.txt",
+      "output_summary": "50 passed · 0 failed → state/harness-evolution/runs/iter-6/checks.json; all 8 role-* ids pass with detail real-provider-envelope"
+    }
+  },
+  "required_markers": [
+    "PASS role-invoke-provider-seam",
+    "PASS role-builder-seal-refusal",
+    "PASS role-builder-seal-mismatch",
+    "PASS role-envelope-request-result-manifest",
+    "PASS role-score-no-analyst-stamp",
+    "PASS role-close-no-critic",
+    "PASS role-implementer-evaluator-rejected",
+    "PASS role-status-file-derived"
+  ],
+  "required_markers_status": "all 8 present in acceptance-build-4-role-envelope-smoke.txt with suite exit 0 and re-asserted in iter-6/checks.json (status=pass, detail=real-provider-envelope); 0 failed checks in suite; plus role-authorship-happy-path marker",
+  "provider_runtime_evidence": {
+    "runtime_check": "bin/consult runtime --check exit 0; bin/consult runtime lists agent /home/logani/.local/bin/agent (active), claude, codex, opencode, cursor found, gemini missing",
+    "active_provider": "agent",
+    "real_invoke_proof": "CONSULT_ROLE_IDENTITY=auditor bin/consult role b4-audit-1765480 invoke Analyst 0 'Return exactly AUDIT_ANALYST_OK.' → exit 0, reply 'AUDIT_ANALYST_OK', real detached worktree (HEAD 2fd43ff) prepared via workspace_ensure",
+    "missing_provider_refusal": "CONSULT_PROVIDER=/nonexistent/no-such-provider invoke → exit 127, refusal names provider, complete failed envelope written",
+    "seam_audit": "provider_ask defined only in lib/provider.sh:47; callsites bin/consult:744 (bench run) and lib/role-envelope.sh:177 (role invoke); no mock provider binary, no second ask function"
+  },
+  "request_result_manifest_hashes": {
+    "analyst_iter0_attempt1": {
+      "request_sha256": "verified against manifest (MATCH)",
+      "result_sha256": "verified against manifest (MATCH)",
+      "exit": 0,
+      "provider": "agent"
+    },
+    "builder_iter0_attempt2": {
+      "request_sha256": "verified against manifest (MATCH)",
+      "result_sha256": "verified against manifest (MATCH)",
+      "exit": 0,
+      "provider": "agent"
+    },
+    "builder_iter0_attempt3_refused": {
+      "request_sha256": "verified against manifest (MATCH)",
+      "result_sha256": "verified against manifest (MATCH)",
+      "exit": 1,
+      "refusal": "sealed Builder input hash mismatch"
+    },
+    "critic_iter0_attempt1": {
+      "request_sha256": "verified against manifest (MATCH)",
+      "result_sha256": "verified against manifest (MATCH)",
+      "exit": 0,
+      "provider": "agent"
+    }
+  },
+  "sealed_input_proofs": {
+    "seal_artifact": "roles/iter-0/Builder/seal.json {role:Builder, iter:0, input_path, input_sha256:4d8e9e79c84dd47d913b7e252bb22384db5bac93083d287ce4d723536ceae8f9, sealed_by:principal, sealed_at:2026-08-10T08:28:57Z, write_once:true}",
+    "seal_hash_verified": "sha256 of original pre-tamper input 'Return exactly AUDIT_BUILDER_OK.\\n' = 4d8e9e79…ceae8f9 == seal.input_sha256 (MATCH)",
+    "write_once": "second seal for iter 0 refused 'already sealed' exit 1",
+    "tamper_refusal": "appended 'tampered' → invoke Builder exit 1 'sealed Builder input hash mismatch' naming seal path",
+    "builder_without_seal": "invoke Builder before seal exit 1 'missing sealed Builder input' naming seal path"
+  },
+  "score_close_authorship_proofs": {
+    "scores_json": "runs/iter-0/scores.json {iter:0, evaluator:auditor, analyst_stamp:…/roles/iter-0/Analyst/stamp.json, overall:6.4, scores:9 areas} — bound to the stamped iteration",
+    "stamp_json": "roles/iter-0/Analyst/stamp.json {role:Analyst, iter:0, identity:auditor, provider:agent, result_path:…/attempt-1/result.json, result_sha256:aa626193…, stamped_at} — result hash re-verified against file (MATCH)",
+    "close_json": "roles/iter-0/close.json {iter:0, decision:closed, closed_at, critic_manifest:…/Critic/attempt-1/manifest.json, critic_manifest_sha256:20d84664…, analyst_stamp:…/stamp.json, analyst_stamp_sha256:157e38ff…, implementer_identity:implementer, evaluator_identity:auditor} — both hashes re-verified against files (MATCH)",
+    "no_stamp_refusal": "bench run --iter 3 exit 1 'scores invalid: missing Analyst stamp …/roles/iter-3/Analyst/stamp.json'",
+    "no_critic_refusal": "close 7 (stamp present, no Critic) exit 1 'cannot close: missing complete Critic envelope under …/roles/iter-7/Critic'",
+    "collision_refusal": "score --iter 6 and close 6 with shared identity exit 1 'scores invalid: implementer = evaluator (same) for iter 6'"
+  },
+  "status_asked_ran_produced_detail": {
+    "asked": "3 entries (Analyst, Builder, Critic) each {role, identity, provider, task, input_ref, input_sha256, at, request}",
+    "ran": "3 entries each {role, identity, provider, exit, refusal_reason, output_sha256, at, result}",
+    "produced": "3 entries each {role, identity, provider, exit, request_sha256, result_sha256, manifest, result}",
+    "missing": "[] for the complete iteration; explicit attempt-*/manifest.json paths listed for a fresh engagement with no envelopes",
+    "byte_stable": "two consecutive `role status 0` invocations in fresh CLI processes → cmp empty (no wall-clock drift in derived answer)",
+    "no_chat_refs": "grep -qiE 'chat|transcript|conversation|process' on status JSON → no match"
+  },
+  "frozen_guard": {
+    "status": "OK",
+    "detail": "git status --short state/harness-evolution/ shows changes only under runs/iter-6/ plus untracked inspect-pack.json and judgment/ (Build 2's own durable gate state, explicitly not touched by Build 4 per §8.1) and the pre-existing iter-3 skill-scaffold relocations (already modified before this audit, restored per baseline-notes). iter-0/…iter-5/ and frozen harness-apc-v1 files unmodified. No Build 4 audit run touched any frozen file.",
+    "temporary_engagements": "all audit mutations ran in temporary engagements (b4-audit-<pid>, b4-missing-<pid>) and the role-smoke-$$ engagement; all removed on exit — state/engagements/ contains no b4-audit-*/role-smoke-* dirs and git worktree list shows no audit/smoke worktrees"
+  },
+  "prohibitions": {
+    "chat_logs_or_transcripts": "find state -iname '*chat*' -o -iname '*transcript*' → 0 paths; status/close/score derive from envelope files only",
+    "mocks_or_stub_providers": "none — every invoke used the real authenticated agent runtime or a real missing-executable refusal; no mock provider binary exists",
+    "daemon_db_router_rag_bus_swarm_auto_orchestrator": "grep -rniE 'daemon|message bus|swarm|auto-orchestrat' bin/ lib/ tests/ → only prose in the smoke fixture README ('It has no daemon, database, or runtime service'); no machinery",
+    "second_orchestrator": "bin/ contains only consult; lib/role-envelope.sh adds no scheduler/daemon (ARCHITECTURE.md 'lib/role-envelope.sh adds no scheduler')",
+    "provider_seam_singleton": "provider_ask defined only in lib/provider.sh:47; callsites bin/consult:744 and lib/role-envelope.sh:177"
+  },
+  "honest_limits": [
+    "Per-mission constraint, provider scoring (`bench … run`) is invoked against the real authenticated agent runtime; the happy-path score (overall 6.4) is a real provider-produced score on a tiny temporary audit repo, not a product score.",
+    "`bin/consult smoke` was run with CONSULT_SMOKE_SKIP_CLIENT=1 (client check-run skipped, not mocked) per the mission's own harness-check convention (smoke-green check uses the same env).",
+    "This verdict covers Build 4 (§8) only; Builds 1–3 verdicts (§2–§7) are not re-scored; the frozen harness-apc-v1 contract is not amended.",
+    "Role invocations are single-turn (as required); no multi-turn agent loop was exercised or required.",
+    "The independent audit's own temporary engagement (b4-audit-<pid>) was removed after evidence capture; its artifacts are cited from the captured outputs above, and the archived suite transcripts are the durable evidence.",
+    "No formatters or linters run (explicitly skipped per mission §8.5).",
+    "Status byte-stability was proven within the audit session (two fresh CLI processes, cmp empty); the smoke suite re-proves it on its own temporary engagement."
+  ],
+  "evidence_artifacts": [
+    "state/harness-evolution/runs/iter-6/evidence/acceptance-build-4-role-envelope-smoke.txt",
+    "state/harness-evolution/runs/iter-6/evidence/acceptance-build-4-smoke.txt",
+    "state/harness-evolution/runs/iter-6/evidence/acceptance-build-4-harness-checks.txt",
+    "state/harness-evolution/runs/iter-6/checks.json",
+    "state/harness-evolution/runs/iter-6/evidence/build-4-baseline.md",
+    "state/harness-evolution/runs/iter-6/mission-benchmark.md"
+  ]
+}
