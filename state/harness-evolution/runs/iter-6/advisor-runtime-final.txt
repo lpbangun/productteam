@@ -1,0 +1,13 @@
+Independent Advisor results:
+
+- `tests/visual-cli.sh ...advisor-visual-checks-final.json` — exit `0`
+  - Visual: `8/8 pass`, `0 fail`, `0 skipped`
+  - Live provider proof: `pass`
+- `bin/productteam smoke` — exit `0`
+  - All smoke checks passed
+- `bash -n ...` — exit `0`
+  - No syntax errors
+
+Initial sandbox attempts exited `1` before execution due to a loopback permission error. Identical commands were rerun successfully with authorization. No files were edited.
+
+ADVISOR_VERDICT=PASS

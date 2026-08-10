@@ -23,6 +23,9 @@ if grep -q 'ofc-v1' <<<"$bench_out"; then ok 'bench contract id'; else bad 'benc
 "$C" help | grep -q 'harness-checks' && ok 'help lists harness-checks' || bad 'help lists harness-checks'
 "$C" help | grep -q 'productteam gh' && ok 'help lists gh' || bad 'help lists gh'
 "$C" help | grep -q 'productteam skill' && ok 'help lists skill' || bad 'help lists skill'
+"$C" help | grep -q 'productteam chat' && ok 'help lists chat' || bad 'help lists chat'
+[[ -f "$ROOT/lib/repl.sh" ]] && ok 'repl.sh present' || bad 'repl.sh present'
+if "$C" chat </dev/null >/dev/null 2>&1; then bad 'chat refuses non-TTY'; else ok 'chat refuses non-TTY'; fi
 [[ -f "$ROOT/skills/critique/SKILL.md" ]] && ok 'skill critique present' || bad 'skill critique present'
 [[ -f "$ROOT/skills/benchmark/SKILL.md" ]] && ok 'skill benchmark present' || bad 'skill benchmark present'
 [[ -f "$ROOT/skills/design-sprint/SKILL.md" ]] && ok 'skill design-sprint present' || bad 'skill design-sprint present'

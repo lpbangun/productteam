@@ -1,0 +1,14 @@
+- `tests/visual-cli.sh state/harness-evolution/runs/iter-6/advisor-visual-checks.json`
+  - Exit code: `0`
+  - Visual results: `8 pass, 0 fail, 0 skipped`
+
+- `bin/productteam smoke`
+  - Exit code: `0`
+  - All smoke checks passed.
+
+- `bash -n bin/productteam lib/theme.sh lib/activity.sh lib/render.sh lib/repl.sh lib/provider.sh tests/visual-cli.sh`
+  - Exit code: `0`
+
+The first sandboxed launches of the visual and smoke commands were blocked before execution by bubblewrap loopback setup. Both exact commands were rerun with execution permission; the results above are from those real repository runs. No files were edited.
+
+ADVISOR_VERDICT=PASS

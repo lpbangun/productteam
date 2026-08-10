@@ -27,9 +27,9 @@ record() {
   local id="$1" status="$2" detail="$3"
   printf '%s\t%s\t%s\n' "$id" "$status" "$detail" >> "$RESULTS"
   if [[ "$status" == pass ]]; then
-    printf '  %s✓%s %-36s %s%s%s\n' "$G" "$R" "$id" "$D" "${detail:0:60}" "$R"
+    printf '  %s %-36s %s%s%s\n' "$(status_badge success)" "$id" "$D" "${detail:0:60}" "$R"
   else
-    printf '  %s✗%s %-36s %s%s%s\n' "$RD" "$R" "$id" "$D" "${detail:0:60}" "$R"
+    printf '  %s %-36s %s%s%s\n' "$(status_badge error)" "$id" "$D" "${detail:0:60}" "$R"
   fi
 }
 

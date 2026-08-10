@@ -3,6 +3,10 @@
 # Sourced by bin/productteam. No --admin. No force. Merge requires authorize-merge.
 # Functions: gh_preflight, gh_pr_create, gh_pr_status, gh_pr_checks, gh_pr_merge, gh_pr_validate.
 
+# Shared role chrome + status badges (empty defaults when uncolored).
+# shellcheck source=lib/theme.sh
+source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/theme.sh"
+
 _gh() {
   command -v gh >/dev/null 2>&1 || { printf 'productteam: gh not found on PATH\n' >&2; return 127; }
   gh "$@"
@@ -14,7 +18,14 @@ gh_preflight() {
   local dir; dir=$(_gh_repo_dir "${1:-}")
   (
     cd "$dir"
-    printf 'gh_user=%s\n' "$(gh api user -q .login 2>/dev/null || echo unknown)"
+    local user
+    user=$(gh api user -q .login 2>/dev/null || echo unknown)
+    if [[ "$user" == unknown ]]; then
+      printf '  %s\n' "$(status_badge error 'auth: not logged in')" >&2
+    else
+      printf '  %s\n' "$(status_badge success "auth: $user")" >&2
+    fi
+    printf 'gh_user=%s\n' "$user"
     gh auth status 2>&1 | grep -E 'Logged in|Token scopes' | sed 's/Token:.*/Token: [redacted]/' || true
     local slug
     slug=$(gh repo view --json nameWithOwner -q .nameWithOwner 2>/dev/null || true)
@@ -51,11 +62,21 @@ gh_pr_status() {
   local pr="${2:-}"
   (
     cd "$dir"
+    local json
     if [[ -n "$pr" ]]; then
-      _gh pr view "$pr" --json number,url,state,mergeable,statusCheckRollup,reviews,title
+      json=$(_gh pr view "$pr" --json number,url,state,mergeable,statusCheckRollup,reviews,title)
     else
-      _gh pr view --json number,url,state,mergeable,statusCheckRollup,reviews,title
+      json=$(_gh pr view --json number,url,state,mergeable,statusCheckRollup,reviews,title)
     fi
+    local state
+    state=$(printf '%s' "$json" | jq -r '.state // empty' 2>/dev/null || true)
+    case "$state" in
+      OPEN)   printf '  %s\n' "$(status_badge running "PR $state")" >&2 ;;
+      MERGED) printf '  %s\n' "$(status_badge success "PR $state")" >&2 ;;
+      CLOSED) printf '  %s\n' "$(status_badge error "PR $state")" >&2 ;;
+      *)      printf '  %s\n' "$(status_badge pending 'PR state')" >&2 ;;
+    esac
+    printf '%s\n' "$json"
   )
 }
 
@@ -64,12 +85,22 @@ gh_pr_checks() {
   local pr="${2:-}"
   (
     cd "$dir"
+    local checks_out
     if [[ -n "$pr" ]]; then
-      _gh pr checks "$pr" 2>/dev/null || true
+      checks_out=$(_gh pr checks "$pr" 2>/dev/null || true)
       _gh pr view "$pr" --json statusCheckRollup,url
     else
-      _gh pr checks 2>/dev/null || true
+      checks_out=$(_gh pr checks 2>/dev/null || true)
       _gh pr view --json statusCheckRollup,url
+    fi
+    if [[ -n "$checks_out" ]]; then
+      if grep -qiE 'fail|error' <<<"$checks_out"; then
+        printf '  %s\n' "$(status_badge error 'checks: failing')" >&2
+      else
+        printf '  %s\n' "$(status_badge success 'checks: passing')" >&2
+      fi
+    else
+      printf '  %s\n' "$(status_badge pending 'checks: none reported')" >&2
     fi
   )
 }
@@ -88,20 +119,20 @@ gh_pr_merge() {
     done
   fi
   if [[ -z "$auth" || ! -f "$auth" ]]; then
-    printf 'productteam: merge refused — missing authorize-merge file.\n' >&2
+    printf '  %s\n' "$(status_badge escalate 'merge refused — missing authorize-merge file.')" >&2
     printf 'Create state/harness-evolution/authorize-merge (or set CONSULT_AUTHORIZE_MERGE)\n' >&2
     printf 'with an explicit owner authorization note. Force/admin merge is forbidden.\n' >&2
     return 2
   fi
   if grep -qiE '(^|[^-])--admin|force-merge|force push|bypass checks' "$auth"; then
-    printf 'productteam: merge refused — authorize file must not request force/admin bypass.\n' >&2
+    printf '  %s\n' "$(status_badge escalate 'merge refused — authorize file must not request force/admin bypass.')" >&2
     return 2
   fi
   (
     cd "$dir"
     local args=(pr merge --merge)
     [[ -n "$pr" ]] && args+=("$pr")
-    printf 'productteam: merging with authorization from %s (non-force)\n' "$auth" >&2
+    printf '  %s\n' "$(status_badge success "merging with authorization from $auth (non-force)")" >&2
     _gh "${args[@]}"
   )
 }

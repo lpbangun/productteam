@@ -170,3 +170,9 @@ and evidence-linked.
   owner sign-off (Constitution: product-behavior change = escalate).
 
 - **2026-08-07** · CLI command renamed `consult` → `productteam` (`bin/consult` remains a shim).
+
+- **2026-08-10 · Visual/runtime proof discipline.** Loading chrome must preserve
+  provider output and exit status on both success and refusal; render captured
+  failure text before the compact card. Deterministic visual criteria may be
+  green without live convergence: a runner must validate the required real
+  provider transcript before writing `converged: true`.

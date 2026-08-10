@@ -100,6 +100,31 @@ runtime_default() {
   return 1
 }
 
+runtime_cycle() { # → next installed catalog entry (wrap-around); exports CONSULT_PROVIDER, prints it
+  local cur base name idx=-1 n=0 tries=0 total=${#AGENT_CATALOG[@]}
+  cur="${CONSULT_PROVIDER:-}"
+  if [[ -n "$cur" ]]; then
+    base=$(basename "$cur")
+  else
+    base=$(basename "$(runtime_default 2>/dev/null || true)")
+  fi
+  for name in "${AGENT_CATALOG[@]}"; do
+    if [[ "$name" == "$base" ]]; then idx=$n; break; fi
+    n=$((n + 1))
+  done
+  while (( tries < total )); do
+    idx=$(( (idx + 1) % total ))
+    name="${AGENT_CATALOG[idx]}"
+    if runtime_have "$name"; then
+      export CONSULT_PROVIDER="$name"
+      printf '%s\n' "$name"
+      return 0
+    fi
+    tries=$((tries + 1))
+  done
+  return 1
+}
+
 provider_ask() { # $1=prompt  $2=cwd (optional)
   local prompt="$1" cwd="${2:-$PWD}" bin base
   bin="$(runtime_default)" || {

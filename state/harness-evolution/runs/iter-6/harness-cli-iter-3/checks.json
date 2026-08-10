@@ -1,0 +1,326 @@
+{
+  "contract": "harness-cli-v1",
+  "suite": "harness-cli",
+  "runner": "lib/harness-cli-checks.sh",
+  "ts": "2026-08-10T07:17:36+02:00",
+  "kind": "full",
+  "live_executed": true,
+  "live_checks": [
+    "provider-live-answer",
+    "skill-critique-live-project-a",
+    "skill-benchmark-live-project-b",
+    "skill-design-sprint-live",
+    "skills-outputs-project-specific"
+  ],
+  "checks": {
+    "cli-theme-single-source": {
+      "status": "pass",
+      "detail": "single theme source: bin/productteam"
+    },
+    "cli-monochrome-chrome": {
+      "status": "pass",
+      "detail": "all headings survive color stripping in status/help/org/bench; bold+dim+reset defined"
+    },
+    "cli-accent-budget": {
+      "status": "pass",
+      "detail": "2 accent hue(s): \\e[31m \\e[32m "
+    },
+    "cli-no-color-clean": {
+      "status": "pass",
+      "detail": "zero escape sequences under NO_COLOR=1 for all 11 top-level commands"
+    },
+    "cli-plain-pipe-safe": {
+      "status": "pass",
+      "detail": "piped status: 0 escapes, longest line 94 cols"
+    },
+    "splash-command-exists": {
+      "status": "pass",
+      "detail": "productteam splash listed in help and exits 0"
+    },
+    "splash-graph-nodes-edges": {
+      "status": "pass",
+      "detail": "frame has 6 node glyphs, 42 edge glyphs; renderer declares nodes+edges lists"
+    },
+    "splash-frames-animate": {
+      "status": "pass",
+      "detail": "3 frames dumped; frame-count and delay are named constants"
+    },
+    "splash-bounded-noninteractive": {
+      "status": "pass",
+      "detail": "piped splash: 34ms, 1 static frame, opt-out env:CONSULT_NO_SPLASH documented"
+    },
+    "splash-first-run-hook": {
+      "status": "pass",
+      "detail": "first run renders, second does not; marker under $CONSULT_STATE_ROOT: /tmp/tmp.4ijqqifJ0x/first-run/first-run "
+    },
+    "onboarding-command-exists": {
+      "status": "pass",
+      "detail": "productteam onboarding present in help and README.md"
+    },
+    "onboarding-cold-start": {
+      "status": "pass",
+      "detail": "cold non-interactive run exit 0 with $CONSULT_STATE_ROOT isolated; transcript in evidence/onboarding-cold.txt"
+    },
+    "onboarding-steps-explicit": {
+      "status": "pass",
+      "detail": "5 numbered steps covering agents, provider, engagement, score, next command"
+    },
+    "onboarding-idempotent": {
+      "status": "pass",
+      "detail": "second run reports already-configured; state root byte-identical"
+    },
+    "onboarding-next-action": {
+      "status": "pass",
+      "detail": "next action 'productteam bench agcode-learning' exits 0"
+    },
+    "detect-command-exists": {
+      "status": "pass",
+      "detail": "productteam agents: 14 rows, one per catalog entry (14), exit 0"
+    },
+    "detect-covers-known-agents": {
+      "status": "pass",
+      "detail": "14-agent catalog declared in exactly one place"
+    },
+    "detect-beyond-path": {
+      "status": "pass",
+      "detail": "off-PATH agent reported with absolute path: \u25cf agent 2026.08.04-aaa8809 /home/logani/.local/bin/agent (selected)"
+    },
+    "detect-no-false-positive": {
+      "status": "pass",
+      "detail": "non-executable agent reported missing; no fabricated agent reported found"
+    },
+    "detect-machine-readable": {
+      "status": "pass",
+      "detail": "productteam agents --json: 14 objects with name/status/path"
+    },
+    "detect-versions": {
+      "status": "pass",
+      "detail": "every found row carries a version or 'unknown'; detection 2384ms"
+    },
+    "help-lists-every-command": {
+      "status": "pass",
+      "detail": "help and dispatch agree on 19 commands"
+    },
+    "every-command-exits-zero": {
+      "status": "pass",
+      "detail": "all 19 dispatch commands exit 0 or refuse by name (evidence/command-exit-table.txt)"
+    },
+    "core-features-reachable": {
+      "status": "pass",
+      "detail": "all 15 core features present in both productteam help and README.md"
+    },
+    "unknown-command-honest": {
+      "status": "pass",
+      "detail": "unknown command exits 1 and points at productteam help"
+    },
+    "no-hidden-env-requirements": {
+      "status": "pass",
+      "detail": "all 13 CONSULT_* env vars documented"
+    },
+    "provider-live-answer": {
+      "status": "pass",
+      "detail": "live reply from agent contains CONSULT-LIVE-OK (evidence/skills/provider-live.txt)"
+    },
+    "tmp-projects-two-varying": {
+      "status": "pass",
+      "detail": "proj-a[JavaScript (Node 20, ESM)/coastal tide forecasting for harbour pilots] vs proj-b[Python (3.11, stdlib only)/greenhouse irrigation scheduling for a commercial tomato nursery]; disjoint source filenames; 56/63 unique guidance terms"
+    },
+    "skill-uses-provider-seam": {
+      "status": "pass",
+      "detail": "all three skill branches call provider_ask (4 call sites); no swallowed provider failure"
+    },
+    "skill-critique-live-project-a": {
+      "status": "pass",
+      "detail": "critique.md cites 4 own paths, guidance term \"actually\", runtime named"
+    },
+    "skill-benchmark-live-project-b": {
+      "status": "pass",
+      "detail": "proj-b contract: dimensions [], 4 real paths, term \"capacity\", runtime named"
+    },
+    "skill-design-sprint-live": {
+      "status": "pass",
+      "detail": "design-sprint.md cites 3 own paths, guidance term \"actually\", runtime named"
+    },
+    "skills-outputs-project-specific": {
+      "status": "pass",
+      "detail": "same skill, two projects: Jaccard 0.172, zero cross-project path citations"
+    },
+    "no-mock-provider": {
+      "status": "pass",
+      "detail": "no provider substitute in bin|lib|tests; every skill artifact names its runtime; lib/harness-cli-checks.sh exempt from CLI-surface scans (measurement scaffold)"
+    },
+    "readme-matches-cli": {
+      "status": "pass",
+      "detail": "README covers every help command; README claims no command that is not dispatched"
+    },
+    "readme-onboarding-section": {
+      "status": "pass",
+      "detail": "first-run section covers onboarding, splash and agent detection in fenced blocks"
+    },
+    "docs-cli-not-tui": {
+      "status": "pass",
+      "detail": "no TUI framing in the product path set; every engagement mention negates it; lib/harness-cli-checks.sh exempt from CLI-surface scans (measurement scaffold)"
+    },
+    "docs-no-stale-paths": {
+      "status": "pass",
+      "detail": "every backticked repo-relative path in README/ARCHITECTURE/AGENTS/docs resolves on disk"
+    },
+    "docs-skills-live": {
+      "status": "pass",
+      "detail": "docs/skills.md states real provider calls, no mocks, and cites tmp-projects"
+    },
+    "smoke-green": {
+      "status": "pass",
+      "detail": "tests/consult-smoke.sh exit 0 (31 checks, CONSULT_SMOKE_SKIP_CLIENT=1 so no sibling repo is built; evidence/smoke.txt)"
+    },
+    "harness-cli-checks-runner": {
+      "status": "pass",
+      "detail": "runner writes 49 ids + dimensions to <iter-dir>/checks.json; failing probe exits 1"
+    },
+    "checks-dispatch-routes-engagement": {
+      "status": "pass",
+      "detail": "productteam checks|score harness-cli both run the harness-cli-v1 suite"
+    },
+    "no-new-runtime-deps": {
+      "status": "pass",
+      "detail": "allowlist held; coreutils/POSIX baseline treated as bash (basename,cat,chmod,comm,cp,cut,date,diff,dirname,env,head,ls,mkdir,mktemp,mv,rm,seq,sha256sum,sleep,tail,tee,timeout,tr,true,wc); client toolchain confined to run-checks/github (npm)"
+    },
+    "errors-name-the-fix": {
+      "status": "pass",
+      "detail": "all 4 failure paths name both a cause and a remedy"
+    },
+    "scripts-parse-clean": {
+      "status": "pass",
+      "detail": "bash -n clean over 15 scripts; shellcheck not installed (optional)"
+    },
+    "status-states-identity": {
+      "status": "pass",
+      "detail": "identity stated in the first 6 lines: Product Consulting Harness Product Judgment Layer \u00b7 CLI-first \u00b7 evidence over opinion P"
+    },
+    "non-goals-visible": {
+      "status": "pass",
+      "detail": "non-goals stated both in the CLI (help/org) and README.md"
+    },
+    "engagement-scope-explicit": {
+      "status": "pass",
+      "detail": "engagement.md keeps in/out-of-scope, names the CLI, excludes sibling products"
+    },
+    "no-overclaim": {
+      "status": "pass",
+      "detail": "all 20 active capability claims map to passing check ids"
+    }
+  },
+  "passed": 49,
+  "failed": 0,
+  "skipped": 0,
+  "skip_note": "Skipped LIVE checks are recorded status=fail with skipped=true, per the frozen runner contract in checks/CHECK-CATALOG.md. A run with any skip is kind=partial and cannot converge.",
+  "id_coverage": {
+    "expected": 49,
+    "recorded": 49,
+    "missing": [],
+    "unexpected": []
+  },
+  "dimensions": {
+    "visual-cli-clarity": {
+      "passed": 5,
+      "total": 5,
+      "gates": [
+        "cli-no-color-clean",
+        "cli-plain-pipe-safe"
+      ],
+      "gates_ok": true,
+      "failed_ids": [],
+      "score": 9.5
+    },
+    "splash-animation": {
+      "passed": 5,
+      "total": 5,
+      "gates": [
+        "splash-command-exists",
+        "splash-bounded-noninteractive"
+      ],
+      "gates_ok": true,
+      "failed_ids": [],
+      "score": 9.5
+    },
+    "onboarding-ease": {
+      "passed": 5,
+      "total": 5,
+      "gates": [
+        "onboarding-command-exists",
+        "onboarding-cold-start"
+      ],
+      "gates_ok": true,
+      "failed_ids": [],
+      "score": 9.5
+    },
+    "agent-detection": {
+      "passed": 6,
+      "total": 6,
+      "gates": [
+        "detect-command-exists",
+        "detect-no-false-positive"
+      ],
+      "gates_ok": true,
+      "failed_ids": [],
+      "score": 9.5
+    },
+    "feature-reachability": {
+      "passed": 5,
+      "total": 5,
+      "gates": [
+        "help-lists-every-command",
+        "every-command-exits-zero"
+      ],
+      "gates_ok": true,
+      "failed_ids": [],
+      "score": 9.5
+    },
+    "skills-llm-reality": {
+      "passed": 8,
+      "total": 8,
+      "gates": [
+        "provider-live-answer",
+        "skill-uses-provider-seam",
+        "no-mock-provider"
+      ],
+      "gates_ok": true,
+      "failed_ids": [],
+      "score": 9.5
+    },
+    "documentation": {
+      "passed": 5,
+      "total": 5,
+      "gates": [
+        "readme-matches-cli",
+        "docs-no-stale-paths"
+      ],
+      "gates_ok": true,
+      "failed_ids": [],
+      "score": 9.5
+    },
+    "developer-experience": {
+      "passed": 6,
+      "total": 6,
+      "gates": [
+        "smoke-green",
+        "harness-cli-checks-runner"
+      ],
+      "gates_ok": true,
+      "failed_ids": [],
+      "score": 9.5
+    },
+    "product-clarity": {
+      "passed": 4,
+      "total": 4,
+      "gates": [
+        "no-overclaim"
+      ],
+      "gates_ok": true,
+      "failed_ids": [],
+      "score": 9.5
+    }
+  },
+  "overall": 9.5,
+  "validation": "real-commands"
+}

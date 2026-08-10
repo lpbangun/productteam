@@ -1,0 +1,55 @@
+{
+  "contract": "visual-cli-v1",
+  "kind": "baseline",
+  "evaluator": "independent-analyst",
+  "source": "agent://AnalystBaseline",
+  "recorded": "2026-08-10",
+  "passed": 0,
+  "failed": 8,
+  "skipped": 0,
+  "converged": false,
+  "no_tests_run": true,
+  "live_provider_proof": "separate",
+  "criteria": [
+    {
+      "id": "role-chrome",
+      "verdict": "fail",
+      "evidence": "Roles exist only as static text in cmd_org (bin/productteam:271-302); REPL header shows brand 'ProductTeam' + robots mark, no role identity (lib/repl.sh:12-30); prompt is bare '›' (lib/repl.sh:95). No role chrome in the session surface."
+    },
+    {
+      "id": "worker-strip",
+      "verdict": "fail",
+      "evidence": "No worker abstraction or state file exists. state/.cli holds only the first-run marker (state/.cli/first-run). cmd_bench_run prints one static line 'The Analyst is inspecting the client…' (bin/productteam:528). No strip, no four states, no file backing."
+    },
+    {
+      "id": "live-loading-card",
+      "verdict": "fail",
+      "evidence": "Loading is a static '…' line in chat (lib/repl.sh:110) and '…' in bench run (bin/productteam:528); completion is a single 'Recorded iter N — overall X' line (bin/productteam:579-580). No live spinner, no card."
+    },
+    {
+      "id": "two-accent-language",
+      "verdict": "fail",
+      "evidence": "Theme block defines exactly 2 accents G/RD (bin/productteam:14-22) and the ≤2-hue budget is held (cli-accent-budget passes, lib/harness-cli-checks.sh:437-443). But only 2 of 4 states have language: success=G (score_color bin/productteam:30-33, cmd_judge_set:322-340), error=RD (die bin/productteam:61, provider-refused lib/repl.sh:112). No progress or escalate state language exists anywhere."
+    },
+    {
+      "id": "evidence-path-highlight",
+      "verdict": "fail",
+      "evidence": "Evidence is printed dimmed+truncated, never path-highlighted: cmd_bench (bin/productteam:483-486), cmd_run_detail (bin/productteam:497-500). cmd_report passes raw markdown through sed indent (bin/productteam:506-510). No +/- markers, no path emphasis."
+    },
+    {
+      "id": "markdown-lite",
+      "verdict": "fail",
+      "evidence": "No markdown renderer. cmd_report and cmd_memory do raw passthrough: sed 's/^/  /' (bin/productteam:510, 443). No heading/fence/bold-verdict processing."
+    },
+    {
+      "id": "session-footer",
+      "verdict": "fail",
+      "evidence": "repl_header footer shows only provider + '/help · ctrl+d exit' (lib/repl.sh:28-29). No engagement/mode/last-iter/overall; no update hook after score/bench. Data accessors exist to build it (client_dir bin/productteam:62-73, latest_run 75-77, engagement_scorer 80-92, mode awk in cmd_judge 307-309, overall jq in cmd_bench 488-489) but nothing renders them in-session."
+    },
+    {
+      "id": "agents-provider-cycle",
+      "verdict": "fail",
+      "evidence": "/agents exists and shows installed/selected: repl dispatch 'agents|runtime' (lib/repl.sh:45) → cmd_agents with ● active marker + '(active)' (bin/productteam:145-225). /provider does NOT exist — no case in repl_run_slash (lib/repl.sh:32-85), no cycle helper in lib/provider.sh (runtime_default 87-101 is one-shot resolution)."
+    }
+  ]
+}

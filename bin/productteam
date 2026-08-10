@@ -22,9 +22,13 @@ else
 fi
 
 source "$ROOT/lib/provider.sh"
+source "$ROOT/lib/theme.sh"
 source "$ROOT/lib/github.sh"
 source "$ROOT/lib/splash.sh"
 source "$ROOT/lib/onboarding.sh"
+source "$ROOT/lib/activity.sh"
+source "$ROOT/lib/repl.sh"
+source "$ROOT/lib/render.sh"
 
 score_color() { # $1=score → accent for the score, or nothing in between
   if awk -v s="$1" 'BEGIN{exit !(s>=9)}'; then printf '%s' "$G"
@@ -74,6 +78,12 @@ engagement_repo() { # engagement dir → absolute Repo: path or empty
 latest_run() { # client dir → highest iter-N name or empty
   { ls "$1/runs" 2>/dev/null || true; } | { grep -E '^iter-[0-9]+$' || true; } | sort -t- -k2 -n | tail -1
 }
+score_val() { # $1=score entry (number or {score,...}) → numeric score
+  jq -r 'if type == "number" then . else .score end' <<<"$1"
+}
+score_ev() { # $1=score entry → evidence text (string or array joined) or empty
+  jq -r 'if type == "number" then "" elif (.evidence|type) == "array" then (.evidence|join("; ")) else (.evidence // "") end' <<<"$1"
+}
 
 # ── commands ─────────────────────────────────────────────────────────
 engagement_scorer() { # engagement dir → checks|provider
@@ -100,6 +110,7 @@ cmd_help() {
   ${B}Commands${R}
     productteam                     Org status and engagements overview
     productteam status              The same overview, named explicitly
+    productteam chat                Interactive session (TTY; V1 robots mark)
     productteam onboarding [--yes]  First run: agents, provider, first score
     productteam splash [--frames]   Knowledge-graph banner (CONSULT_NO_SPLASH=1 skips)
     productteam agents [--json]     Coding agents on this device
@@ -130,8 +141,8 @@ cmd_help() {
     productteam help                This text
 
   ${B}Non-goals${R}
-    ${D}Not an IDE, not a client redesign, not a chat UI. There is no daemon,
-    no server and no database — state is plain files you can read.${R}
+    ${D}Not an IDE, not a client redesign. There is no daemon, no server and
+    no database — state is plain files you can read.${R}
 
   ${D}State: state/engagements/<client>/ · harness-evolution: state/harness-evolution/
   Client repos: siblings (Repo: path) · Judgment: JUDGMENT.md
@@ -166,7 +177,7 @@ cmd_agents() {
   while IFS=$'\t' read -r name status path ver note; do
     if [[ "$status" == found ]]; then
       if [[ "$name" == "$active" || "$name" == "$base" ]]; then
-        printf '  %s●%s %-9s %-14s %s%s%s %s(active)%s\n' "$G" "$R" "$name" "$ver" "$D" "$path" "$R" "$B" "$R"
+        printf '  %s●%s %-9s %-14s %s%s%s %s(selected)%s\n' "$G" "$R" "$name" "$ver" "$D" "$path" "$R" "$B" "$R"
       else
         printf '  %s●%s %-9s %-14s %s%s%s\n' "$G" "$R" "$name" "$ver" "$D" "$path" "$R"
       fi
@@ -271,10 +282,10 @@ cmd_org() {
 
   ${B}The organization${R} ${D}(AGENTS.md · CONSTITUTION.md · JUDGMENT.md)${R}
 
-    Principal   orchestrates the loop; decides, escalates; never self-scores
-    Analyst     inspects and scores against the frozen contract, with evidence
-    Builder     implements accepted items; smallest diff; verification attached
-    Critic      rebuts priorities, audits diffs and scores, reviews the org
+    $(role_chrome Principal)   orchestrates the loop; decides, escalates; never self-scores
+    $(role_chrome Analyst)     inspects and scores against the frozen contract, with evidence
+    $(role_chrome Builder)     implements accepted items; smallest diff; verification attached
+    $(role_chrome Critic)      rebuts priorities, audits diffs and scores, reviews the org
 
   ${B}Product Judgment modes${R}
     Guided · Directive · Challenge · Override   ${D}(see JUDGMENT.md)${R}
@@ -463,8 +474,8 @@ cmd_bench() {
       kind=$(jq -r '.kind' <<<"$line")
       ts=$(jq -r '.ts' <<<"$line")
       ov=$(jq -r '.overall' <<<"$line")
-      at=$(jq -r '[.scores | to_entries[] | select(.value.score>=9)] | length' <<<"$line")
-      weak=$(jq -r '.scores | to_entries | min_by(.value.score) | "\(.key) \(.value.score)"' <<<"$line")
+      at=$(jq -r '[.scores | to_entries[] | select((.value|if type=="number" then . else .score end)>=9)] | length' <<<"$line")
+      weak=$(jq -r '.scores | to_entries | min_by(.value|if type=="number" then . else .score end) | "\(.key) \(.value|if type=="number" then . else .score end)"' <<<"$line")
       printf '   %-5s %-11s %-11s %s%-8s%s %-9s %s\n' \
         "$iter" "$ts" "$kind" "$(score_color "$ov")" "$ov" "$R" "$at" "$weak"
       sparkvals+="$ov"$'\n'
@@ -478,10 +489,32 @@ cmd_bench() {
   local last; last=$(latest_run "$d")
   [[ -n "$last" && -f "$d/runs/$last/scores.json" ]] || return 0
   printf '  %sLATEST — %s%s\n' "$B" "$last" "$R"
-  jq -r '.scores | to_entries[] | "\(.key)\t\(.value.score)\t\(.value.evidence)"' \
+  local prev=''
+  if [[ -f "$d/history.jsonl" && -s "$d/history.jsonl" ]]; then
+    prev=$(jq -rs --argjson n "${last#iter-}" '[.[] | select(.iter < $n)] | last | .iter // empty' "$d/history.jsonl" 2>/dev/null || true)
+  fi
+  local prev_scores='{}'
+  if [[ -n "$prev" && -f "$d/runs/iter-$prev/scores.json" ]]; then
+    prev_scores=$(jq -c '.scores' "$d/runs/iter-$prev/scores.json")
+  fi
+  jq -r '.scores | to_entries[] | "\(.key)\t\(.value|if type=="number" then . else .score end)\t\(.value|if type=="number" then "" elif (.evidence|type)=="array" then (.evidence|join("; ")) else (.evidence // "") end)"' \
     "$d/runs/$last/scores.json" | \
   while IFS=$'\t' read -r area sc ev; do
-    printf '   %-20s %s%4s%s %s  %s%s%s\n' "$area" "$(score_color "$sc")" "$sc" "$R" "$(bar "$sc")" "$D" "$(trunc "$ev" 72)" "$R"
+    local delta='' ev_path='' ev_text="$ev"
+    if [[ "$ev" == *': '* && "${ev%%:*}" =~ [./] ]]; then
+      ev_path="${ev%%:*}"
+      ev_text="${ev#*: }"
+    fi
+    if [[ -n "$prev" && "$prev_scores" != '{}' ]]; then
+      local psc
+      psc=$(jq -r --arg a "$area" '.[$a] // empty' <<<"$prev_scores")
+      if [[ -n "$psc" ]]; then
+        local pv
+        pv=$(score_val "$psc")
+        delta=$(awk -v a="$sc" -v b="$pv" 'BEGIN{d=a-b; printf "%s%.1f", (d>=0?"+":""), d}')
+      fi
+    fi
+    printf '   %-20s %s%4s%s %s  %s\n' "$area" "$(score_color "$sc")" "$sc" "$R" "$(bar "$sc")" "$(render_evidence "$delta" "$ev_path" "$ev_text")"
   done
   local ov; ov=$(jq -r '.overall' "$d/runs/$last/scores.json")
   printf '\n   %soverall%s  %s%s%s   %s%s/scores.json%s\n\n' "$B" "$R" "$(score_color "$ov")" "$ov" "$R" "$D" "$d/runs/$last" "$R"
@@ -492,9 +525,31 @@ cmd_run_detail() {
   local rd="$d/runs/iter-$n"
   [[ -f "$rd/scores.json" ]] || die "no scores for $c iter-$n"
   printf '\n  %s%s — %s%s\n' "$B" "$c" "iter-$n" "$R"
-  jq -r '.scores | to_entries[] | "\(.key)\t\(.value.score)\t\(.value.evidence)"' "$rd/scores.json" | \
+  local prev=''
+  if [[ -f "$d/history.jsonl" && -s "$d/history.jsonl" ]]; then
+    prev=$(jq -rs --argjson n "$n" '[.[] | select(.iter < $n)] | last | .iter // empty' "$d/history.jsonl" 2>/dev/null || true)
+  fi
+  local prev_scores='{}'
+  if [[ -n "$prev" && -f "$d/runs/iter-$prev/scores.json" ]]; then
+    prev_scores=$(jq -c '.scores' "$d/runs/iter-$prev/scores.json")
+  fi
+  jq -r '.scores | to_entries[] | "\(.key)\t\(.value|if type=="number" then . else .score end)\t\(.value|if type=="number" then "" elif (.evidence|type)=="array" then (.evidence|join("; ")) else (.evidence // "") end)"' "$rd/scores.json" | \
   while IFS=$'\t' read -r area sc ev; do
-    printf '   %-20s %s%4s%s %s\n     %s%s%s\n' "$area" "$(score_color "$sc")" "$sc" "$R" "$(bar "$sc")" "$D" "$ev" "$R"
+    local delta='' ev_path='' ev_text="$ev"
+    if [[ "$ev" == *': '* && "${ev%%:*}" =~ [./] ]]; then
+      ev_path="${ev%%:*}"
+      ev_text="${ev#*: }"
+    fi
+    if [[ -n "$prev" && "$prev_scores" != '{}' ]]; then
+      local psc
+      psc=$(jq -r --arg a "$area" '.[$a] // empty' <<<"$prev_scores")
+      if [[ -n "$psc" ]]; then
+        local pv
+        pv=$(score_val "$psc")
+        delta=$(awk -v a="$sc" -v b="$pv" 'BEGIN{d=a-b; printf "%s%.1f", (d>=0?"+":""), d}')
+      fi
+    fi
+    printf '   %-20s %s%4s%s %s\n     %s\n' "$area" "$(score_color "$sc")" "$sc" "$R" "$(bar "$sc")" "$(render_evidence "$delta" "$ev_path" "$ev_text")"
   done
   printf '\n   %soverall%s %s%s\n' "$B" "$R" "$(score_color "$(jq -r .overall "$rd/scores.json")")" "$(jq -r .overall "$rd/scores.json")"
   [[ -f "$rd/report.md" ]] && printf '\n  %sreport:%s %s\n' "$D" "$R" "$rd/report.md"
@@ -505,7 +560,9 @@ cmd_report() {
   local c="$1" d; d=$(client_dir "$c")
   local last; last=$(latest_run "$d")
   [[ -n "$last" && -f "$d/runs/$last/report.md" ]] || die "no report yet for $c"
-  printf '\n'; sed 's/^/  /' "$d/runs/$last/report.md"; printf '\n'
+  printf '\n'
+  render_markdown_lite "$d/runs/$last/report.md"
+  printf '\n'
 }
 
 cmd_bench_run() {
@@ -585,6 +642,7 @@ main() {
   case "$cmd" in
     help)           cmd_help ;;
     status)         cmd_status ;;
+    chat)           cmd_chat ;;
     org)            cmd_org ;;
     memory)         cmd_memory ;;
     smoke)          cmd_smoke ;;

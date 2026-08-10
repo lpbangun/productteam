@@ -58,6 +58,7 @@ One module, swappable (`lib/provider.sh`):
 - `AGENT_CATALOG` — single list of known coding agents (≥10)
 - `runtime_detect` / `productteam agents [--json]` — PATH then `CONSULT_AGENT_DIRS`
 - `runtime_default` / `provider_ask` — real LLM calls; honest refusal if missing
+- `runtime_cycle` — advances through installed catalog entries for one chat session
 
 Default provider is the authenticated Cursor `agent` CLI — no API keys, no
 mocks. Set `CONSULT_PROVIDER` to swap. `productteam agents --check` (alias:
@@ -65,9 +66,17 @@ mocks. Set `CONSULT_PROVIDER` to swap. `productteam agents --check` (alias:
 
 ## CLI chrome + first run
 
-- `lib/theme.sh` — sole ANSI source (bold/dim + two accents)
+- `lib/theme.sh` — structural role tags + semantic badges; ANSI literals remain
+  centralized in `bin/productteam` with bold/dim and two accent hues
+- `lib/render.sh` — markdown-lite replies plus signed evidence-path rendering
+- `lib/activity.sh` — telemetry-only TSV below `state/.cli/runs/` in a
+  `session-*/workers.tsv` path; no daemon or worker supervisor
+- `lib/repl.sh` — per-turn status line, `/workers`, and session-only `/provider`
 - `lib/splash.sh` — knowledge-graph splash; `CONSULT_NO_SPLASH=1` skips
 - `lib/onboarding.sh` — `productteam onboarding --yes`; state under `CONSULT_STATE_ROOT`
+
+`CONSULT_NO_SPINNER=1` suppresses spinner frames without changing the real
+provider call, activity transitions, completion card, or reply.
 
 ## Harness self-checks
 

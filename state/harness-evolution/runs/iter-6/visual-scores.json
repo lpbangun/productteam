@@ -1,0 +1,115 @@
+{
+  "contract": "visual-cli-v1",
+  "kind": "full",
+  "iteration": "iter-6",
+  "evaluator": "independent-analyst",
+  "passed": 8,
+  "failed": 0,
+  "skipped": 0,
+  "converged": true,
+  "convergence_note": "All eight deterministic criteria pass with zero skips (visual-checks-final.json and advisor-visual-checks-final.json both record 8/8 pass / 0 fail / 0 skipped with converged=true), the full suite is 49/49 with real-command validation (harness-cli-final/checks.json: 49 passed, 0 failed, 0 skipped, kind full, live_executed, validation real-commands), Advisor runtime confirms real repo runs with ADVISOR_VERDICT=PASS (advisor-runtime-final.txt: advisor visual suite exit 0, smoke exit 0, bash -n clean), and the archived live evidence directly proves the entire live_provider_proof contract: live-chat.typescript shows the real provider chat (spinner/elapsed/mission/provider, success card, complete markdown-lite reply, refreshed five-field strip) and live-chat-cycle.typescript shows the working /provider cycle (no-arg /provider advances agent -> claude, /agents marks claude selected, /provider agent switches back, sentinel LIVE-CYCLE-OK with a fresh loading/success card, status strip refreshing after each command, exit code 0). The agents-provider-cycle live-proof gap is closed; converged=true.",
+  "provider_proof_path": "state/harness-evolution/runs/iter-6/live-chat-cycle.typescript",
+  "provider_proof_detail": "env CONSULT_PROVIDER=agent bin/productteam chat, exit code 0. Cycle transcript directly shows the working /provider cycle: no-arg '/provider' advances agent -> claude with the status strip refreshing ('provider: agent' -> 'provider: claude'); '/agents' renders the catalog distinguishing installed/missing/selected and marks '● claude … (selected)' with 'Active provider: claude'; '/provider agent' switches back to agent (strip refreshes to 'provider: agent'); the following real provider invocation shows spinner frames with mission/provider/elapsed ('Reply with exactly: LIVE-CYCLE-OK · agent · 0s' .. '7s'), a compact success card ('✓ done ◇ Analyst · 7s · 1.txt'), and the reply is exactly the sentinel 'LIVE-CYCLE-OK'; the five-field status strip ('engagement: — · mode: — · provider: … · last-iter: — · overall: —') appears above every prompt and refreshes after each command. Companion live-chat.typescript (same session family) shows the complete markdown-lite reply with success card and refreshed strip. This directly proves the frozen contract's live_provider_proof scope (live-loading-card, session-footer, agents-provider-cycle), closing the agents-provider-cycle live-proof gap recorded in iter-5/6 prior scores.",
+  "full_suite": {
+    "path": "state/harness-evolution/runs/iter-6/harness-cli-final/checks.json",
+    "passed": 49,
+    "failed": 0,
+    "skipped": 0,
+    "expected": 49,
+    "recorded": 49,
+    "missing": [],
+    "unexpected": [],
+    "kind": "full",
+    "live_executed": true,
+    "overall": 9.5,
+    "validation": "real-commands"
+  },
+  "baseline_delta": "0/8 -> 8/8 (+8; all eight baseline fails in visual-baseline.json flipped to pass in visual-checks-final.json and advisor-visual-checks-final.json)",
+  "criteria": [
+    {
+      "id": "role-chrome",
+      "status": "pass",
+      "evidence": [
+        "state/harness-evolution/runs/iter-6/visual-checks-final.json",
+        "state/harness-evolution/runs/iter-6/advisor-visual-checks-final.json",
+        "state/harness-evolution/runs/iter-6/live-chat.typescript",
+        "state/harness-evolution/runs/iter-6/visual-baseline.json"
+      ],
+      "observed": "Benchmark recorded pass for the shared role-renderer probe (four distinct plain-text prefixes for Principal/Analyst/Builder/Critic). PTY transcript directly shows distinct structural glyphs: '◆ Principal ›' prompt and '✓ done ◇ Analyst · 8s · 1.txt' completion card. Baseline recorded no role chrome (bare '›' prompt); chrome now present in the session surface."
+    },
+    {
+      "id": "worker-strip",
+      "status": "pass",
+      "evidence": [
+        "state/harness-evolution/runs/iter-6/visual-checks-final.json",
+        "state/harness-evolution/runs/iter-6/advisor-visual-checks-final.json",
+        "state/harness-evolution/runs/iter-6/live-chat.typescript",
+        "state/harness-evolution/runs/iter-6/advisor-runtime-final.txt"
+      ],
+      "observed": "Benchmark recorded pass for the isolated-CONSULT_STATE_ROOT probe (start+complete a worker via the activity API, runs/session-* backing file, rendered role/mission/provider/done state). Transcript shows a completed worker strip with role, elapsed, and artifact ('agent · 8s · 1.txt', '✓ done ◇ Analyst · 8s · 1.txt'). advisor-runtime-final.txt confirms real repo runs (advisor visual suite exit 0, smoke exit 0, bash -n clean, ADVISOR_VERDICT=PASS). Baseline recorded no worker abstraction or state file."
+    },
+    {
+      "id": "live-loading-card",
+      "status": "pass",
+      "evidence": [
+        "state/harness-evolution/runs/iter-6/visual-checks-final.json",
+        "state/harness-evolution/runs/iter-6/advisor-visual-checks-final.json",
+        "state/harness-evolution/runs/iter-6/live-chat.typescript",
+        "state/harness-evolution/runs/iter-6/live-chat-cycle.typescript"
+      ],
+      "observed": "Real provider invocation shows live spinner frames ('⠋ ⠙ ⠹ …') with one-line mission + provider + elapsed ('· agent · 0s' .. '· agent · 8s') while running, then a compact success card with role, elapsed, and artifact ('✓ done ◇ Analyst · 8s · 1.txt'); complete reply preserved (no lost content). The cycle transcript repeats the pattern for the sentinel invocation (spinner 'Reply with exactly: LIVE-CYCLE-OK · agent · 0s' .. '7s', card '✓ done ◇ Analyst · 7s · 1.txt', reply 'LIVE-CYCLE-OK'). Benchmark recorded pass, including the deterministic unusable-provider leg showing loading fields and a failure card without losing the refusal."
+    },
+    {
+      "id": "two-accent-language",
+      "status": "pass",
+      "evidence": [
+        "state/harness-evolution/runs/iter-6/visual-checks-final.json",
+        "state/harness-evolution/runs/iter-6/advisor-visual-checks-final.json",
+        "state/harness-evolution/runs/iter-6/harness-cli-final/checks.json"
+      ],
+      "observed": "Benchmark recorded pass for the shared status-renderer probe (distinct legible glyphs for pass/success/done, fail/error, progress/running, pending, escalate under NO_COLOR). Full-suite checks corroborate the source budget: cli-accent-budget pass ('2 accent hue(s): \\e[31m \\e[32m'), cli-no-color-clean pass (zero escapes under NO_COLOR), cli-plain-pipe-safe pass. Baseline recorded language for only 2 of 4 states with no progress/escalate language."
+    },
+    {
+      "id": "evidence-path-highlight",
+      "status": "pass",
+      "evidence": [
+        "state/harness-evolution/runs/iter-6/visual-checks-final.json",
+        "state/harness-evolution/runs/iter-6/advisor-visual-checks-final.json",
+        "state/harness-evolution/runs/iter-6/harness-cli-final/checks.json"
+      ],
+      "observed": "Benchmark recorded pass for 'productteam bench harness-cli' and a nested-score engagement completing without jq errors, bench/run output placing real signed deltas beside evidence paths, and report rendering preserving highlighted +/- evidence lines. The harness-cli bench itself completed and its runner wrote 49/49 checks with zero failures (harness-cli-final/checks.json, validation real-commands). Baseline recorded evidence printed dimmed/truncated with no +/- markers or path emphasis."
+    },
+    {
+      "id": "markdown-lite",
+      "status": "pass",
+      "evidence": [
+        "state/harness-evolution/runs/iter-6/visual-checks-final.json",
+        "state/harness-evolution/runs/iter-6/advisor-visual-checks-final.json",
+        "state/harness-evolution/runs/iter-6/live-chat.typescript"
+      ],
+      "observed": "Transcript shows a real provider reply rendered through markdown-lite with structure preserved: '## Live' heading, '**Verdict PASS**' bold verdict, and a fenced code block containing 'echo ok' — all content retained. Benchmark recorded pass for the renderer probe (heading, fence, verdict) and for both chat replies and 'productteam report' calling the renderer. Baseline recorded raw sed-passthrough with no renderer."
+    },
+    {
+      "id": "session-footer",
+      "status": "pass",
+      "evidence": [
+        "state/harness-evolution/runs/iter-6/visual-checks-final.json",
+        "state/harness-evolution/runs/iter-6/advisor-visual-checks-final.json",
+        "state/harness-evolution/runs/iter-6/live-chat.typescript",
+        "state/harness-evolution/runs/iter-6/live-chat-cycle.typescript"
+      ],
+      "observed": "Transcript shows the one-line status strip with all five labeled fields ('engagement: — · mode: — · provider: agent · last-iter: — · overall: —') immediately above the '◆ Principal ›' prompt, appearing both before the exchange and refreshed after the provider reply. The cycle transcript shows the strip refreshing after every command: after no-arg '/provider' ('provider: claude'), after '/agents', after '/provider agent' ('provider: agent'), and after the sentinel reply. Benchmark recorded pass for the '/bench harness-cli' refresh leg (next strip shows harness-cli with its latest iteration/overall). Baseline recorded a footer with only provider + '/help · ctrl+d exit'."
+    },
+    {
+      "id": "agents-provider-cycle",
+      "status": "pass",
+      "evidence": [
+        "state/harness-evolution/runs/iter-6/visual-checks-final.json",
+        "state/harness-evolution/runs/iter-6/advisor-visual-checks-final.json",
+        "state/harness-evolution/runs/iter-6/live-chat-cycle.typescript",
+        "state/harness-evolution/runs/iter-6/live-chat.typescript"
+      ],
+      "observed": "Benchmark recorded pass for the PTY probe ('/provider then /agents must show a changed selected provider') and for dispatch calling the cycle helper backed by the sole AGENT_CATALOG. The archived live-cycle transcript now directly proves the full cycle in a real chat: no-arg '/provider' advanced agent -> claude ('provider → claude', strip refreshed), '/agents' distinguished installed (●), missing (○ … missing), and unknown entries and marked the changed selection ('● claude … (selected)' / 'Active provider: claude'), '/provider agent' switched back to agent ('provider → agent', strip refreshed), and the sentinel reply 'LIVE-CYCLE-OK' arrived after a real loading/success card (spinner frames '· agent · 0s' .. '7s', '✓ done ◇ Analyst · 7s · 1.txt', exit code 0). Live-proof gap closed; all three live_provider_proof-scope criteria are directly proven by archived transcripts."
+    }
+  ]
+}

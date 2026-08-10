@@ -69,7 +69,21 @@ section '7. Status overview'
 "$C" status
 pause
 
-section '8. harness-cli engagement scores'
+section '8. Chat session (V1 robots; TTY or non-TTY refuse)'
+if [[ -t 0 && -t 1 ]]; then
+  printf 'Entering chat for /help then /exit…\n'
+  printf '/help\n/exit\n' | script -qefc "$C chat" /dev/null || true
+else
+  printf 'Non-TTY: expecting refuse…\n'
+  if "$C" chat </dev/null; then
+    printf 'UNEXPECTED: chat succeeded without TTY\n' >&2
+  else
+    printf 'Refused as expected.\n'
+  fi
+fi
+pause
+
+section '9. harness-cli engagement scores'
 if [[ -f "$ROOT/state/engagements/harness-cli/runs/iter-1/scores.json" ]]; then
   jq '{overall, converged, scores: [.scores|to_entries[]|{dim:.key, score:.value.score}]}' \
     "$ROOT/state/engagements/harness-cli/runs/iter-1/scores.json"
@@ -78,7 +92,7 @@ else
 fi
 pause
 
-section '9. Optional live skill (proj-a critique) — real LLM call'
+section '10. Optional live skill (proj-a critique) — real LLM call'
 if [[ "${CONSULT_INSPECT_SKILL:-}" == 1 ]]; then
   OUT="$DEMO_STATE/skill-critique"
   "$C" skill critique "$ROOT/state/engagements/harness-cli/tmp-projects/proj-a" "$OUT"
@@ -93,6 +107,7 @@ section 'Done'
 printf 'Re-run pieces yourself:\n'
 printf '  %s help\n' "$C"
 printf '  %s splash\n' "$C"
+printf '  %s chat\n' "$C"
 printf '  CONSULT_STATE_ROOT=%s %s onboarding --yes\n' "$DEMO_STATE" "$C"
 printf '  %s agents --json\n' "$C"
 printf '  %s status\n' "$C"

@@ -1,0 +1,73 @@
+{
+  "contract": "visual-cli-v1",
+  "frozen": "2026-08-10",
+  "subject": "Product Consulting Harness CLI — eight requested visual features",
+  "runner": "tests/visual-cli.sh",
+  "convergence": "8/8 pass, no skips, plus real provider chat proof",
+  "no_mocks": "Assertions inspect or execute real CLI/source/state surfaces (bin/productteam, lib/*.sh, state/engagements/*/runs, state/harness-evolution/runs). No provider mocks: live provider chat is never invoked by this benchmark.",
+  "criteria": [
+    {
+      "id": "role-chrome",
+      "name": "Role chrome",
+      "contract": "Principal, Analyst, Builder, and Critic turns use distinct structural glyphs plus bold/dim framing; only the active worker may use an accent.",
+      "kind": "behavioral+source",
+      "probe": "Invoke the shared role renderer for all four roles and require four distinct plain-text prefixes; PTY chat must use the Principal and Analyst chrome."
+    },
+    {
+      "id": "worker-strip",
+      "name": "File-backed worker strip",
+      "contract": "A worker strip backed by a session file under state/.../runs shows role, mission, provider, elapsed/artifact, and pending|running|done|failed.",
+      "kind": "behavioral",
+      "probe": "With an isolated CONSULT_STATE_ROOT, start and complete a worker through the activity API, require a runs/session-* backing file, then render the recorded role, mission, provider, and done state."
+    },
+    {
+      "id": "live-loading-card",
+      "name": "Live loading + compact completion card",
+      "contract": "A real provider invocation shows spinner, elapsed time, one-line mission, and provider while running, then a compact success or failure card with role, elapsed time, and artifact.",
+      "kind": "behavioral+live",
+      "probe": "A deterministic unusable-provider PTY run must show the loading fields and a failure card without losing the refusal; separate live-provider proof requires the success card and complete reply."
+    },
+    {
+      "id": "two-accent-language",
+      "name": "Two-accent status language",
+      "contract": "Pass/success/done, fail/error, progress/running, pending, and escalate states share one glyph-and-style language while the CLI uses only success and error accent hues.",
+      "kind": "behavioral+source",
+      "probe": "Invoke the shared status renderer for every semantic state under NO_COLOR and require distinct legible glyphs; source ANSI literals remain limited to 32m and 31m."
+    },
+    {
+      "id": "evidence-path-highlight",
+      "name": "+/- evidence path highlighting",
+      "contract": "Score, report, and run surfaces emphasize evidence paths and show signed deltas only when a previous score exists; both flat and nested score history schemas render.",
+      "kind": "behavioral",
+      "probe": "`productteam bench harness-cli` and a nested-score engagement must complete without jq errors; bench/run output must place real signed deltas beside evidence paths and report rendering must preserve highlighted +/- evidence lines."
+    },
+    {
+      "id": "markdown-lite",
+      "name": "Markdown-lite rendering",
+      "contract": "Provider replies and reports pass through a markdown-lite renderer that structures headings, dims fences, and bolds verdicts while preserving content under NO_COLOR.",
+      "kind": "behavioral+source",
+      "probe": "Feed a heading, fenced block, and verdict through the renderer; require all content and structural output, then require both chat replies and `productteam report` to call that renderer."
+    },
+    {
+      "id": "session-footer",
+      "name": "Session status line",
+      "contract": "A one-line status strip immediately above every prompt shows engagement, mode, provider, last-iter, and overall, and refreshes after score or bench.",
+      "kind": "behavioral",
+      "probe": "PTY chat must show all five labeled fields immediately before the Principal prompt; after `/bench harness-cli`, the next strip must show harness-cli and its latest iteration/overall."
+    },
+    {
+      "id": "agents-provider-cycle",
+      "name": "/agents presence + one-command provider cycle",
+      "contract": "In chat, /agents distinguishes installed, missing, and selected agents; no-argument /provider advances to the next installed AGENT_CATALOG entry for that session only.",
+      "kind": "behavioral+source",
+      "probe": "PTY `/provider` then `/agents` must show a changed selected provider; dispatch must call the cycle helper backed by the sole AGENT_CATALOG."
+    }
+  ],
+  "live_provider_proof": {
+    "required": true,
+    "run_by": "Principal — separate from this benchmark",
+    "why_separate": "Live provider chat is inherently nondeterministic; this benchmark never substitutes or invokes a provider and instead validates the archived real-provider transcript.",
+    "method": "Run `productteam chat` with the real authenticated default provider: a bare prompt must show spinner/elapsed/mission/provider, a success card, the complete markdown-lite reply, the refreshed five-field status strip, and a working `/provider` cycle.",
+    "scope": ["live-loading-card", "session-footer", "agents-provider-cycle"]
+  }
+}

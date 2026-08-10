@@ -35,9 +35,9 @@ record() {
   local id="$1" status="$2" detail="$3"
   printf '%s\t%s\t%s\n' "$id" "$status" "$detail" >> "$RESULTS_FILE"
   if [[ "$status" == pass ]]; then
-    printf '  %s✓%s %-40s %s%s%s\n' "$G" "$R" "$id" "$D" "${detail:0:55}" "$R"
+    printf '  %s %-40s %s%s%s\n' "$(status_badge success)" "$id" "$D" "${detail:0:55}" "$R"
   else
-    printf '  %s✗%s %-40s %s%s%s\n' "$RD" "$R" "$id" "$D" "${detail:0:55}" "$R"
+    printf '  %s %-40s %s%s%s\n' "$(status_badge error)" "$id" "$D" "${detail:0:55}" "$R"
   fi
 }
 
@@ -326,5 +326,9 @@ PY
 
 passed=$(awk -F'\t' '$2=="pass"{c++} END{print c+0}' "$RESULTS_FILE")
 failed=$(awk -F'\t' '$2=="fail"{c++} END{print c+0}' "$RESULTS_FILE")
-printf '\n  %s%d passed · %d failed%s\n\n' "$B" "$passed" "$failed" "$R"
+if (( failed > 0 )); then
+  printf '\n  %s %s%d passed · %d failed%s\n\n' "$(status_badge error)" "$B" "$passed" "$failed" "$R"
+else
+  printf '\n  %s %s%d passed · %d failed%s\n\n' "$(status_badge success)" "$B" "$passed" "$failed" "$R"
+fi
 exit 0

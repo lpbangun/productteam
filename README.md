@@ -26,6 +26,7 @@ bin/productteam                    # status overview (splash once on first run)
 bin/productteam                  # org overview (status)
 bin/productteam status           # same overview, named explicitly
 bin/productteam help             # command table
+bin/productteam chat             # role-aware interactive session
 bin/productteam onboarding [--yes]
 bin/productteam splash [--frames]
 bin/productteam agents [--json] [--check]
@@ -49,6 +50,9 @@ bin/productteam skill critique|benchmark|design-sprint <target>
 Provider: authenticated Cursor `agent` CLI by default (`CONSULT_PROVIDER` to swap).
 Detected agents: `bin/productteam agents`. No API keys. No mocks — skills call the
 real provider seam (`lib/provider.sh`).
+In chat, `/agents` shows installed/missing/selected providers, `/provider`
+cycles the installed catalog for that session, and `/workers` shows the
+file-backed activity log under `state/.cli/runs/` in a session directory.
 
 GitHub: `bin/productteam gh …` wraps `gh` with gates — **never** `--admin` /
 force-merge. Merge requires `state/harness-evolution/authorize-merge` (or
@@ -65,6 +69,7 @@ Learning artifacts: `docs/learning-schema.md` · harness evolution under
 | `CONSULT_STATE_ROOT` | Relocate CLI first-run / onboarding state (default `state/.cli`) |
 | `CONSULT_NONINTERACTIVE` | `1` makes `productteam onboarding` write (same as `--yes`) |
 | `CONSULT_NO_SPLASH` | `1` skips the splash banner entirely |
+| `CONSULT_NO_SPINNER` | `1` disables chat spinner frames; provider execution and completion cards remain |
 | `CONSULT_SPLASH_DUMP` / `CONSULT_SPLASH_FRAMES=all` | Dump every splash frame as text |
 | `CONSULT_AGENT_DIRS` | Extra `:`-separated dirs scanned after `PATH` for agents |
 | `CONSULT_AUTHORIZE_MERGE` | Path to authorize-merge file for `gh merge` |
@@ -110,9 +115,11 @@ Full text: `JUDGMENT.md`.
 | `docs/learning-schema.md` | Harness-evolution learning artifact schema |
 | `docs/skills.md` | First-party skills (live provider calls) |
 | `bin/productteam` | CLI |
-| `lib/theme.sh` | Empty defaults for batch runners (ANSI lives in `bin/productteam`) |
-| `lib/provider.sh` | Provider + agent detection seam |
-| `lib/splash.sh` | Knowledge-graph splash |
+| `lib/theme.sh` | Role chrome + semantic badges (ANSI literals stay in `bin/productteam`) |
+| `lib/render.sh` | Markdown-lite replies and evidence/delta highlighting |
+| `lib/activity.sh` | File-backed worker activity + bounded loading spinner |
+| `lib/repl.sh` | Interactive chat, status line, worker/provider controls |
+| `lib/provider.sh` | Provider detection, session cycling, and ask seam |
 | `lib/onboarding.sh` | First-run onboarding |
 | `lib/github.sh` | Gated PR/merge/validate helpers (no `--admin`) |
 | `lib/run-checks.sh` | Deterministic checks (`scorer=checks`) |
