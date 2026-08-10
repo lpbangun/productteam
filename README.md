@@ -51,8 +51,12 @@ Provider: authenticated Cursor `agent` CLI by default (`CONSULT_PROVIDER` to swa
 Detected agents: `bin/productteam agents`. No API keys. No mocks — skills call the
 real provider seam (`lib/provider.sh`).
 In chat, `/agents` shows installed/missing/selected providers, `/provider`
-cycles the installed catalog for that session, and `/workers` shows the
-file-backed activity log under `state/.cli/runs/` in a session directory.
+cycles the installed catalog, and `/workers` shows the file-backed activity
+log under `state/.cli/runs/`. Prompt chrome keeps the Product Judgment mode
+and engagement score trend visible; slash prefixes show matching commands.
+Provider turns state that execution is blocking and Ctrl+C preserves any
+partial artifact. `/export` writes the timestamped markdown transcript under
+the state/.cli/sessions/ directory.
 
 GitHub: `bin/productteam gh …` wraps `gh` with gates — **never** `--admin` /
 force-merge. Merge requires `state/harness-evolution/authorize-merge` (or
@@ -118,7 +122,7 @@ Full text: `JUDGMENT.md`.
 | `lib/theme.sh` | Role chrome + semantic badges (ANSI literals stay in `bin/productteam`) |
 | `lib/render.sh` | Markdown-lite replies and evidence/delta highlighting |
 | `lib/activity.sh` | File-backed worker activity + bounded loading spinner |
-| `lib/repl.sh` | Interactive chat, status line, worker/provider controls |
+| `lib/repl.sh` | Interactive chat, judgment/score chrome, slash hints, interrupt-safe artifacts, transcript export |
 | `lib/provider.sh` | Provider detection, session cycling, and ask seam |
 | `lib/onboarding.sh` | First-run onboarding |
 | `lib/github.sh` | Gated PR/merge/validate helpers (no `--admin`) |
@@ -127,7 +131,7 @@ Full text: `JUDGMENT.md`.
 | `lib/harness-cli-checks.sh` | harness-cli-v1 check suite |
 | `lib/run-skill.sh` | Skills via real `provider_ask` |
 | `tests/consult-smoke.sh` | CLI smoke |
-| `state/` | Engagements, scores, history |
+| `state/` | Engagements, scores, history, and plain-file CLI sessions |
 | `state/harness-evolution/` | APC self-improvement (locked `harness-apc-v1`) |
 
 Client products live as **sibling repos**; each brief has `Repo: /absolute/path`

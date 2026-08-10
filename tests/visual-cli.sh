@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
-# visual-cli — executable benchmark for the eight requested CLI visual features.
+# visual-cli — executable benchmark for the fourteen requested CLI visual features.
 # Run from repo root: tests/visual-cli.sh [out.json]
-#   - evaluates all eight contract ids in state/harness-evolution/visual-contract.json
+#   - evaluates all fourteen contract ids in state/harness-evolution/visual-contract.json
 #     against real CLI/source/state surfaces; it never substitutes a provider
 #   - validates (but does not invoke) a live transcript from CONSULT_LIVE_PROOF
 #     or the output directory's live-chat-cycle.typescript
 #   - emits visible PASS/FAIL rows and writes optional JSON
-#   - exits nonzero until 8/8, no skips, and the live proof all pass
+#   - exits nonzero until 14/14, no skips, and the live proof all pass
 set -uo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 C="$ROOT/bin/productteam"
@@ -188,10 +188,319 @@ else
   failc "$id" 'provider cycle dispatch or installed/missing/selected presence is incomplete'
 fi
 
+# ── 9. grouped-check-progress ────────────────────────────────────────
+# One collapsed summary line derived from the real result JSON the runner
+# wrote (checks{} status counts, min scores{} key) — never from progress
+# counters. Runs the real ofc-v1 runner against a temporary engagement +
+# repo fixture; npm scripts are plain echo stubs, so the fixture is
+# deterministic and needs no install.
+id=grouped-check-progress
+grp_root=$(mktemp -d)
+grp_eng="$grp_root/engagements/ofc-demo"
+grp_repo="$grp_root/repo"
+mkdir -p "$grp_eng/runs" "$grp_repo/src"
+printf '{"contract":"ofc-v1","scorer":"checks"}\n' > "$grp_eng/contract.json"
+printf '{"name":"ofc-demo","scripts":{"build":"echo built","test":"echo ok"}}\n' > "$grp_repo/package.json"
+printf 'Fictional prototype\n' > "$grp_repo/README.md"
+printf 'export const MAYA_ID="m1";\nexport const STORAGE_KEY="k";\n// Fictional prototype — Local-only, not a real AI\n// People Ops · Manager · New Hire\n' > "$grp_repo/src/App.tsx"
+printf 'export function deriveSupport() {}\n' > "$grp_repo/src/domain.ts"
+printf 'export {}\n' > "$grp_repo/src/extra-a.ts"
+printf 'export {}\n' > "$grp_repo/src/extra-b.ts"
+printf 'export {}\n' > "$grp_repo/src/extra-c.ts"
+grp_out=$(NO_COLOR=1 bash "$ROOT/lib/run-checks.sh" ofc-demo "$grp_eng" "$grp_repo" 2>&1)
+grp_json="$grp_eng/runs/.checks-latest.json"
+grp_expected=$(jq -r --arg c ofc-demo '
+  ([.checks | to_entries[] | select(.value.status == "pass")] | length) as $p
+  | (.checks | length) as $t
+  | (.scores | to_entries | min_by(.value.score) | .key) as $w
+  | "checks ▸ \($c) · \($p)/\($t) · weakest: \($w)"
+' "$grp_json" 2>/dev/null || true)
+if [[ -f "$grp_json" ]] \
+   && [[ -n "$grp_expected" ]] \
+   && [[ "$(tail -1 <<<"$grp_out")" == "$grp_expected" ]]; then
+  pass "$id" "grouped summary '$grp_expected' matches real JSON counts/weakest"
+else
+  failc "$id" 'grouped checks line does not match counts/weakest derived from result JSON'
+fi
+rm -rf "$grp_root"
+
+# ── 10. judgment-mode-badge ─────────────────────────────────────────
+# Exactly Guided|Directive|Challenge|Override; Override reuses the
+# existing escalate styling (▲) instead of a third hue — the two-accent
+# budget is already enforced by two-accent-language.
+id=judgment-mode-badge
+jmodes=$(NO_COLOR=1 bash -c '
+  source "$1/lib/theme.sh"; source "$1/lib/provider.sh"; source "$1/lib/repl.sh"
+  for m in Guided Directive Challenge Override; do judgment_badge "$m"; printf "\n"; done
+' _ "$ROOT")
+jmodes_words=$(sed -E 's/^[^ ]+ //' <<<"$jmodes" | sort -u)
+if [[ "$jmodes_words" == "$(printf 'Challenge\nDirective\nGuided\nOverride')" ]] \
+   && grep -q '^▲ Override' <<<"$jmodes" \
+   && ! grep -qE '^▲ (Guided|Directive|Challenge)' <<<"$jmodes"; then
+  pass "$id" 'mode vocabulary renders dim chips; Override reuses escalate styling'
+else
+  failc "$id" 'judgment mode badge vocabulary or Override escalate styling is missing'
+fi
+
+# ── 11. honest-partial-output ───────────────────────────────────────
+# Real temporary executable provider that writes a prefix then sleeps;
+# SIGINT goes to the foreground process group like a real Ctrl+C. Assert
+# artifact bytes preserved at the printed path, worker marked failed,
+# honest partial wording, REPL alive after interrupt, clean /exit.
+id=honest-partial-output
+sig_root=$(mktemp -d)
+sig_home="$sig_root/home"
+sig_prov="$sig_root/bin/slow-provider"
+mkdir -p "$sig_root/bin" "$sig_home"
+cat > "$sig_prov" <<'PROV'
+#!/usr/bin/env bash
+printf '%s\n' "$$" > "$CONSULT_STATE_ROOT/provider.pid"
+printf 'partial analysis begins\n'
+sleep 30 &
+printf '%s\n' "$!" > "$CONSULT_STATE_ROOT/provider-child.pid"
+wait
+PROV
+chmod +x "$sig_prov"
+sig_out=$( CONSULT_STATE_ROOT="$sig_home" CONSULT_PROVIDER="$sig_prov" python3 - "$C" <<'PY' 2>&1
+import os, pty, select, signal, sys, time, glob
+
+cli = sys.argv[1]
+pid, fd = pty.fork()
+if pid == 0:
+    os.execve(cli, [cli, "chat"], os.environ)
+
+def drain(timeout=0.25):
+    out = b""
+    deadline = time.monotonic() + timeout
+    while True:
+        remaining = deadline - time.monotonic()
+        if remaining <= 0:
+            break
+        r, _, _ = select.select([fd], [], [], remaining)
+        if not r:
+            break
+        try:
+            chunk = os.read(fd, 65536)
+        except OSError:
+            break
+        if not chunk:
+            break
+        out += chunk
+    return out
+
+state_root = os.environ["CONSULT_STATE_ROOT"]
+out = drain(1.0)
+os.write(fd, b"hello\n")
+interrupted = False
+deadline = time.time() + 20
+while time.time() < deadline and not interrupted:
+    out += drain(0.2)
+    for a in glob.glob(state_root + "/runs/session-*/artifacts/*.txt"):
+        if os.path.getsize(a) > 0:
+            try:
+                os.killpg(pid, signal.SIGINT)
+                interrupted = True
+            except OSError:
+                pass
+            break
+out += drain(2.0)
+try:
+    os.write(fd, b"/exit\n")
+except OSError:
+    pass
+deadline = time.time() + 15
+status = None
+while time.time() < deadline:
+    out += drain(0.4)
+    try:
+        done, st = os.waitpid(pid, os.WNOHANG)
+        if done:
+            status = st
+            break
+    except ChildProcessError:
+        status = 0
+        break
+if status is None:
+    try:
+        os.killpg(pid, signal.SIGKILL)
+    except OSError:
+        pass
+    try:
+        _, status = os.waitpid(pid, 0)
+    except ChildProcessError:
+        status = 0
+sys.stdout.buffer.write(out)
+sys.exit(os.waitstatus_to_exitcode(status) if status is not None else 1)
+PY
+)
+sig_rc=$?
+sig_art=$(ls "$sig_home"/runs/session-*/artifacts/*.txt 2>/dev/null | head -1)
+sig_tsv=$(ls "$sig_home"/runs/session-*/workers.tsv 2>/dev/null | head -1)
+sig_provider_pid=$(cat "$sig_home/provider.pid" 2>/dev/null || true)
+sig_child_pid=$(cat "$sig_home/provider-child.pid" 2>/dev/null || true)
+sleep 1
+if [[ $sig_rc -eq 0 && -n "$sig_art" && -f "$sig_art" ]] \
+   && grep -qF 'partial analysis begins' "$sig_art" \
+   && [[ -n "$sig_tsv" ]] \
+   && awk -F'\t' '$3=="failed"{c++} END{exit !(c>=1)}' "$sig_tsv" \
+   && grep -qF 'Ctrl+C leaves partial on disk' <<<"$sig_out" \
+   && grep -qF 'Ctrl+C — partial output left on disk' <<<"$sig_out" \
+   && grep -qi 'working' <<<"$sig_out" \
+   && grep -qF "$sig_art" <<<"$sig_out" \
+   && [[ -n "$sig_provider_pid" && -n "$sig_child_pid" ]] \
+   && ! ps -p "$sig_provider_pid" >/dev/null 2>&1 \
+   && ! ps -p "$sig_child_pid" >/dev/null 2>&1; then
+  pass "$id" 'SIGINT keeps REPL alive; artifact bytes/path preserved; worker marked failed'
+else
+  failc "$id" 'SIGINT run did not preserve the partial artifact, mark the worker failed, and exit cleanly'
+fi
+rm -rf "$sig_root"
+
+# ── 12. slash-palette-hints ─────────────────────────────────────────
+# One canonical command array shared by /help and prefix hints; the hint
+# list updates live during readline entry as the slash prefix is typed
+# (no alternate screen). The PTY probe types `/c` then `h` and requires
+# the live hint to list checks and clear, then narrow to checks only.
+id=slash-palette-hints
+pal_root=$(mktemp -d)
+pal_seg1="$pal_root/seg1"
+pal_seg2="$pal_root/seg2"
+pal_out=$(PAL_SEG1="$pal_seg1" PAL_SEG2="$pal_seg2" python3 - "$C" <<'PY' 2>&1
+import os, pty, select, sys, time
+
+cli = sys.argv[1]
+pid, fd = pty.fork()
+if pid == 0:
+    os.execve(cli, [cli, "chat"], os.environ)
+
+def drain(timeout=0.3):
+    out = b""
+    while True:
+        r, _, _ = select.select([fd], [], [], timeout)
+        if not r:
+            break
+        try:
+            chunk = os.read(fd, 65536)
+        except OSError:
+            break
+        if not chunk:
+            break
+        out += chunk
+    return out
+
+out = drain(1.0)
+os.write(fd, b"/")
+out += drain(0.6)
+os.write(fd, b"c")
+seg = b""
+deadline = time.time() + 10
+while time.time() < deadline and b"checks" not in seg:
+    seg += drain(0.2)
+out += seg
+os.write(fd, b"h")
+seg2 = b""
+deadline = time.time() + 10
+while time.time() < deadline and b"checks" not in seg2:
+    seg2 += drain(0.2)
+out += seg2
+time.sleep(0.4)
+out += drain(0.5)
+os.write(fd, b"\r")
+out += drain(1.0)
+os.write(fd, b"/bench\r")
+out += drain(1.0)
+os.write(fd, b"/exit\r")
+out += drain(0.5)
+with open(os.environ["PAL_SEG1"], "wb") as f:
+    f.write(seg)
+with open(os.environ["PAL_SEG2"], "wb") as f:
+    f.write(seg2)
+try:
+    os.close(fd)
+except OSError:
+    pass
+_, status = os.waitpid(pid, 0)
+sys.stdout.buffer.write(out)
+sys.exit(os.waitstatus_to_exitcode(status))
+PY
+)
+pal_rc=$?
+pal_seg1_txt=$(cat "$pal_seg1" 2>/dev/null)
+pal_seg2_txt=$(cat "$pal_seg2" 2>/dev/null)
+help_verbs=$(pty_chat $'/help\n/exit\n' 2>&1 | grep -oE '/[a-z][a-z-]*' | tr -d '/' | sort -u)
+missing_verbs=$(NO_COLOR=1 bash -c '
+  source "$1/lib/theme.sh"; source "$1/lib/provider.sh"; source "$1/lib/repl.sh"
+  for v in $2; do
+    r=$(repl_slash_hints "$v" 2>/dev/null || true)
+    grep -qF "$v" <<<"$r" || printf "%s\n" "$v"
+  done
+' _ "$ROOT" "$help_verbs")
+if [[ $pal_rc -eq 0 ]] \
+   && grep -qF 'checks' <<<"$pal_seg1_txt" \
+   && grep -qF 'clear' <<<"$pal_seg1_txt" \
+   && grep -qF 'checks' <<<"$pal_seg2_txt" \
+   && ! grep -qF 'clear' <<<"$pal_seg2_txt" \
+   && ! grep -qF $'\e[?1049h' <<<"$pal_out" \
+   && grep -q 'repl_slash_verbs=' "$ROOT/lib/repl.sh" \
+   && grep -q 'repl_slash_hints' "$ROOT/lib/repl.sh" \
+   && [[ -z "$missing_verbs" ]]; then
+  pass "$id" 'live prefix hints narrow while typing; help and hints share one verb array'
+else
+  failc "$id" 'slash palette does not update live per prefix or diverges from the help verbs'
+fi
+rm -rf "$pal_root"
+
+# ── 13. transcript-export ───────────────────────────────────────────
+# Timestamped separators between turns, honest raw markdown recorded,
+# and /export writing under ${STATE_ROOT}/sessions/ with the path printed.
+# The provider is a real deterministic markdown-answering executable.
+id=transcript-export
+exp_root=$(mktemp -d)
+exp_prov="$exp_root/provider.sh"
+printf '#!/usr/bin/env bash\nprintf "%%s\\n" "# Heading" "**Verdict:** PASS" "- one"\n' > "$exp_prov"
+chmod +x "$exp_prov"
+exp_out=$( CONSULT_STATE_ROOT="$exp_root" CONSULT_PROVIDER="$exp_prov" pty_chat $'hello\n/export\n/exit\n' 2>&1 )
+exp_file=$(ls "$exp_root"/sessions/chat-*.md 2>/dev/null | head -1)
+if [[ -n "$exp_file" ]] \
+   && grep -q 'hello' "$exp_file" \
+   && grep -q '# Heading' "$exp_file" \
+   && grep -qF '**Verdict:** PASS' "$exp_file" \
+   && grep -qE '── [0-9]{2}:[0-9]{2}:[0-9]{2} · user ──' "$exp_file" \
+   && grep -qE '── [0-9]{2}:[0-9]{2}:[0-9]{2} · assistant ──' "$exp_file" \
+   && grep -qF "$exp_file" <<<"$exp_out"; then
+  pass "$id" "timestamped export under sessions/ with both turns, honest markdown, printed path"
+else
+  failc "$id" 'transcript export path, turn separators, or honest markdown content is missing'
+fi
+rm -rf "$exp_root"
+
+# ── 14. header-score-spark ──────────────────────────────────────────
+# The prompt-adjacent chrome shows the selected engagement's score trend
+# as a sparkline computed from the real history.jsonl overalls with the
+# documented spark() formula; the five v1 footer fields remain (checked
+# by session-footer).
+id=header-score-spark
+spark_hist="$ROOT/state/engagements/harness-cli/history.jsonl"
+spark_expected=$(jq -r '.overall' "$spark_hist" 2>/dev/null | python3 -c '
+import sys
+b = "▁▂▃▄▅▆▇█"
+print("".join(b[max(0, min(7, int(float(v.strip()) / 10 * 7.99)))] for v in sys.stdin if v.strip()))
+')
+spark_out=$(pty_chat $'/bench harness-cli\n/exit\n' 2>&1)
+if [[ -n "$spark_expected" ]] \
+   && grep -qE "history: .*$spark_expected" <<<"$spark_out" \
+   && grep -q 'mode: .*Directive' <<<"$spark_out"; then
+  pass "$id" "chrome spark '$spark_expected' matches real history.jsonl; mode badge present"
+else
+  failc "$id" 'prompt-adjacent chrome lacks the history-derived spark or the mode badge'
+fi
+
 # ── result + required live proof ─────────────────────────────────────
 passed=0
 for k in role-chrome worker-strip live-loading-card two-accent-language \
-         evidence-path-highlight markdown-lite session-footer agents-provider-cycle; do
+         evidence-path-highlight markdown-lite session-footer agents-provider-cycle \
+         grouped-check-progress judgment-mode-badge honest-partial-output \
+         slash-palette-hints transcript-export header-score-spark; do
   [[ "${RESULT[$k]:-}" == pass ]] && passed=$((passed + 1))
 done
 skipped=0
@@ -211,22 +520,24 @@ if [[ -n "$live_path" && -f "$live_path" ]]; then
   fi
 fi
 converged=false
-if [[ $passed -eq 8 && "$live_status" == pass ]]; then
+if [[ $passed -eq 14 && "$live_status" == pass ]]; then
   converged=true
 fi
-printf '\n  %d/8 pass · %d fail · %d skipped · live provider proof %s\n' \
-  "$passed" "$((8 - passed - skipped))" "$skipped" "$live_status"
+printf '\n  %d/14 pass · %d fail · %d skipped · live provider proof %s\n' \
+  "$passed" "$((14 - passed - skipped))" "$skipped" "$live_status"
 if [[ -n "$OUT" ]]; then
   {
     printf '{\n'
-    printf '  "contract": "visual-cli-v1",\n'
+    printf '  "contract": "visual-cli-v2",\n'
     printf '  "ts": "%s",\n' "$(date +%F)"
-    printf '  "passed": %d,\n  "failed": %d,\n  "skipped": %d,\n' "$passed" "$((8 - passed - skipped))" "$skipped"
+    printf '  "passed": %d,\n  "failed": %d,\n  "skipped": %d,\n' "$passed" "$((14 - passed - skipped))" "$skipped"
     printf '  "converged": %s,\n' "$converged"
     printf '  "results": {\n'
     first=1
     for k in role-chrome worker-strip live-loading-card two-accent-language \
-             evidence-path-highlight markdown-lite session-footer agents-provider-cycle; do
+             evidence-path-highlight markdown-lite session-footer agents-provider-cycle \
+             grouped-check-progress judgment-mode-badge honest-partial-output \
+             slash-palette-hints transcript-export header-score-spark; do
       [[ $first -eq 0 ]] && printf ',\n'
       first=0
       printf '    "%s": "%s"' "$k" "${RESULT[$k]:-fail}"

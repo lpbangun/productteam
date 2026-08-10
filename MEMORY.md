@@ -176,3 +176,11 @@ and evidence-linked.
   failure text before the compact card. Deterministic visual criteria may be
   green without live convergence: a runner must validate the required real
   provider transcript before writing `converged: true`.
+
+- **2026-08-10 · Interactive CLI honesty.** A blocking provider turn must say it
+  is working rather than imply streaming; Ctrl+C must terminate the whole
+  provider process group, retain any bytes and their path, mark the worker
+  failed, and return to the prompt. PTY probes need wall-clock-bounded drains
+  or spinner output can starve the intended signal window. Keep `/help` and
+  slash-prefix hints on one verb list; keep exported sessions as markdown
+  under `state/.cli/sessions/`.

@@ -31,14 +31,47 @@ trap 'rm -rf "$TMPDIR_CHECKS"' EXIT
 RESULTS_FILE="$TMPDIR_CHECKS/results.tsv"
 : > "$RESULTS_FILE"
 
+# ── live progress chrome ───────────────────────────────────────────
+# Compact grouped progress: one collapsed line on a colour TTY, updated
+# in place from real seen/pass counts; no per-check rows are ever printed.
+# The runner never defines its own ANSI literals (cli-theme-single-source)
+# and bin/productteam does not export the theme vars into this child, so
+# output here is plain text by design; NO_COLOR/non-TTY simply skip the
+# in-place updates and still get the same stable final summary line.
+TTY_LIVE=0
+if [[ -t 1 && -z "${NO_COLOR:-}" ]]; then
+  TTY_LIVE=1
+fi
+CHECK_TOTAL=40   # 24 static run_check + 14 named vitest probes + 2 composite record
+CHECK_SEEN=0
+CHECK_PASS=0
+CHECK_FAIL=0
+CHECK_LINE_LEN=0
+
+progress() {
+  [[ "$TTY_LIVE" == 1 ]] || return 0
+  local text len
+  text=$(printf '  checks ▸ %s · %s/%s · %s pass · %s fail' \
+    "$CLIENT" "$CHECK_SEEN" "$CHECK_TOTAL" "$CHECK_PASS" "$CHECK_FAIL")
+  len=${#text}
+  if (( len < CHECK_LINE_LEN )); then
+    printf '\r%s%*s' "$text" $((CHECK_LINE_LEN - len)) ''
+  else
+    printf '\r%s' "$text"
+  fi
+  CHECK_LINE_LEN=$len
+}
+
 record() {
   local id="$1" status="$2" detail="$3"
   printf '%s\t%s\t%s\n' "$id" "$status" "$detail" >> "$RESULTS_FILE"
+  CHECK_SEEN=$((CHECK_SEEN + 1))
   if [[ "$status" == pass ]]; then
-    printf '  %s %-40s %s%s%s\n' "$(status_badge success)" "$id" "$D" "${detail:0:55}" "$R"
+    CHECK_PASS=$((CHECK_PASS + 1))
   else
-    printf '  %s %-40s %s%s%s\n' "$(status_badge error)" "$id" "$D" "${detail:0:55}" "$R"
+    CHECK_FAIL=$((CHECK_FAIL + 1))
   fi
+  progress
 }
 
 run_check() {
@@ -322,13 +355,16 @@ with open(out_path, "w") as f:
     json.dump(payload, f, indent=2)
     f.write("\n")
 print(f"\n  overall {overall}  → {out_path}")
+
+# Stable grouped summary — the single final line of a checks run, derived
+# from the JSON written above (never from the progress counters): counts
+# come from checks{}, weakest from scores{} (— when no scores exist).
+n_pass = sum(1 for c in checks.values() if c.get("status") == "pass")
+n_total = len(checks)
+weakest = "—"
+if scores:
+    weakest = min(scores, key=lambda d: scores[d]["score"])
+print(f"checks ▸ {client} · {n_pass}/{n_total} · weakest: {weakest}")
 PY
 
-passed=$(awk -F'\t' '$2=="pass"{c++} END{print c+0}' "$RESULTS_FILE")
-failed=$(awk -F'\t' '$2=="fail"{c++} END{print c+0}' "$RESULTS_FILE")
-if (( failed > 0 )); then
-  printf '\n  %s %s%d passed · %d failed%s\n\n' "$(status_badge error)" "$B" "$passed" "$failed" "$R"
-else
-  printf '\n  %s %s%d passed · %d failed%s\n\n' "$(status_badge success)" "$B" "$passed" "$failed" "$R"
-fi
 exit 0

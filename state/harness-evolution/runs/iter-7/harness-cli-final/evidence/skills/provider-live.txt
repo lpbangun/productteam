@@ -1,0 +1,7 @@
+runtime: agent
+runtime-path: /home/logani/.local/bin/agent
+ts: 2026-08-10T08:10:31Z
+prompt: Reply with exactly: CONSULT-LIVE-OK
+exit: 0
+--- reply ---
+CONSULT-LIVE-OK

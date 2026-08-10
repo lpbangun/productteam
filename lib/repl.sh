@@ -3,8 +3,10 @@
 # Bare text → provider_ask. /cmd → argv handlers. No daemon.
 # Chat chrome: role_chrome prompt (active Principal), file-backed activity
 # strip (Analyst worker), live spinner, completion card, markdown-lite reply,
-# and an honest footer (engagement · mode · provider · last-iter · overall)
-# redrawn immediately above each prompt.
+# dim timestamped turn separators with a plain-file markdown transcript
+# (/export), live slash-verb hints while typing a / prefix (readline -x, no
+# raw mode), and an honest footer (engagement · mode-badge · provider ·
+# last-iter · overall · history-spark) redrawn immediately above each prompt.
 
 ROBOTS_MARK=(
   ' ▄██▄═════▄██▄═════▄██▄ '
@@ -16,6 +18,15 @@ ROBOTS_MARK=(
 # ── session + footer state ──────────────────────────────────────────
 SESSION_DIR='' SESSION_ART='' SESSION_TS=''
 FOOT_ENGAGEMENT=''
+SESSION_TRANSCRIPT=''       # $SESSION_DIR/transcript.md once repl_session_init runs
+REPL_HINT_BOUND=''          # non-empty while slash-hint readline bindings are live
+HINT_BUFFER='' HINT_DEDUP='' # readline hint state (slash prefix + last rendered set)
+
+# ── slash verb palette (canonical; /help and live hints render from this) ──
+repl_slash_verbs=(
+  help status agents runtime onboarding splash judge score checks bench report run
+  memory org gh skill smoke harness-checks workers provider clear export exit quit
+)
 
 repl_header() {
   local tip tip_w=22 i
@@ -51,16 +62,171 @@ repl_session_init() {
   SESSION_ART="$d/artifacts"
   mkdir -p "$SESSION_ART" 2>/dev/null || true
   SESSION_TS=$(date +%s)
+  SESSION_TRANSCRIPT="$d/transcript.md"
 }
 
 repl_foot_select() { # $1=client — remember the engagement for the footer
   FOOT_ENGAGEMENT="$1"
 }
 
+# judgment_badge <mode> → Product Judgment chip. Override is the only loud
+# state (existing escalate styling — no third hue); the rest are dim/structural.
+judgment_badge() {
+  local mode="$1"
+  case "${mode:-}" in
+    Override) status_badge escalate "$mode" ;;
+    Guided|Directive|Challenge) printf '%s%s%s' "${D:-}" "$mode" "${R:-}" ;;
+    *) printf '%s%s%s' "${D:-}" "${mode:-—}" "${R:-}" ;;
+  esac
+}
+
+repl_history_spark() { # $1=engagement (relative to $STATE) → spark() over history.jsonl overalls
+  local eng="$1" f vals out
+  f="${STATE:-$ROOT/state/engagements}/$eng/history.jsonl"
+  [[ -f "$f" ]] || return 0
+  vals=$(jq -r '.overall' "$f" 2>/dev/null || true)
+  [[ -n "$vals" ]] || return 0
+  if declare -F spark >/dev/null 2>&1; then
+    out=$(spark <<<"$vals")
+  else
+    out=''
+  fi
+  [[ -n "$out" ]] && printf '%s' "$out"
+}
+
+# ── slash palette: one canonical verb list drives /help AND live hints ──
+repl_slash_hints() { # $1=prefix ('' or without leading /) → matching verbs, one per line
+  local pre="$1" v
+  pre="${pre#/}"
+  for v in "${repl_slash_verbs[@]}"; do
+    if [[ -z "$pre" || "$v" == "$pre"* ]]; then
+      printf '%s\n' "$v"
+    fi
+  done
+}
+
+repl_slash_hint_line() { # $1=prefix → space-joined matching verbs ('' when none)
+  local pre="$1" out='' v
+  pre="${pre#/}"
+  for v in "${repl_slash_verbs[@]}"; do
+    if [[ -z "$pre" || "$v" == "$pre"* ]]; then
+      [[ -n "$out" ]] && out+=' '
+      out+="$v"
+    fi
+  done
+  printf '%s' "$out"
+}
+
+_repl_hint_wire() { # install readline -x callbacks so typing / + letters renders hints
+  local seq
+  if [[ -n "$REPL_HINT_BOUND" || ! -t 0 ]]; then
+    return 0
+  fi
+  bind -x '"/": _repl_hint_cb /' 2>/dev/null || return 0
+  for seq in a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7 8 9 -; do
+    bind -x "\"$seq\": _repl_hint_cb $seq" 2>/dev/null || true
+  done
+  bind -x '"\C-h": _repl_hint_cb ""' 2>/dev/null || true
+  bind -x '"\177": _repl_hint_cb ""' 2>/dev/null || true
+  REPL_HINT_BOUND=1
+}
+
+_repl_hint_unwire() { # remove chat-local readline callbacks before process exit
+  local seq
+  [[ -n "$REPL_HINT_BOUND" ]] || return 0
+  bind -r '"/"' 2>/dev/null || true
+  for seq in a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7 8 9 -; do
+    bind -r "\"$seq\"" 2>/dev/null || true
+  done
+  bind -r '"\C-h"' 2>/dev/null || true
+  bind -r '"\177"' 2>/dev/null || true
+  REPL_HINT_BOUND=''
+}
+
+_repl_hint_cb() { # $1=char to inject; renders the currently matching verbs
+  local ch="$1" line="${READLINE_LINE:-}" pt="${READLINE_POINT:-0}" hint
+  # Mirror readline's insertion of the typed char ('' = backspace removal).
+  if [[ -n "$ch" ]]; then
+    READLINE_LINE="${line:0:pt}$ch${line:pt}"
+    READLINE_POINT=$((pt + 1))
+  else
+    if (( pt > 0 )); then
+      READLINE_LINE="${line:0:$((pt - 1))}${line:pt}"
+      READLINE_POINT=$((pt - 1))
+    fi
+  fi
+  if [[ "$READLINE_LINE" == /* ]]; then
+    hint=$(repl_slash_hint_line "$READLINE_LINE")
+  else
+    hint=''
+  fi
+  # Wipe the hint region, draw the new palette to the right, return to prompt.
+  printf '\r%*s\r' "${REPL_HINT_WIPE:-72}" ''
+  if [[ -n "$hint" ]]; then
+    printf '%*s%s' "${REPL_HINT_COL:-34}" '' "$hint"
+  fi
+  printf '\r'
+}
+
+# ── turn separators + transcript (plain markdown, inspectable) ──────
+repl_turn_sep() { # $1=kind (user|assistant|command) → dim `── HH:MM:SS · kind ──` line
+  printf '  %s── %s · %s ──%s\n' "${D:-}" "$(date +%H:%M:%S)" "$1" "${R:-}"
+}
+
+repl_transcript_append() { # $1=kind $2=content → honest markdown turn in transcript.md
+  local kind="$1" content="$2" ts
+  repl_session_init
+  [[ -n "$SESSION_TRANSCRIPT" ]] || return 0
+  ts=$(date +%H:%M:%S)
+  case "$kind" in
+    user)      printf '── %s · user ──\n\n## User\n\n%s\n\n' "$ts" "$content" ;;
+    assistant) printf '── %s · assistant ──\n\n## Assistant\n\n%s\n\n' "$ts" "$content" ;;
+    command)   printf '── %s · command ──\n\n## Command\n\n%s\n\n' "$ts" "$content" ;;
+    *) return 0 ;;
+  esac >> "$SESSION_TRANSCRIPT"
+}
+
+repl_export_session() { # → ${STATE_ROOT}/sessions/chat-<ts>.md, prints the path
+  local root out ts
+  root="${STATE_ROOT:-$ROOT/state/.cli}"
+  ts=$(date +%Y%m%d-%H%M%S)
+  out="$root/sessions/chat-$ts.md"
+  mkdir -p "$root/sessions" 2>/dev/null || true
+  {
+    printf '# Chat session — %s\n\n' "$(date '+%Y-%m-%d %H:%M:%S')"
+    if [[ -n "$SESSION_TRANSCRIPT" && -f "$SESSION_TRANSCRIPT" ]]; then
+      cat "$SESSION_TRANSCRIPT"
+    else
+      printf '_No turns recorded yet._\n'
+    fi
+  } > "$out"
+  printf '  %s%s%s\n' "$B" "$out" "$R"
+}
+
+# ── interrupt cleanup: kill+reap the provider child, preserve bytes ──
+repl_interrupt_cleanup() { # $1=pid/process-group $2=artifact $3=worker-id
+  local pid="$1" art="$2" wid="$3" size
+  # The background provider owns process group $pid. Kill the group so its
+  # grandchildren cannot outlive an interrupted turn; fall back to the pid.
+  kill -TERM -- "-$pid" 2>/dev/null || kill -TERM "$pid" 2>/dev/null || true
+  wait "$pid" 2>/dev/null || true
+  if declare -F activity_update >/dev/null 2>&1 && [[ -n "$wid" ]]; then
+    activity_update "$wid" failed "$art" 2>/dev/null || true
+  fi
+  if [[ -s "$art" ]]; then
+    size=$(wc -c < "$art" 2>/dev/null || echo 0)
+    printf '  %sCtrl+C — partial output left on disk%s (%s bytes): %s\n' \
+      "${D:-}" "${R:-}" "$size" "$art"
+  else
+    printf '  %sCtrl+C — no output captured yet (empty artifact):%s %s\n' \
+      "${D:-}" "${R:-}" "$art"
+  fi
+}
+
 repl_footer() { # honest status line, redrawn immediately above each prompt
-  local prov mode last ov d
+  local prov mode last ov spark d
   prov="${CONSULT_PROVIDER:-$(runtime_default 2>/dev/null || echo none)}"
-  mode='—'; last='—'; ov='—'
+  mode='—'; last='—'; ov='—'; spark=''
   if [[ -n "$FOOT_ENGAGEMENT" ]]; then
     d="${STATE:-$ROOT/state/engagements}/$FOOT_ENGAGEMENT"
     if [[ -f "$d/engagement.md" ]]; then
@@ -75,9 +241,14 @@ repl_footer() { # honest status line, redrawn immediately above each prompt
       ov=$(jq -r '.overall' "$d/runs/$last/scores.json" 2>/dev/null || true)
       ov="${ov:-—}"
     fi
+    spark=$(repl_history_spark "$FOOT_ENGAGEMENT")
   fi
-  printf '  %sengagement: %s · mode: %s · provider: %s · last-iter: %s · overall: %s%s\n' \
-    "${D:-}" "${FOOT_ENGAGEMENT:-—}" "$mode" "$prov" "$last" "$ov" "${R:-}"
+  printf '  %sengagement: %s · mode: %s · provider: %s · last-iter: %s · overall: %s%s' \
+    "${D:-}" "${FOOT_ENGAGEMENT:-—}" "$(judgment_badge "$mode")" "$prov" "$last" "$ov" "${R:-}"
+  if [[ -n "$spark" ]]; then
+    printf ' · %shistory: %s%s' "${D:-}" "$spark" "${R:-}"
+  fi
+  printf '\n'
 }
 
 repl_prompt() { # active Principal chrome + prompt arrow
@@ -99,7 +270,7 @@ repl_render_reply() { # $1=artifact path
 }
 
 repl_ask() { # $1=prompt — real background provider invocation + activity + card
-  local line="$1" provider rc=0 id='' art='' start elapsed pid
+  local line="$1" provider rc=0 id='' art='' start elapsed pid interrupted=0 monitor_was_on=0
   provider="$(runtime_default 2>/dev/null || true)"
   repl_session_init
   start=$(date +%s)
@@ -111,15 +282,22 @@ repl_ask() { # $1=prompt — real background provider invocation + activity + ca
   if declare -F activity_update >/dev/null 2>&1; then
     activity_update "$id" running "$art" 2>/dev/null || true
   fi
-  printf '  %s…%s\n' "${D:-}" "${R:-}"
-  # real provider invocation in the background; stdout+stderr → session artifact
+  printf '  %s… working%s — %sCtrl+C leaves partial on disk%s\n' "${D:-}" "${R:-}" "${D:-}" "${R:-}"
+  # A temporary Bash job-control group lets interrupt cleanup terminate the
+  # provider tree with builtins only; no new runtime dependency or daemon.
+  [[ $- == *m* ]] && monitor_was_on=1
+  set -m
   provider_ask "$line" "$ROOT" >"$art" 2>&1 &
   pid=$!
+  (( monitor_was_on == 1 )) || set +m
+  # Scoped SIGINT: kill/reap the provider, keep the REPL alive afterwards.
+  trap 'interrupted=1; repl_interrupt_cleanup "$pid" "$art" "$id"; rc=130' INT
   if declare -F activity_spinner >/dev/null 2>&1; then
     activity_spinner "$pid" Analyst "$line" "$provider" "$start" || rc=$?
   else
     if wait "$pid" 2>/dev/null; then rc=0; else rc=$?; fi
   fi
+  trap - INT
   elapsed=$(( $(date +%s) - start ))
   if declare -F activity_update >/dev/null 2>&1; then
     if (( rc == 0 )); then
@@ -135,13 +313,18 @@ repl_ask() { # $1=prompt — real background provider invocation + activity + ca
     if declare -F activity_card >/dev/null 2>&1; then
       activity_card done Analyst "$elapsed" "$art"
     fi
+    repl_turn_sep assistant
     repl_render_reply "$art"
+    repl_transcript_append assistant "$(cat "$art")"
   else
     if declare -F activity_card >/dev/null 2>&1; then
       activity_card failed Analyst "$elapsed" "$art"
     fi
-    [[ -s "$art" ]] && repl_render_reply "$art"
-    printf '  %sprovider refused%s — /agents · raw: %s\n' "${RD:-}" "${R:-}" "$art"
+    if (( interrupted == 0 )); then
+      repl_turn_sep assistant
+      [[ -s "$art" ]] && repl_render_reply "$art"
+      printf '  %sprovider refused%s — /agents · raw: %s\n' "${RD:-}" "${R:-}" "$art"
+    fi
   fi
 }
 
@@ -150,13 +333,16 @@ repl_run_slash() { # $1=line without leading /
   IFS=' ' builtin read -r cmd args <<<"$line"
   case "$cmd" in
     ''|help)
-      printf '  /status /agents|/runtime /onboarding /splash\n'
-      printf '  /judge /score /checks /bench /report /run\n'
-      printf '  /memory /org /gh /skill /smoke /harness-checks\n'
-      printf '  /workers /provider /clear /exit   · bare text → provider\n'
+      local v out=''
+      for v in "${repl_slash_verbs[@]}"; do
+        out+="/$v "
+      done
+      printf '  %s\n' "${out% }"
+      printf '  bare text → provider · /export writes markdown under the CLI sessions directory\n'
       ;;
     clear) printf '%s' "${CLR:-}"; repl_header ;;
     exit|quit) return 99 ;;
+    export) repl_export_session ;;
     status) cmd_status ;;
     agents|runtime) cmd_agents $args ;;
     workers)
@@ -245,6 +431,7 @@ cmd_chat() {
   fi
   repl_header
   local line
+  _repl_hint_wire
   while true; do
     repl_footer
     repl_prompt
@@ -258,10 +445,15 @@ cmd_chat() {
     [[ -z "$line" ]] && continue
     if [[ "$line" == /* ]]; then
       local rc=0
+      repl_turn_sep command
+      repl_transcript_append command "$line"
       repl_run_slash "${line#/}" || rc=$?
       (( rc == 99 )) && break
       continue
     fi
+    repl_turn_sep user
+    repl_transcript_append user "$line"
     repl_ask "$line"
   done
+  _repl_hint_unwire
 }

@@ -1,10 +1,10 @@
 {
-  "contract": "visual-cli-v1",
+  "contract": "visual-cli-v2",
   "frozen": "2026-08-10",
-  "subject": "Product Consulting Harness CLI — eight requested visual features",
+  "subject": "Product Consulting Harness CLI — fourteen requested visual features",
   "runner": "tests/visual-cli.sh",
-  "convergence": "8/8 pass, no skips, plus real provider chat proof",
-  "no_mocks": "Assertions inspect or execute real CLI/source/state surfaces (bin/productteam, lib/*.sh, state/engagements/*/runs, state/harness-evolution/runs). No provider mocks: live provider chat is never invoked by this benchmark.",
+  "convergence": "14/14 pass, no skips, plus real provider chat proof",
+  "no_mocks": "Assertions inspect or execute real CLI/source/state surfaces (bin/productteam, lib/*.sh, state/engagements/*/runs, state/harness-evolution/runs). No provider mocks: live provider chat is never invoked by this benchmark; interrupt and export probes use real temporary executable providers (never scripted responses from the CLI itself).",
   "criteria": [
     {
       "id": "role-chrome",
@@ -61,6 +61,48 @@
       "contract": "In chat, /agents distinguishes installed, missing, and selected agents; no-argument /provider advances to the next installed AGENT_CATALOG entry for that session only.",
       "kind": "behavioral+source",
       "probe": "PTY `/provider` then `/agents` must show a changed selected provider; dispatch must call the cycle helper backed by the sole AGENT_CATALOG."
+    },
+    {
+      "id": "grouped-check-progress",
+      "name": "Grouped check progress line",
+      "contract": "A checks run shows one collapsed grouped line — `checks ▸ <client> · <passed>/<total> · weakest: <dimension-or-—>` — derived from the real result JSON the runner writes, never from progress counters.",
+      "kind": "behavioral",
+      "probe": "Run the real ofc-v1 runner against a temporary engagement + repo fixture (npm scripts are plain echo stubs, so no install is needed); compute passed/total from checks{} statuses and weakest from the min scores{} key in the written .checks-latest.json and require the runner's final line to equal that derivation."
+    },
+    {
+      "id": "judgment-mode-badge",
+      "name": "Judgment mode badge",
+      "contract": "The judgment mode renders as a badge with vocabulary exactly Guided|Directive|Challenge|Override; Override reuses the existing escalate status styling rather than a third hue.",
+      "kind": "behavioral",
+      "probe": "Render the mode badge for all four modes under NO_COLOR and require the exact vocabulary with dim chips for Guided/Directive/Challenge and the existing escalate styling (▲) for Override; the two-accent budget stays enforced by two-accent-language."
+    },
+    {
+      "id": "honest-partial-output",
+      "name": "Honest partial output on interrupt",
+      "contract": "A real provider run shows working state with the hint that Ctrl+C leaves the partial on disk; SIGINT kills and reaps the child, preserves artifact bytes at the printed path, marks the worker failed, and leaves the REPL alive.",
+      "kind": "behavioral",
+      "probe": "In a PTY chat with an isolated CONSULT_STATE_ROOT and a real temporary executable provider that writes a prefix then sleeps, send SIGINT to the process group; require the artifact to exist with its bytes intact, its printed path present in the transcript, the worker row failed in runs/session-*/workers.tsv, the partial-on-disk wording, no surviving provider process, and a clean /exit afterwards."
+    },
+    {
+      "id": "slash-palette-hints",
+      "name": "Slash palette prefix hints",
+      "contract": "One canonical command array is shared by /help and the slash prefix hints; hints update as a slash prefix is typed during readline entry, without an alternate screen or raw-mode TUI.",
+      "kind": "behavioral",
+      "probe": "In a PTY chat, type `/c`, capture the hint region, then type `h` and require the hint list to have narrowed (checks remains, clear drops); require the /help verb list to be covered by the shared hint function, the canonical array declared once in lib/repl.sh, and no alternate-screen escape in the transcript."
+    },
+    {
+      "id": "transcript-export",
+      "name": "Transcript export with separators",
+      "contract": "The chat records honest markdown of every user/assistant turn separated by timestamped separators, and /export writes the transcript under ${STATE_ROOT}/sessions/ and prints the path.",
+      "kind": "behavioral",
+      "probe": "In a PTY chat with an isolated CONSULT_STATE_ROOT and a real deterministic markdown-answering provider, run a bare prompt then /export; require a chat-<ts>.md under sessions/ containing the user turn, the provider's markdown verbatim, and ── HH:MM:SS · user|assistant ── separators, plus the printed path."
+    },
+    {
+      "id": "header-score-spark",
+      "name": "Prompt-adjacent score spark",
+      "contract": "The prompt-adjacent header/footer chrome shows the selected engagement's score trend as a sparkline computed from the real history.jsonl overalls using the existing spark() formula.",
+      "kind": "behavioral",
+      "probe": "Compute the expected sparkline from state/engagements/harness-cli/history.jsonl overalls with the documented spark() formula; PTY `/bench harness-cli` must show that spark in the prompt-adjacent chrome and the judgment mode badge, while the five v1 footer fields remain (checked by session-footer)."
     }
   ],
   "live_provider_proof": {

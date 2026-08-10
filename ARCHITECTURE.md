@@ -28,6 +28,9 @@ state/
     runs/iter-N/
       scores.json      # {dimension: {score, evidence}}
       report.md        # reasoning, debate, diff, lessons, org review
+  .cli/
+    runs/session-*/    # worker TSV, transcript source, provider artifacts
+    sessions/*.md      # user-exported chat transcripts
 ```
 
 Client product repos are **siblings**, not nested under the harness.
@@ -71,8 +74,8 @@ mocks. Set `CONSULT_PROVIDER` to swap. `productteam agents --check` (alias:
 - `lib/render.sh` — markdown-lite replies plus signed evidence-path rendering
 - `lib/activity.sh` — telemetry-only TSV below `state/.cli/runs/` in a
   `session-*/workers.tsv` path; no daemon or worker supervisor
-- `lib/repl.sh` — per-turn status line, `/workers`, and session-only `/provider`
-- `lib/splash.sh` — knowledge-graph splash; `CONSULT_NO_SPLASH=1` skips
+- `lib/repl.sh` — persistent Judgment/score chrome, live slash-prefix hints,
+  interrupt-safe provider artifacts, turn separators, and markdown `/export`
 - `lib/onboarding.sh` — `productteam onboarding --yes`; state under `CONSULT_STATE_ROOT`
 
 `CONSULT_NO_SPINNER=1` suppresses spinner frames without changing the real
