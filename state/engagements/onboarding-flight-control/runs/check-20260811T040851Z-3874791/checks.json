@@ -1,0 +1,226 @@
+{
+  "ts": "2026-08-11",
+  "client": "onboarding-flight-control",
+  "contract": "ofc-v1",
+  "checks": {
+    "readme-exists": {
+      "status": "pass",
+      "detail": "present"
+    },
+    "readme-required-sections": {
+      "status": "pass",
+      "detail": "ok"
+    },
+    "walkthrough-covers-maya": {
+      "status": "pass",
+      "detail": "ok"
+    },
+    "docs-honest-prototype": {
+      "status": "pass",
+      "detail": "ok"
+    },
+    "cross-role-demo-script": {
+      "status": "pass",
+      "detail": "ok"
+    },
+    "architecture-notes": {
+      "status": "pass",
+      "detail": "ok"
+    },
+    "readme-non-goals-explicit": {
+      "status": "pass",
+      "detail": "ok"
+    },
+    "dev-script-documented": {
+      "status": "pass",
+      "detail": "ok"
+    },
+    "node-version-noted": {
+      "status": "pass",
+      "detail": "engines"
+    },
+    "deps-pinned": {
+      "status": "pass",
+      "detail": "ok"
+    },
+    "test-script-exists": {
+      "status": "pass",
+      "detail": "vitest run"
+    },
+    "deps-minimal": {
+      "status": "pass",
+      "detail": "ok"
+    },
+    "domain-pure": {
+      "status": "pass",
+      "detail": "ok"
+    },
+    "app-not-monolith": {
+      "status": "pass",
+      "detail": "App.tsx=572 extras=6"
+    },
+    "lean-src-tree": {
+      "status": "pass",
+      "detail": "src_files=9"
+    },
+    "single-derive-support": {
+      "status": "pass",
+      "detail": "count=1"
+    },
+    "demo-constants-centralized": {
+      "status": "pass",
+      "detail": "MAYA_ID_defs=1 STORAGE_KEY_defs=1"
+    },
+    "home-states-fictional": {
+      "status": "pass",
+      "detail": "ok"
+    },
+    "topbar-prototype-chip": {
+      "status": "pass",
+      "detail": "ok"
+    },
+    "copilot-not-ai": {
+      "status": "pass",
+      "detail": "ok"
+    },
+    "three-role-labels": {
+      "status": "pass",
+      "detail": "ok"
+    },
+    "build-green": {
+      "status": "pass",
+      "detail": "built"
+    },
+    "typescript-build": {
+      "status": "pass",
+      "detail": "dist/assets/index-CXfkuQ1D.js   256.17 kB \u2502 gzip: 76.56 kB  \u2713 built in 403ms "
+    },
+    "test-suite-green": {
+      "status": "pass",
+      "detail": "tested"
+    },
+    "maya-intro-flow": {
+      "status": "pass",
+      "detail": "pass"
+    },
+    "initial-handoffs-complete": {
+      "status": "pass",
+      "detail": "pass"
+    },
+    "domain-transitions-generic": {
+      "status": "pass",
+      "detail": "pass"
+    },
+    "derive-support-seed": {
+      "status": "pass",
+      "detail": "pass"
+    },
+    "status-signal-consistency": {
+      "status": "pass",
+      "detail": "pass"
+    },
+    "override-requires-reason": {
+      "status": "pass",
+      "detail": "pass"
+    },
+    "board-pills-require-reason": {
+      "status": "pass",
+      "detail": "pass"
+    },
+    "coordinator-signal-matches-domain": {
+      "status": "pass",
+      "detail": "pass"
+    },
+    "home-to-workspace": {
+      "status": "pass",
+      "detail": "pass"
+    },
+    "role-switcher-three-roles": {
+      "status": "pass",
+      "detail": "pass"
+    },
+    "reset-demo-restores-seed": {
+      "status": "pass",
+      "detail": "pass"
+    },
+    "a11y-smoke": {
+      "status": "pass",
+      "detail": "pass"
+    },
+    "no-duplicate-status-meta": {
+      "status": "pass",
+      "detail": "pass"
+    },
+    "no-dead-seed-fields": {
+      "status": "pass",
+      "detail": "pass"
+    },
+    "ci-local-parity": {
+      "status": "pass",
+      "detail": "build+test"
+    },
+    "readme-clone-run-verified": {
+      "status": "pass",
+      "detail": "readme+build+test"
+    }
+  },
+  "scores": {
+    "onboarding-quality": {
+      "score": 9.5,
+      "evidence": "5/5 checks pass",
+      "passed": 5,
+      "total": 5,
+      "failed": []
+    },
+    "workflow-clarity": {
+      "score": 9.5,
+      "evidence": "5/5 checks pass",
+      "passed": 5,
+      "total": 5,
+      "failed": []
+    },
+    "usability": {
+      "score": 9.5,
+      "evidence": "5/5 checks pass",
+      "passed": 5,
+      "total": 5,
+      "failed": []
+    },
+    "maintainability": {
+      "score": 9.5,
+      "evidence": "5/5 checks pass",
+      "passed": 5,
+      "total": 5,
+      "failed": []
+    },
+    "documentation": {
+      "score": 9.5,
+      "evidence": "5/5 checks pass",
+      "passed": 5,
+      "total": 5,
+      "failed": []
+    },
+    "developer-experience": {
+      "score": 9.5,
+      "evidence": "5/5 checks pass",
+      "passed": 5,
+      "total": 5,
+      "failed": []
+    },
+    "product-clarity": {
+      "score": 9.5,
+      "evidence": "5/5 checks pass",
+      "passed": 5,
+      "total": 5,
+      "failed": []
+    },
+    "simplicity": {
+      "score": 9.5,
+      "evidence": "5/5 checks pass",
+      "passed": 5,
+      "total": 5,
+      "failed": []
+    }
+  },
+  "overall": 9.5
+}

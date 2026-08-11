@@ -68,6 +68,27 @@ do
   fi
 done
 
+# Cold open → baseline bootstrap (real temp git sibling; no hand-written tree).
+open_probe=$(cd "$ROOT" && tests/open-baseline-smoke.sh 2>&1)
+open_probe_rc=$?
+for spec in \
+  'open-repo-missing:PASS open-repo-missing' \
+  'open-repo-not-absolute:PASS open-repo-not-absolute' \
+  'open-cold-stub:PASS open-cold-stub' \
+  'open-exists:PASS open-exists' \
+  'baseline-honest-default:PASS baseline-honest-default' \
+  'baseline-exists:PASS baseline-exists' \
+  'baseline-provider-requires-analyst:PASS baseline-provider-requires-analyst'
+do
+  id=${spec%%:*}
+  marker=${spec#*:}
+  if grep -qF "$marker" <<<"$open_probe" && { [[ "$id" != baseline-provider-requires-analyst ]] || (( open_probe_rc == 0 )); }; then
+    record "$id" pass real-open-baseline
+  else
+    record "$id" fail "${open_probe//$'\n'/; }"
+  fi
+done
+
 # Judgment gates (real temporary CLI engagements; no fixtures, no mocks).
 gate_probe=$(cd "$ROOT" && tests/judgment-gate-smoke.sh 2>&1)
 gate_probe_rc=$?

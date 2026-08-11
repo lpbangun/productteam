@@ -1,0 +1,9 @@
+**READY_TO_SCORE** — stamped 2026-08-11T04:13Z (Analyst, iter 2)
+
+| Check | Verdict | Evidence |
+|---|---|---|
+| (1) Isolated workspace ≠ source | PASS | `state/engagements/onboarding-flight-control/workspace.json`: `path` = `.../tmp/workspaces/onboarding-flight-control`, `source_repo` = `/home/logani/projects/onboarding-flight-control`; mirrored in `runs/check-20260811T041005Z-3881502/workspace.json` (`dirty: false`, `sha` `6a8db8e…`) |
+| (2) Builder sealed verification | PASS | `roles/iter-2/Builder/seal.json` (`sealed_by: principal`, `write_once: true`); sealed result `roles/iter-2/Builder/attempt-3/result.json` cites **HEAD** `6a8db8e260a38851f62ec92bcd681d2010a0e75a` and **Product files changed: none** (matches workspace SHA; attempt-2 refused for unavailable workspace) |
+| (3) ofc-v1 still scoring path | PASS | `contract.json` (`contract: ofc-v1`, `scorer: checks`); `BENCHMARK-CONTRACT.md`; `judgment/selection.json` direction re-verify ofc-v1; live checks `runs/.checks-latest.json` + `runs/check-20260811T041005Z-3881502/checks.json` both `contract: ofc-v1` |
+
+No blockers. Proceed to score against ofc-v1 checks on the isolated workspace.

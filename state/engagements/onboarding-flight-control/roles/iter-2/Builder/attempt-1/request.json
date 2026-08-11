@@ -1,0 +1,10 @@
+{
+  "role": "Builder",
+  "iter": 2,
+  "provider": "agent",
+  "identity": "builder",
+  "task": "",
+  "input_ref": null,
+  "input_sha256": null,
+  "requested_at": "2026-08-11T04:06:43Z"
+}

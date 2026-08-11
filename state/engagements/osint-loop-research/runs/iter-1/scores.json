@@ -1,0 +1,120 @@
+{
+  "ts": "2026-08-11",
+  "client": "osint-loop-research",
+  "contract": "osint-loop-v1",
+  "checks": {
+    "cli-module-help": {
+      "status": "pass",
+      "detail": "usage: main_loop.py [-h] --target TARGET [--family FAMILY]"
+    },
+    "cli-flags-parse": {
+      "status": "pass",
+      "detail": "ok"
+    },
+    "cold-run-exits-zero": {
+      "status": "pass",
+      "detail": "ok"
+    },
+    "cold-run-target-generic": {
+      "status": "pass",
+      "detail": "ok"
+    },
+    "resume-refuse-at-max": {
+      "status": "pass",
+      "detail": "ok"
+    },
+    "resume-continue-raised-max": {
+      "status": "pass",
+      "detail": "ok"
+    },
+    "termination-artifact": {
+      "status": "pass",
+      "detail": "ok"
+    },
+    "termination-matches-engine": {
+      "status": "pass",
+      "detail": "ok"
+    },
+    "readme-stop-aligned": {
+      "status": "pass",
+      "detail": "ok"
+    },
+    "evidence-persist-upgrade": {
+      "status": "pass",
+      "detail": "ok"
+    },
+    "evidence-provenance-fields": {
+      "status": "pass",
+      "detail": "ok"
+    },
+    "output-inspectable": {
+      "status": "pass",
+      "detail": "ok"
+    },
+    "boundedness-honored": {
+      "status": "pass",
+      "detail": "ok"
+    },
+    "no-unbounded-mission": {
+      "status": "pass",
+      "detail": "ok"
+    }
+  },
+  "scores": {
+    "cli-runnable": {
+      "score": 9.5,
+      "evidence": "2/2 checks pass",
+      "passed": 2,
+      "total": 2,
+      "failed": []
+    },
+    "cold-run": {
+      "score": 9.5,
+      "evidence": "2/2 checks pass",
+      "passed": 2,
+      "total": 2,
+      "failed": []
+    },
+    "resume-semantics": {
+      "score": 9.5,
+      "evidence": "2/2 checks pass",
+      "passed": 2,
+      "total": 2,
+      "failed": []
+    },
+    "termination-fidelity": {
+      "score": 9.5,
+      "evidence": "3/3 checks pass",
+      "passed": 3,
+      "total": 3,
+      "failed": []
+    },
+    "evidence-integrity": {
+      "score": 9.5,
+      "evidence": "2/2 checks pass",
+      "passed": 2,
+      "total": 2,
+      "failed": []
+    },
+    "output-inspectability": {
+      "score": 9.5,
+      "evidence": "1/1 checks pass",
+      "passed": 1,
+      "total": 1,
+      "failed": []
+    },
+    "boundedness": {
+      "score": 9.5,
+      "evidence": "2/2 checks pass",
+      "passed": 2,
+      "total": 2,
+      "failed": []
+    }
+  },
+  "overall": 9.5,
+  "iter": 1,
+  "kind": "iteration",
+  "evaluator": "analyst",
+  "analyst_stamp": "/home/logani/.herdr/worktrees/Product Consulting Harness/test-rapid-basics/state/engagements/osint-loop-research/roles/iter-1/Analyst/stamp.json",
+  "check_evidence": "/home/logani/.herdr/worktrees/Product Consulting Harness/test-rapid-basics/state/engagements/osint-loop-research/runs/check-20260811T042637Z-3969010"
+}

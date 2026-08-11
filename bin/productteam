@@ -73,7 +73,7 @@ client_dir() {
     printf '%s' "$ROOT/state/harness-evolution"
     return
   fi
-  [[ -d "$STATE/$c" ]] || die "no engagement '$c'. Known: $(ls "$STATE" 2>/dev/null | tr '\n' ' ')harness-evolution — create state/engagements/$c/engagement.md, or try: productteam status"
+  [[ -d "$STATE/$c" ]] || die "no engagement '$c'. Known: $(ls "$STATE" 2>/dev/null | tr '\n' ' ')harness-evolution — open with: productteam open $c --repo <absolute-sibling-path>"
   printf '%s' "$STATE/$c"
 }
 engagement_repo() { # engagement dir → absolute Repo: path or empty
@@ -176,6 +176,10 @@ cmd_help() {
     productteam judge <client>      Product Judgment mode + mission
     productteam judge <client> set <mode>
                                 Set Guided|Directive|Challenge|Override
+    productteam open <client> --repo <abs-path> [--mode …] [--scorer …]
+                                Cold engagement stub + freeze stamp + workspace
+    productteam baseline <client> [--allow-dirty <reason>]
+                                iter-0 via workspace + checks/score entrypoints
     productteam gate <client> status|implement|select|direct|challenge|override
                                 Durable judgment decisions + machine status
     productteam workspace <client> ensure|status|remove
@@ -507,28 +511,101 @@ cmd_checks() {
   [[ -z "$block_reason" ]] || die "$block_reason"
   local scorer; scorer=$(engagement_scorer "$d")
   [[ "$scorer" == checks ]] || die "engagement '$c' uses scorer=$scorer — use: productteam score $c (or productteam bench $c run)"
-  local cid rel repo
+  local dirty_reason='' cid rel source_repo snapshot repo check_dir
+  dirty_reason=$(parse_allow_dirty "$@")
   cid=$(jq -r '.contract // "unknown"' "$d/contract.json" 2>/dev/null || echo unknown)
   rel=$(jq -r '.checks_runner // empty' "$d/contract.json" 2>/dev/null || true)
-  repo=$(engagement_repo "$d")
+  source_repo=$(engagement_repo "$d")
   printf '\n  %sDeterministic checks — %s%s\n' "$B" "$c" "$R"
 
   # The engagement picks its own runner; without one, the shared client suite.
   if [[ -n "$rel" ]]; then
     [[ -f "$ROOT/$rel" ]] || die "contract $cid names checks_runner '$rel', which is missing under $ROOT — fix .checks_runner in $d/contract.json"
     printf '  %scontract %s · runner %s%s\n\n' "$D" "$cid" "$rel" "$R"
-    if [[ "$repo" == "$ROOT" ]]; then
+    if [[ "$source_repo" == "$ROOT" ]]; then
       checks_self_route "$c" "$d" "$rel"
       return 0
     fi
-    bash "$ROOT/$rel" "$d/runs/.latest"
+    # Named engagement runners still operate through the isolated worktree.
+    snapshot=$(workspace_ensure "$c" "$d" "$dirty_reason") || exit $?
+    repo=$(jq -r '.path' <<<"$snapshot")
+    check_dir="$d/runs/check-$(date -u +%Y%m%dT%H%M%SZ)-$$"
+    mkdir -p "$check_dir"
+    workspace_write_evidence "$snapshot" "$check_dir/workspace.json" checks
+    local pre_dirty=''
+    pre_dirty=$(git -C "$repo" status --porcelain --untracked-files=all 2>/dev/null || true)
+    # Runner contract: <check-dir> [workspace-path]. Self-scoring harness
+    # suites may ignore the workspace argument; client suites must use it.
+    bash "$ROOT/$rel" "$check_dir" "$repo"
+    if [[ -z "$pre_dirty" ]]; then
+      git -C "$repo" checkout -- . >/dev/null 2>&1 || true
+      git -C "$repo" clean -fd >/dev/null 2>&1 || true
+    fi
+    snapshot=$(workspace_snapshot "$c" "$d" "$dirty_reason")
+    workspace_write_evidence "$snapshot" "$check_dir/workspace.json" checks
+    CHECKS_LAST_DIR="$check_dir"
+    CHECKS_LAST_SNAPSHOT="$snapshot"
     return
   fi
-  [[ -d "$repo" ]] || die "client repo not found: ${repo:-no Repo: line} — set an absolute Repo: path in $d/engagement.md"
+  [[ -n "$source_repo" && -d "$source_repo" ]] || die "client repo not found: ${source_repo:-no Repo: line} — set an absolute Repo: path in $d/engagement.md"
+  snapshot=$(workspace_ensure "$c" "$d" "$dirty_reason") || exit $?
+  repo=$(jq -r '.path' <<<"$snapshot")
+  check_dir="$d/runs/check-$(date -u +%Y%m%dT%H%M%SZ)-$$"
+  mkdir -p "$check_dir"
+  workspace_write_evidence "$snapshot" "$check_dir/workspace.json" checks
   local checker="$ROOT/lib/run-checks.sh"
   [[ -f "$checker" ]] || die "missing $checker — restore it or set .checks_runner in $d/contract.json"
-  printf '  %scontract %s · repo %s · runner lib/run-checks.sh%s\n\n' "$D" "$cid" "$repo" "$R"
+  printf '  %scontract %s · workspace %s · runner lib/run-checks.sh%s\n\n' "$D" "$cid" "$repo" "$R"
+  local pre_dirty=''
+  pre_dirty=$(git -C "$repo" status --porcelain --untracked-files=all 2>/dev/null || true)
   bash "$checker" "$c" "$d" "$repo"
+  # Checks may rewrite tracked build caches (e.g. tsconfig.tsbuildinfo). If the
+  # workspace was clean on entry, restore that cleanliness so subsequent role
+  # invokes are not blocked by measurement side-effects.
+  if [[ -z "$pre_dirty" ]]; then
+    git -C "$repo" checkout -- . >/dev/null 2>&1 || true
+    git -C "$repo" clean -fd >/dev/null 2>&1 || true
+  fi
+  # Refresh snapshot SHA/dirty after any restore so archived evidence matches.
+  snapshot=$(workspace_snapshot "$c" "$d" "$dirty_reason")
+  workspace_write_evidence "$snapshot" "$check_dir/workspace.json" checks
+  # Keep a pointer beside the unique check archive so later sessions can find evidence.
+  if [[ -f "$d/runs/.checks-latest.json" ]]; then
+    cp -f "$d/runs/.checks-latest.json" "$check_dir/checks.json"
+  fi
+  CHECKS_LAST_DIR="$check_dir"
+  CHECKS_LAST_SNAPSHOT="$snapshot"
+}
+
+cmd_score_checks_publish() {
+  # Bind Analyst-stamped deterministic scores into runs/iter-N (ofc-v1 path).
+  local c="$1" d="$2" n="$3" dirty_reason="$4"
+  local rd="$d/runs/iter-$n" latest stamp evaluator snapshot
+  [[ -e "$rd/scores.json" ]] && die "scores already exist for role iter $n: $rd/scores.json"
+  latest="$d/runs/.checks-latest.json"
+  [[ -f "$latest" ]] || die "missing $latest after checks — cannot publish iter $n scores"
+  stamp=$(role_stamp_path "$d" "$n")
+  evaluator=$(jq -r '.identity' "$stamp")
+  mkdir -p "$rd"
+  if [[ -n "${CHECKS_LAST_SNAPSHOT:-}" ]]; then
+    snapshot="$CHECKS_LAST_SNAPSHOT"
+  else
+    snapshot=$(workspace_ensure "$c" "$d" "$dirty_reason") || exit $?
+  fi
+  workspace_write_evidence "$snapshot" "$rd/workspace.json" score
+  jq --argjson iter "$n" --arg evaluator "$evaluator" --arg stamp "$stamp" \
+    --arg check_dir "${CHECKS_LAST_DIR:-}" \
+    '. + {iter:$iter, kind:(if $iter == 0 then "baseline" else "iteration" end), evaluator:$evaluator, analyst_stamp:$stamp, check_evidence:(if $check_dir == "" then null else $check_dir end)}' \
+    "$latest" > "$rd/scores.json"
+  if [[ -n "${CHECKS_LAST_DIR:-}" && -f "$CHECKS_LAST_DIR/checks.json" ]]; then
+    cp -f "$CHECKS_LAST_DIR/checks.json" "$rd/checks.json"
+  elif [[ -f "$latest" ]]; then
+    cp -f "$latest" "$rd/checks.json"
+  fi
+  jq -c '{ts, iter, kind, evaluator, analyst_stamp, overall, scores}' "$rd/scores.json" >> "$d/history.jsonl"
+  local ov; ov=$(jq -r '.overall' "$rd/scores.json")
+  printf '  %sRecorded iter %s — overall %s%s\n' "$B" "$n" "$(score_color "$ov")" "$ov"
+  printf '  %sAnalyst stamp:%s %s\n\n' "$D" "$R" "$stamp"
 }
 
 cmd_score() {
@@ -539,8 +616,23 @@ cmd_score() {
   [[ -z "$refusal" ]] || die "$refusal"
   local scorer; scorer=$(engagement_scorer "$d")
   case "$scorer" in
-    checks) cmd_checks "$c" ;;
-    provider) cmd_bench_run "$c" --iter "$SCORE_ITER" ;;
+    checks)
+      CHECKS_LAST_DIR=''
+      CHECKS_LAST_SNAPSHOT=''
+      if [[ -n "$SCORE_DIRTY_REASON" ]]; then
+        cmd_checks "$c" --allow-dirty "$SCORE_DIRTY_REASON"
+      else
+        cmd_checks "$c"
+      fi
+      cmd_score_checks_publish "$c" "$d" "$SCORE_ITER" "$SCORE_DIRTY_REASON"
+      ;;
+    provider)
+      if [[ -n "$SCORE_DIRTY_REASON" ]]; then
+        cmd_bench_run "$c" --iter "$SCORE_ITER" --allow-dirty "$SCORE_DIRTY_REASON"
+      else
+        cmd_bench_run "$c" --iter "$SCORE_ITER"
+      fi
+      ;;
     *) die "unknown scorer '$scorer' in $d/contract.json (expected checks|provider)" ;;
   esac
 }
@@ -552,6 +644,176 @@ cmd_skill() {
   [[ -f "$runner" ]] || die "missing $runner"
   bash "$runner" "$skill" "$target" "$out"
 }
+
+cmd_open() {
+  # Cold engagement bootstrap: stub + freeze stamp from a sibling Repo:.
+  local c='' repo='' mode='Guided' scorer='provider' contract='' mission='' public=''
+  while (( $# )); do
+    case "$1" in
+      --repo)
+        [[ $# -ge 2 && -n "$2" ]] || die 'usage: productteam open <client> --repo <absolute-path> [--mode …] [--scorer …] [--contract …]'
+        repo="$2"; shift 2 ;;
+      --mode)
+        [[ $# -ge 2 && -n "$2" ]] || die '--mode requires Guided|Directive|Challenge|Override'
+        mode="$2"; shift 2 ;;
+      --scorer)
+        [[ $# -ge 2 && -n "$2" ]] || die '--scorer requires checks|provider'
+        scorer="$2"; shift 2 ;;
+      --contract)
+        [[ $# -ge 2 && -n "$2" ]] || die '--contract requires an id'
+        contract="$2"; shift 2 ;;
+      --mission)
+        [[ $# -ge 2 && -n "$2" ]] || die '--mission requires text'
+        mission="$2"; shift 2 ;;
+      --public)
+        [[ $# -ge 2 && -n "$2" ]] || die '--public requires a URL'
+        public="$2"; shift 2 ;;
+      -*)
+        die "unknown open option '$1'" ;;
+      *)
+        if [[ -z "$c" ]]; then c="$1"; shift; else die "unexpected argument '$1'"; fi ;;
+    esac
+  done
+  [[ -n "$c" && -n "$repo" ]] || die 'usage: productteam open <client> --repo <absolute-path> [--mode Guided|Directive|Challenge|Override] [--scorer checks|provider] [--contract <id>] [--mission <text>] [--public <url>]'
+  [[ "$c" =~ ^[a-z0-9][a-z0-9_-]*$ ]] || die "open-invalid-client: '$c' (use lowercase slug [a-z0-9_-]+)"
+  case "$mode" in Guided|Directive|Challenge|Override) ;; *) die "open-invalid-mode: $mode" ;; esac
+  case "$scorer" in checks|provider) ;; *) die "open-invalid-scorer: $scorer" ;; esac
+  [[ -d "$STATE/$c" ]] && die "open-exists: $c (engagement already at $STATE/$c)"
+  [[ "$repo" == /* ]] || die "open-repo-not-absolute: $repo"
+  [[ -d "$repo" ]] || die "open-repo-missing: $repo"
+  git -C "$repo" rev-parse --show-toplevel >/dev/null 2>&1 || die "open-repo-not-git: $repo"
+  repo=$(git -C "$repo" rev-parse --show-toplevel)
+  [[ -n "$contract" ]] || contract="${c}-v1"
+  [[ -n "$mission" ]] || mission="Improve ${c} against frozen contract ${contract}. Measure baseline before changes."
+  local frozen d
+  frozen=$(date -u +%Y-%m-%d)
+  d="$STATE/$c"
+  mkdir -p "$d/runs" "$d/judgment"
+  cat > "$d/engagement.md" <<EOF
+# Engagement: $c
+
+Opened: $frozen · Contract: $contract (frozen) · Client owner: local
+Mode: **$mode**
+
+Repo: $repo
+Public: ${public:-}
+Scorer: $scorer
+Vision: Sibling product engagement opened via productteam open.
+
+## Mission
+
+$mission
+EOF
+  if [[ "$scorer" == checks ]]; then
+    jq -n --arg contract "$contract" --arg frozen "$frozen" --arg client "$c" \
+      '{contract:$contract,frozen:$frozen,scorer:"checks",client:$client,target:9.0,convergence:"every dimension >= 9.0",max_iterations:5,source:"BENCHMARK-CONTRACT.md",dimensions:["correctness","simplicity","maintainability","usability","developer-experience","documentation","product-clarity","architecture"],baseline_rules:{iter_0:"Before any engagement change.",immutable:"Never re-scored retroactively."}}' \
+      > "$d/contract.json"
+  else
+    jq -n --arg contract "$contract" --arg frozen "$frozen" --arg client "$c" \
+      '{contract:$contract,frozen:$frozen,scorer:"provider",client:$client,target:9.0,convergence:"every dimension >= 9.0",max_iterations:5,source:"BENCHMARK-CONTRACT.md",dimensions:["correctness","simplicity","maintainability","usability","educational-quality","developer-experience","architecture","documentation","product-clarity"],baseline_rules:{iter_0:"Before any engagement change.",immutable:"Never re-scored retroactively."}}' \
+      > "$d/contract.json"
+  fi
+  cat > "$d/BENCHMARK-CONTRACT.md" <<EOF
+# Frozen benchmark — $contract
+
+Frozen: $frozen via \`productteam open\`. Do not move goalposts mid-engagement.
+
+## Mission
+
+$mission
+
+## Scorer
+
+\`$scorer\` (declared in contract.json). Baseline is \`productteam baseline $c\`.
+EOF
+  jq -n --arg client "$c" --arg repo "$repo" --arg contract "$contract" --arg frozen "$frozen" \
+    --arg mode "$mode" --arg scorer "$scorer" --arg ts "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+    '{client:$client,repo:$repo,contract:$contract,frozen:$frozen,mode:$mode,scorer:$scorer,opened_at:$ts,tool:"productteam open"}' \
+    > "$d/open-stamp.json"
+  local snapshot
+  snapshot=$(workspace_ensure "$c" "$d" '') || exit $?
+  printf '\n  %sOpened engagement %s%s\n' "$B" "$c" "$R"
+  printf '  %srepo%s %s\n' "$D" "$R" "$repo"
+  printf '  %scontract%s %s (frozen %s) · scorer %s · mode %s\n' "$D" "$R" "$contract" "$frozen" "$scorer" "$mode"
+  printf '  %sworkspace%s %s\n' "$D" "$R" "$(jq -r .path <<<"$snapshot")"
+  printf '  %snext%s productteam baseline %s\n\n' "$D" "$R" "$c"
+}
+
+cmd_baseline() {
+  # iter-0 measurement through workspace + checks/score entrypoints.
+  local c="${1:-}"; shift || true
+  [[ -n "$c" ]] || die 'usage: productteam baseline <client> [--allow-dirty <reason>]'
+  local dirty_reason='' d rd
+  dirty_reason=$(parse_allow_dirty "$@")
+  d=$(client_dir "$c")
+  [[ -f "$d/engagement.md" ]] || die "baseline-missing-engagement: $d/engagement.md"
+  [[ -f "$d/contract.json" ]] || die "baseline-missing-contract: $d/contract.json"
+  rd="$d/runs/iter-0"
+  [[ -e "$rd/scores.json" ]] && die "baseline-exists: $rd/scores.json"
+  local block_reason; block_reason=$(progress_blocked_reason "$d")
+  [[ -z "$block_reason" ]] || die "$block_reason"
+  local snapshot repo scorer runner cid
+  snapshot=$(workspace_ensure "$c" "$d" "$dirty_reason") || exit $?
+  repo=$(jq -r '.path' <<<"$snapshot")
+  scorer=$(engagement_scorer "$d")
+  cid=$(jq -r '.contract // "unknown"' "$d/contract.json")
+  runner=$(jq -r '.checks_runner // empty' "$d/contract.json" 2>/dev/null || true)
+  mkdir -p "$rd"
+  workspace_write_evidence "$snapshot" "$rd/workspace.json" baseline
+  printf '\n  %sBaseline iter-0 — %s%s\n' "$B" "$c" "$R"
+  printf '  %scontract %s · scorer %s · workspace %s%s\n\n' "$D" "$cid" "$scorer" "$repo" "$R"
+
+  if [[ "$scorer" == checks ]]; then
+    if [[ -n "$runner" ]]; then
+      [[ -f "$ROOT/$runner" ]] || die "baseline-runner-missing: contract names checks_runner '$runner'"
+      CHECKS_LAST_DIR=''
+      CHECKS_LAST_SNAPSHOT="$snapshot"
+      if [[ -n "$dirty_reason" ]]; then
+        cmd_checks "$c" --allow-dirty "$dirty_reason"
+      else
+        cmd_checks "$c"
+      fi
+      # Publish without Analyst stamp — cold baseline bootstrap path.
+      local latest="$d/runs/.checks-latest.json"
+      [[ -f "$latest" ]] || die "baseline-checks-failed: missing $latest"
+      jq --argjson iter 0 --arg evaluator baseline-bootstrap \
+        --arg check_dir "${CHECKS_LAST_DIR:-}" \
+        '. + {iter:0, kind:"baseline", evaluator:$evaluator, analyst_stamp:null, check_evidence:(if $check_dir=="" then null else $check_dir end)}' \
+        "$latest" > "$rd/scores.json"
+      [[ -n "${CHECKS_LAST_DIR:-}" && -f "$CHECKS_LAST_DIR/checks.json" ]] && cp -f "$CHECKS_LAST_DIR/checks.json" "$rd/checks.json"
+    elif [[ "$cid" == ofc-v1 ]]; then
+      CHECKS_LAST_DIR=''
+      CHECKS_LAST_SNAPSHOT="$snapshot"
+      if [[ -n "$dirty_reason" ]]; then
+        cmd_checks "$c" --allow-dirty "$dirty_reason"
+      else
+        cmd_checks "$c"
+      fi
+      local latest="$d/runs/.checks-latest.json"
+      [[ -f "$latest" ]] || die "baseline-checks-failed: missing $latest"
+      jq --argjson iter 0 --arg evaluator baseline-bootstrap \
+        --arg check_dir "${CHECKS_LAST_DIR:-}" \
+        '. + {iter:0, kind:"baseline", evaluator:$evaluator, analyst_stamp:null, check_evidence:(if $check_dir=="" then null else $check_dir end)}' \
+        "$latest" > "$rd/scores.json"
+      [[ -n "${CHECKS_LAST_DIR:-}" && -f "$CHECKS_LAST_DIR/checks.json" ]] && cp -f "$CHECKS_LAST_DIR/checks.json" "$rd/checks.json"
+    else
+      # Honest default: no deterministic runner declared — do not invent scores.
+      jq -n --arg ts "$(date -u +%Y-%m-%d)" --arg client "$c" --arg contract "$cid" \
+        --arg reason "no checks_runner in contract.json; baseline deferred (honest unscored)" \
+        '{ts:$ts,iter:0,kind:"baseline",client:$client,contract:$contract,evaluator:"baseline-bootstrap",analyst_stamp:null,overall:null,deferred:true,reason:$reason,scores:{}}' \
+        > "$rd/scores.json"
+      printf '  %sHonest default:%s no checks_runner — wrote deferred unscored baseline\n' "$D" "$R"
+    fi
+  else
+    die "baseline-provider-requires-analyst: scorer=provider — run: productteam role $c invoke Analyst 0 '<task>'; then productteam score $c --iter 0"
+  fi
+
+  jq -c '{ts, iter, kind, evaluator, analyst_stamp, overall, deferred}' "$rd/scores.json" >> "$d/history.jsonl"
+  local ov; ov=$(jq -r '.overall // "deferred"' "$rd/scores.json")
+  printf '  %sRecorded iter-0 baseline — overall %s%s\n' "$B" "$R" "$ov"
+  printf '  %s%s%s\n\n' "$D" "$rd/scores.json" "$R"
+}
+
 
 cmd_gh() {
   local sub="${1:-}"; shift || true
@@ -811,6 +1073,11 @@ main() {
       else
         cmd_judge "$1"
       fi ;;
+    open)
+      cmd_open "$@" ;;
+    baseline)
+      [[ $# -ge 1 ]] || die 'usage: productteam baseline <client> [--allow-dirty <reason>]'
+      cmd_baseline "$@" ;;
     workspace|worktree)
       [[ $# -ge 2 ]] || die 'usage: productteam workspace <client> ensure|status|remove'
       cmd_workspace "$@" ;;

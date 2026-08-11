@@ -1,0 +1,10 @@
+{
+  "role": "Builder",
+  "iter": 1,
+  "provider": "agent",
+  "identity": "builder",
+  "task": "Single-turn Builder attestation for osint-loop-research iter 1 (already implemented in isolated workspace).\n\nReport only (do not re-implement): confirm these files exist/changed under the workspace cwd and summarize in ≤12 lines:\n- loops/__init__.py, loops/__main__.py (package CLI)\n- loops/main_loop.py (resume exit 2 / raised max continue; termination.json; target-generic dossier)\n- loops/evidence_store.py (update/persist)\n- loops/verification_loop.py (durable upgrades)\n- README.md stop criteria aligned to termination_engine\n\nCite `git status --porcelain` and `python3 -m loops.main_loop --help` exit. No ethics/contact-hunting work. No further product changes unless a file is missing.",
+  "input_ref": "/home/logani/.herdr/worktrees/Product Consulting Harness/test-rapid-basics/state/missions/osint-lift/builder-input-iter-1.txt",
+  "input_sha256": "f84611ff422ebc25c252a2a62dee820b09491bb4da6c6c4c35f279a00a757bdd",
+  "requested_at": "2026-08-11T04:25:40Z"
+}

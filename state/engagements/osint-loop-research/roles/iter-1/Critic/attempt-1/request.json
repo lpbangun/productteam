@@ -1,0 +1,10 @@
+{
+  "role": "Critic",
+  "iter": 1,
+  "provider": "agent",
+  "identity": "critic",
+  "task": "Critic close for osint-loop-research iter 1 product lift. Review: operable CLI, resume/stop, termination.json, evidence persist, target-generic outputs, no unbounded contact mission. Verdict ACCEPT / ACCEPT-WITH-NITS / REJECT with file citations. One paragraph org note.",
+  "input_ref": null,
+  "input_sha256": null,
+  "requested_at": "2026-08-11T04:27:38Z"
+}

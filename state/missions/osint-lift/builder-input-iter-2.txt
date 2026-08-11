@@ -1,0 +1,25 @@
+Single-turn Builder task for osint-loop-research iter 2.
+Work ONLY in the isolated workspace cwd (do not touch /home/logani/projects/osint-loop-research).
+
+Implement ALL of:
+1. Remove default target="Shane Patrick Arthur Lowe" from ingest helpers in
+   discovery_loop.py, archive_loop.py, image_intel.py, blackhat_loop.py.
+   Require an explicit target argument (no Shane default). Call sites must pass the active target.
+2. In blackhat_loop alias/contact planning, derive short-name queries from the
+   active target (e.g. first+last tokens), not hardcoded "Shane Lowe" / spa_lowe.
+3. termination_engine: either INCLUDE diminishing_returns.met in should_stop OR
+   stop appending it to reasons and document that it is informational only in README.
+   Prefer: wire it into should_stop OR (and README) as documented stop criterion.
+4. README Quick Start: use Fixture Person (or generic placeholders), not Shane.
+   Keep Stopping Criteria aligned with termination_engine after change (3).
+5. Do not add unbounded contact-hunting / don't-stop missions. No ethics redesign.
+
+Verify before finishing:
+  python3 -m loops.main_loop --help
+  rm -rf .tmp output && mkdir -p .tmp output evidence
+  python3 -m loops.main_loop --target "Fixture Person" --family "Anchor One" --max-iterations 1
+  # planned queries / evidence paths must not inject Shane when target is Fixture Person
+  ! grep -R "Shane Patrick Arthur Lowe" loops/discovery_loop.py loops/archive_loop.py loops/image_intel.py loops/blackhat_loop.py
+  grep -n "should_stop" loops/termination_engine.py | head -5
+
+Return a concise file list + verification exits.

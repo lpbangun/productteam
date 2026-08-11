@@ -1,0 +1,11 @@
+{
+  "role": "Analyst",
+  "iter": 1,
+  "provider": "agent",
+  "identity": "analyst",
+  "exit": 0,
+  "ran_at": "2026-08-11T04:26:37Z",
+  "refusal_reason": null,
+  "output": "**READY_TO_SCORE** — stamped 2026-08-11 (Analyst, osint-loop-v1 iter 1)\n\n| Gate | Verdict | Evidence |\n|---|---|---|\n| Contract frozen / scoring path | PASS | `state/engagements/osint-loop-research/contract.json` (`osint-loop-v1`, `scorer: checks`, `checks_runner: lib/osint-loop-checks.sh`); `BENCHMARK-CONTRACT.md` (7 dims ≥ 9.0) |\n| Isolated workspace ≠ source | PASS | `workspace.json` + `runs/check-20260811T042409Z-3955817/workspace.json`: `path` = `…/tmp/workspaces/osint-loop-research`, `source_repo` = `/home/logani/projects/osint-loop-research` |\n| Deterministic checks 14/14 @ 9.5 | PASS | `runs/check-20260811T042409Z-3955817/checks.json` and `runs/.checks-latest.json`: **14/14** `status: pass`; all 7 dims **9.5**; **overall 9.5** |\n\n**Dimension → check map (file-backed):**\n\n| Dimension | Score | Checks (all pass) | Workspace paths |\n|---|---|---|---|\n| cli-runnable | 9.5 | cli-module-help, cli-flags-parse | `loops/__main__.py`, `loops/main_loop.py` (`--target`/`--resume`/`--max-iterations`) |\n| cold-run | 9.5 | cold-run-exits-zero, cold-run-target-generic | `loops/main_loop.py` (dossier/summary from store for active target) |\n| resume-semantics | 9.5 | resume-refuse-at-max, resume-continue-raised-max | `loops/main_loop.py` L94–115 (`sys.exit(2)` vs continue when max raised) |\n| termination-fidelity | 9.5 | termination-artifact, termination-matches-engine, readme-stop-aligned | `loops/termination_engine.py`, `README.md` Stopping Criteria |\n| evidence-integrity | 9.5 | evidence-persist-upgrade, evidence-provenance-fields | `loops/evidence_store.py` (`update`/`persist`), `loops/verification_loop.py` |\n| output-inspectability | 9.5 | output-inspectable | contract expects `output/dossier.md`, `evidence_summary.md`, `termination.json` |\n| boundedness | 9.5 | boundedness-honored, no-unbounded-mission | `while self.iteration < self.max_iterations`; no unbounded-mission language in workspace |\n\nChecks run provenance: `operation: \"checks\"`, `allow_dirty_reason: \"osint-loop-v1 iter-1 implementation in isolated workspace\"`, SHA `e7d433e9…`.",
+  "output_sha256": "9f89a1b9c0e0cebca31437bba94b705ccffb07edda6bf66e997bc051d9272168"
+}

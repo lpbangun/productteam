@@ -1,0 +1,10 @@
+{
+  "role": "Critic",
+  "iter": 2,
+  "provider": "agent",
+  "identity": "critic",
+  "task": "You are the Critic closing OFC foundation-proof iter 2. Adversarially review: workspace isolation for checks/score, judgment gate, sealed Builder input, Analyst stamp distinct from Builder identity, score artifacts (runs/iter-2/scores.json + workspace.json), and honest refuse evidence (missing stamp, missing seal, dirty workspace). Verdict must be ACCEPT, ACCEPT-WITH-NITS, or REJECT with file-cited reasons. Also give a one-paragraph org self-review.",
+  "input_ref": null,
+  "input_sha256": null,
+  "requested_at": "2026-08-11T04:15:54Z"
+}

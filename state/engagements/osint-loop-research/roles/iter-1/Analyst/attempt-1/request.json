@@ -1,0 +1,10 @@
+{
+  "role": "Analyst",
+  "iter": 1,
+  "provider": "agent",
+  "identity": "analyst",
+  "task": "Analyst stamp for osint-loop-v1 iter 1. Verify against contract dimensions using file evidence under state/engagements/osint-loop-research/ and the isolated workspace. Confirm 14/14 deterministic checks at 9.5 if present. Verdict READY_TO_SCORE or BLOCKED with paths.",
+  "input_ref": null,
+  "input_sha256": null,
+  "requested_at": "2026-08-11T04:26:37Z"
+}

@@ -1,0 +1,11 @@
+{
+  "role": "Builder",
+  "iter": 2,
+  "provider": "agent",
+  "identity": "builder",
+  "requested_at": "2026-08-11T04:09:29Z",
+  "ran_at": "2026-08-11T04:09:29Z",
+  "exit": 1,
+  "request_sha256": "08172f793ab89bc5d3474531f9c3baa1b6f2d0aa94c495c690091c5ceeae23ef",
+  "result_sha256": "481ba2e591793b9c3fcbe0e64ba827f6d0fc2c0ef04f07cf93dc628e5b27f394"
+}

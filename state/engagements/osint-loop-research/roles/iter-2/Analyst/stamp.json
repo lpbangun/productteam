@@ -1,0 +1,9 @@
+{
+  "role": "Analyst",
+  "iter": 2,
+  "identity": "analyst",
+  "provider": "agent",
+  "result_path": "/home/logani/.herdr/worktrees/Product Consulting Harness/test-rapid-basics/state/engagements/osint-loop-research/roles/iter-2/Analyst/attempt-1/result.json",
+  "result_sha256": "3e0904b59d06696c2b83d60347845fd251a0976924294fcb761d7abc9ae84f3b",
+  "stamped_at": "2026-08-11T05:30:21Z"
+}

@@ -17,6 +17,8 @@ bin/productteam onboarding --yes   # agents → provider → engagement → scor
 bin/productteam splash             # knowledge-graph banner (CONSULT_NO_SPLASH=1 skips)
 bin/productteam agents             # detect coding agents (agents|runtime)
 bin/productteam runtime --check    # alias of agents; fails if none usable
+bin/productteam open <client> --repo /abs/sibling   # engagement stub + freeze + workspace
+bin/productteam baseline <client>  # iter-0 via isolated workspace (checks or honest deferred)
 bin/productteam                    # status overview (splash once on first run)
 ```
 

@@ -1,0 +1,10 @@
+{
+  "client": "osint-loop-research",
+  "source_repo": "/home/logani/projects/osint-loop-research",
+  "path": "/home/logani/.herdr/worktrees/Product Consulting Harness/test-rapid-basics/tmp/workspaces/osint-loop-research",
+  "sha": "e16c4ce2ebd1df32771e3218461a7fbaa8117dfc",
+  "exists": true,
+  "dirty": false,
+  "allow_dirty_reason": null,
+  "created_at": "2026-08-11T04:18:13Z"
+}

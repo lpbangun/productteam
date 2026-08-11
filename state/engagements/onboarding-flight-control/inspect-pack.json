@@ -1,0 +1,361 @@
+{
+  "client": "onboarding-flight-control",
+  "mode": {
+    "value": "Guided",
+    "source": "/home/logani/.herdr/worktrees/Product Consulting Harness/test-rapid-basics/state/engagements/onboarding-flight-control/engagement.md",
+    "missing": false
+  },
+  "gate": {
+    "status": {
+      "client": "onboarding-flight-control",
+      "mode": "Guided",
+      "allowed": true,
+      "decision": "allowed",
+      "reason": "implement allowed",
+      "bound_direction": "Foundation proof: re-verify ofc-v1 on the isolated workspace without product vision changes",
+      "artifact": "/home/logani/.herdr/worktrees/Product Consulting Harness/test-rapid-basics/state/engagements/onboarding-flight-control/judgment/selection.json",
+      "artifact_ts": "2026-08-11T04:09:20Z",
+      "required": {
+        "selection.json": "selection with non-empty direction + selected_by"
+      },
+      "present": {
+        "selection_present": true,
+        "direction_present": true,
+        "selected_by_present": true
+      }
+    },
+    "judgment_dir_missing": false
+  },
+  "scores": {
+    "missing": false,
+    "history": [
+      {
+        "run": "/home/logani/.herdr/worktrees/Product Consulting Harness/test-rapid-basics/state/engagements/onboarding-flight-control/runs/iter-0",
+        "ts": "2026-08-06",
+        "kind": "baseline",
+        "overall": "5.8",
+        "weakest": "documentation 2.0"
+      },
+      {
+        "run": "/home/logani/.herdr/worktrees/Product Consulting Harness/test-rapid-basics/state/engagements/onboarding-flight-control/runs/iter-1",
+        "ts": "2026-08-06",
+        "kind": "iteration",
+        "overall": "9.5",
+        "weakest": "onboarding-quality 9.5"
+      }
+    ],
+    "latest": {
+      "ts": "2026-08-06",
+      "iter": 1,
+      "kind": "iteration",
+      "contract": "ofc-v1",
+      "scores": {
+        "onboarding-quality": {
+          "score": 9.5,
+          "evidence": "5/5 checks pass"
+        },
+        "workflow-clarity": {
+          "score": 9.5,
+          "evidence": "5/5 checks pass"
+        },
+        "usability": {
+          "score": 9.5,
+          "evidence": "5/5 checks pass"
+        },
+        "maintainability": {
+          "score": 9.5,
+          "evidence": "5/5 checks pass"
+        },
+        "documentation": {
+          "score": 9.5,
+          "evidence": "5/5 checks pass"
+        },
+        "developer-experience": {
+          "score": 9.5,
+          "evidence": "5/5 checks pass"
+        },
+        "product-clarity": {
+          "score": 9.5,
+          "evidence": "5/5 checks pass"
+        },
+        "simplicity": {
+          "score": 9.5,
+          "evidence": "5/5 checks pass"
+        }
+      },
+      "overall": 9.5,
+      "checks_snapshot": {
+        "readme-exists": {
+          "status": "pass",
+          "detail": "present"
+        },
+        "readme-required-sections": {
+          "status": "pass",
+          "detail": "ok"
+        },
+        "walkthrough-covers-maya": {
+          "status": "pass",
+          "detail": "ok"
+        },
+        "docs-honest-prototype": {
+          "status": "pass",
+          "detail": "ok"
+        },
+        "cross-role-demo-script": {
+          "status": "pass",
+          "detail": "ok"
+        },
+        "architecture-notes": {
+          "status": "pass",
+          "detail": "ok"
+        },
+        "readme-non-goals-explicit": {
+          "status": "pass",
+          "detail": "ok"
+        },
+        "dev-script-documented": {
+          "status": "pass",
+          "detail": "ok"
+        },
+        "node-version-noted": {
+          "status": "pass",
+          "detail": "engines"
+        },
+        "deps-pinned": {
+          "status": "pass",
+          "detail": "ok"
+        },
+        "test-script-exists": {
+          "status": "pass",
+          "detail": "vitest run"
+        },
+        "deps-minimal": {
+          "status": "pass",
+          "detail": "ok"
+        },
+        "domain-pure": {
+          "status": "pass",
+          "detail": "ok"
+        },
+        "app-not-monolith": {
+          "status": "pass",
+          "detail": "App.tsx=572 extras=6"
+        },
+        "lean-src-tree": {
+          "status": "pass",
+          "detail": "src_files=9"
+        },
+        "single-derive-support": {
+          "status": "pass",
+          "detail": "count=1"
+        },
+        "demo-constants-centralized": {
+          "status": "pass",
+          "detail": "MAYA_ID_defs=1 STORAGE_KEY_defs=1"
+        },
+        "home-states-fictional": {
+          "status": "pass",
+          "detail": "ok"
+        },
+        "topbar-prototype-chip": {
+          "status": "pass",
+          "detail": "ok"
+        },
+        "copilot-not-ai": {
+          "status": "pass",
+          "detail": "ok"
+        },
+        "three-role-labels": {
+          "status": "pass",
+          "detail": "ok"
+        },
+        "build-green": {
+          "status": "pass",
+          "detail": "built"
+        },
+        "typescript-build": {
+          "status": "pass",
+          "detail": "dist/assets/index-CXfkuQ1D.js   256.17 kB │ gzip: 76.56 kB  ✓ built in 337ms "
+        },
+        "test-suite-green": {
+          "status": "pass",
+          "detail": "tested"
+        },
+        "maya-intro-flow": {
+          "status": "pass",
+          "detail": "pass"
+        },
+        "initial-handoffs-complete": {
+          "status": "pass",
+          "detail": "pass"
+        },
+        "domain-transitions-generic": {
+          "status": "pass",
+          "detail": "pass"
+        },
+        "derive-support-seed": {
+          "status": "pass",
+          "detail": "pass"
+        },
+        "status-signal-consistency": {
+          "status": "pass",
+          "detail": "pass"
+        },
+        "override-requires-reason": {
+          "status": "pass",
+          "detail": "pass"
+        },
+        "board-pills-require-reason": {
+          "status": "pass",
+          "detail": "pass"
+        },
+        "coordinator-signal-matches-domain": {
+          "status": "pass",
+          "detail": "pass"
+        },
+        "home-to-workspace": {
+          "status": "pass",
+          "detail": "pass"
+        },
+        "role-switcher-three-roles": {
+          "status": "pass",
+          "detail": "pass"
+        },
+        "reset-demo-restores-seed": {
+          "status": "pass",
+          "detail": "pass"
+        },
+        "a11y-smoke": {
+          "status": "pass",
+          "detail": "pass"
+        },
+        "no-duplicate-status-meta": {
+          "status": "pass",
+          "detail": "pass"
+        },
+        "no-dead-seed-fields": {
+          "status": "pass",
+          "detail": "pass"
+        },
+        "ci-local-parity": {
+          "status": "pass",
+          "detail": "build+test"
+        },
+        "readme-clone-run-verified": {
+          "status": "pass",
+          "detail": "readme+build+test"
+        }
+      }
+    },
+    "latest_run": "/home/logani/.herdr/worktrees/Product Consulting Harness/test-rapid-basics/state/engagements/onboarding-flight-control/runs/iter-1"
+  },
+  "history": {
+    "file": "/home/logani/.herdr/worktrees/Product Consulting Harness/test-rapid-basics/state/engagements/onboarding-flight-control/history.jsonl",
+    "missing": false,
+    "entries": [
+      {
+        "ts": "2026-08-06",
+        "iter": 0,
+        "kind": "baseline",
+        "overall": 5.8,
+        "scores": {
+          "onboarding-quality": {
+            "score": 7.0,
+            "evidence": "3/5 checks pass; fail: test-suite-green, domain-transitions-generic"
+          },
+          "workflow-clarity": {
+            "score": 4.5,
+            "evidence": "2/5 checks pass; fail: status-signal-consistency, board-pills-require-reason, cross-role-demo-script"
+          },
+          "usability": {
+            "score": 9.5,
+            "evidence": "5/5 checks pass"
+          },
+          "maintainability": {
+            "score": 4.0,
+            "evidence": "3/5 checks pass; fail: app-not-monolith, architecture-notes"
+          },
+          "documentation": {
+            "score": 2.0,
+            "evidence": "0/5 checks pass; fail: readme-exists, readme-required-sections, readme-clone-run-verified, walkthrough-covers-maya"
+          },
+          "developer-experience": {
+            "score": 4.0,
+            "evidence": "1/5 checks pass; fail: deps-pinned, ci-local-parity, dev-script-documented, node-version-noted"
+          },
+          "product-clarity": {
+            "score": 7.5,
+            "evidence": "4/5 checks pass; fail: readme-non-goals-explicit"
+          },
+          "simplicity": {
+            "score": 7.5,
+            "evidence": "4/5 checks pass; fail: no-dead-seed-fields"
+          }
+        }
+      },
+      {
+        "ts": "2026-08-06",
+        "iter": 1,
+        "kind": "iteration",
+        "overall": 9.5,
+        "scores": {
+          "onboarding-quality": {
+            "score": 9.5,
+            "evidence": "5/5 checks pass"
+          },
+          "workflow-clarity": {
+            "score": 9.5,
+            "evidence": "5/5 checks pass"
+          },
+          "usability": {
+            "score": 9.5,
+            "evidence": "5/5 checks pass"
+          },
+          "maintainability": {
+            "score": 9.5,
+            "evidence": "5/5 checks pass"
+          },
+          "documentation": {
+            "score": 9.5,
+            "evidence": "5/5 checks pass"
+          },
+          "developer-experience": {
+            "score": 9.5,
+            "evidence": "5/5 checks pass"
+          },
+          "product-clarity": {
+            "score": 9.5,
+            "evidence": "5/5 checks pass"
+          },
+          "simplicity": {
+            "score": 9.5,
+            "evidence": "5/5 checks pass"
+          }
+        }
+      }
+    ]
+  },
+  "escalations": {
+    "file": "/home/logani/.herdr/worktrees/Product Consulting Harness/test-rapid-basics/state/engagements/onboarding-flight-control/escalations.json",
+    "missing": true
+  },
+  "pause": {
+    "file": "/home/logani/.herdr/worktrees/Product Consulting Harness/test-rapid-basics/state/engagements/onboarding-flight-control/pause.json",
+    "missing": true
+  },
+  "lessons": {
+    "pointer": null,
+    "missing": true
+  },
+  "continuation": {
+    "file": "/home/logani/.herdr/worktrees/Product Consulting Harness/test-rapid-basics/state/engagements/onboarding-flight-control/continuation.json",
+    "missing": true
+  },
+  "next_suggested_action": "continue the loop: consult bench onboarding-flight-control run",
+  "missing": [
+    "escalations.json",
+    "pause.json",
+    "continuation.json",
+    "lessons.md"
+  ]
+}

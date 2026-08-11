@@ -1,0 +1,11 @@
+{
+  "iter": 1,
+  "decision": "closed",
+  "closed_at": "2026-08-11T04:27:38Z",
+  "critic_manifest": "/home/logani/.herdr/worktrees/Product Consulting Harness/test-rapid-basics/state/engagements/osint-loop-research/roles/iter-1/Critic/attempt-1/manifest.json",
+  "critic_manifest_sha256": "067a4c307441f15ed380e67e90c6e3cc2f9adbd0b6008b4c31c2204ffea5d0c7",
+  "analyst_stamp": "/home/logani/.herdr/worktrees/Product Consulting Harness/test-rapid-basics/state/engagements/osint-loop-research/roles/iter-1/Analyst/stamp.json",
+  "analyst_stamp_sha256": "16c3cece2e52befd98b2d9376f76ee6aa26ccbfd1743436ccc90573ad6039d3f",
+  "implementer_identity": "builder",
+  "evaluator_identity": "analyst"
+}

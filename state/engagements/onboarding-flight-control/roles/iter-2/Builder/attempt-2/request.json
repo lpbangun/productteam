@@ -1,0 +1,10 @@
+{
+  "role": "Builder",
+  "iter": 2,
+  "provider": "agent",
+  "identity": "builder",
+  "task": "Single-turn Builder task for OFC foundation proof (iter 2).\n\nScope (do exactly this, nothing else):\n1. Work only in the isolated workspace already provided as the cwd/repo for this role.\n2. Do NOT change product vision, add backends/auth/AI, or expand integrations.\n3. Confirm the ofc-v1 client is still operable: note package.json scripts, README clone-run section, and that src/ exists.\n4. Do not modify tracked product files. If you must create anything, write only a short verification note under /tmp or return it in your reply.\n5. Return a concise result with: workspace HEAD (git rev-parse HEAD), whether package.json has build/test scripts, and confirmation that no product files were changed.\n\nThis is a foundation-proof iteration: sealed verification, not a product lift.",
+  "input_ref": "/home/logani/.herdr/worktrees/Product Consulting Harness/test-rapid-basics/state/missions/ofc-foundation/builder-input-iter-2.txt",
+  "input_sha256": "1c4de55fe3807f5238026c5a8a1f32bd6d2680f3828b7e2f0856cf29086a4bfb",
+  "requested_at": "2026-08-11T04:09:29Z"
+}

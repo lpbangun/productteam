@@ -1,0 +1,11 @@
+{
+  "client": "osint-loop-research",
+  "source_repo": "/home/logani/projects/osint-loop-research",
+  "path": "/home/logani/.herdr/worktrees/Product Consulting Harness/test-rapid-basics/tmp/workspaces/osint-loop-research",
+  "sha": "e7d433e9f5aff13859181ad03d5b28733ca11777",
+  "exists": true,
+  "dirty": true,
+  "allow_dirty_reason": "osint-loop-v1 iter-1 implementation in isolated workspace",
+  "operation": "checks",
+  "recorded_at": "2026-08-11T04:24:10Z"
+}

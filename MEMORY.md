@@ -6,6 +6,15 @@ and evidence-linked.
 
 ## Engagements
 
+- **osint-loop-research** (opened + closed 2026-08-11) — operable loop engine lift.
+  Repo: `/home/logani/projects/osint-loop-research` · Mode: Directive · Contract: osint-loop-v1 · Scorer: checks.
+  Isolated workspace commit `8af078f`. Baseline→iter-1 overall **9.5** (14/14). Critic ACCEPT-WITH-NITS.
+  Evidence: `state/engagements/osint-loop-research/`. Live sibling not mutated.
+- **onboarding-flight-control** foundation proof iter-2 (2026-08-11) — closed seams:
+  workspace isolation for checks/score, judgment gate, sealed roles, Analyst stamp, Critic close.
+  Evidence: `state/engagements/onboarding-flight-control/roles/iter-2/`.
+
+
 - **harness-cli** (opened + closed 2026-08-07) — Product Consulting Harness
   **CLI** (not JobOS). Mode: Directive · Contract: harness-cli-v1 · Scorer: checks.
   Baseline 3.4 → **9.5** in 1 iteration; all 9 dims ≥9.5; 49/49 checks live.
@@ -63,6 +72,8 @@ and evidence-linked.
   ahead of GitHub. The engagement carries it forward, not over it.
 
 ## Lessons
+
+- 2026-08-11 · three-mission loop: `productteam checks` must ensure isolated worktrees and archive `runs/check-*/workspace.json`; restore check-induced dirt so role invokes aren't blocked. `productteam open` + `baseline` remove hand-written engagement trees. OSINT stop/resume must be one engine + exit 2 when max not raised.
 
 - 2026-08-10 · operability mission iter-6 Build 2: `consult gate` now
   re-derives implementability from engagement `judgment/*.json`. Guided

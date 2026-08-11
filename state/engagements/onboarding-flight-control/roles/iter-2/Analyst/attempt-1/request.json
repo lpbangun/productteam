@@ -1,0 +1,10 @@
+{
+  "role": "Analyst",
+  "iter": 2,
+  "provider": "agent",
+  "identity": "analyst",
+  "task": "You are the Analyst for OFC foundation proof iter 2. Independently verify: (1) isolated workspace path != Repo: source, (2) Builder sealed verification cites HEAD and no product changes, (3) ofc-v1 checks remain the scoring path. Cite concrete paths under state/engagements/onboarding-flight-control/. Return a short stamped readiness verdict: READY_TO_SCORE or BLOCKED with reasons.",
+  "input_ref": null,
+  "input_sha256": null,
+  "requested_at": "2026-08-11T04:13:44Z"
+}
