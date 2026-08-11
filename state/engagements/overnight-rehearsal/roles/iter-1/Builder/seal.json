@@ -1,0 +1,9 @@
+{
+  "role": "Builder",
+  "iter": 1,
+  "input_path": "/tmp/tmp.AlFUDSL4oL/seal-input.txt",
+  "input_sha256": "245ee520f4a5e92bfba0b1fca83c521040b9a719da76ea88852eed3f24f5bca8",
+  "sealed_by": "principal",
+  "sealed_at": "2026-08-11T07:40:11Z",
+  "write_once": true
+}

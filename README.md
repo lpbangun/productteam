@@ -39,6 +39,7 @@ bin/productteam workspace <client> ensure|status|remove
 bin/productteam escalation <client> block|status|resume
 bin/productteam inspect <client>
 bin/productteam role <client> seal|invoke|status|close
+bin/productteam card list|show|seed-specialist   # named agent cards (state/agents/)
 bin/productteam score <client> --iter <n>   # Analyst-stamped score
 bin/productteam checks <client>  # deterministic contract checks
 bin/productteam bench <client>   # scores + history
@@ -258,6 +259,8 @@ provider binary name, enforces separation.
 | `lib/judgment-gate.sh` | Durable per-mode judgment gates + machine status |
 | `lib/engagement-state.sh` | Escalation pause/resume + file-derived inspect |
 | `lib/role-envelope.sh` | Sealed single-turn roles + authorship gates |
+| `lib/agent-cards.sh` | Named agent cards (markdown + json under state/agents/) |
+| `state/agents/` | Permanent role cards + specialist template |
 | `lib/run-checks.sh` | Deterministic checks (`scorer=checks`) |
 | `lib/harness-checks.sh` | Harness-apc objective checks + secrets scan |
 | `lib/harness-cli-checks.sh` | harness-cli-v1 check suite |
@@ -267,6 +270,7 @@ provider binary name, enforces separation.
 | `tests/judgment-gate-smoke.sh` | Real-CLI judgment gate refuse/pass probe |
 | `tests/escalation-smoke.sh` | Real block/authorize/resume/inspect probe |
 | `tests/role-envelope-smoke.sh` | Real-provider seal/envelope/authorship probe |
+| `tests/agent-cards-smoke.sh` | Agent card list/show/seed + envelope display_name |
 | `state/` | Engagements, scores, history, and plain-file CLI sessions |
 | `state/harness-evolution/` | APC self-improvement (locked `harness-apc-v1`) |
 

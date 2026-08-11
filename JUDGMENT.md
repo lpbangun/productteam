@@ -10,6 +10,11 @@ Inspect the product and propose a small number of high-leverage
 directions with plain-language tradeoffs. Do not implement until the
 Principal (or owner) selects a direction. Default for open-ended briefs.
 
+In Guided mode, Principal/Analyst propose ≤N directions (`productteam direction propose`;
+`CONSULT_DIRECTION_MAX`, default 3). After selection, Vesper (Critic) must rebut before
+Builder seal (`productteam direction rebut` or `gate rebut`). Sealed input must cite the
+bound direction. Critic rebuttal is Guided-only; Directive/Challenge/Override unchanged.
+
 ### Directive
 Follow a user-provided direction. Validate assumptions, surface risks,
 and refuse silent scope expansion. Implement the smallest diff that

@@ -1,0 +1,10 @@
+{
+  "client": "overnight-rehearsal",
+  "repo": "/tmp/tmp.AlFUDSL4oL/client",
+  "contract": "overnight-rehearsal-v1",
+  "frozen": "2026-08-11",
+  "mode": "Guided",
+  "scorer": "provider",
+  "opened_at": "2026-08-11T07:40:08Z",
+  "tool": "productteam open"
+}

@@ -227,11 +227,22 @@ judgment_atomic_write() { # file → writes stdin payload atomically (tmp + rena
   mv "$tmp" "$file"
 }
 
-judgment_write_selection() { # client dir, direction, selected_by (default principal) → path
-  local d="$1" dir="$2" sel="${3:-principal}"
-  jq -n --arg mode "$(judgment_mode "$d")" --arg ts "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+judgment_write_selection() { # client dir, direction, selected_by, [proposal_id], [display_name] → path
+  local d="$1" dir="$2" sel="${3:-principal}" proposal_id="${4:-}" display_name="${5:-}"
+  local dn=''
+  if [[ -n "$display_name" ]]; then
+    dn="$display_name"
+  elif declare -F direction_selector_display_name >/dev/null 2>&1; then
+    dn=$(direction_selector_display_name "$sel" "$d")
+  else
+    dn="$sel"
+  fi
+  jq -n \
+    --arg mode "$(judgment_mode "$d")" --arg ts "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
     --arg direction "$dir" --arg selected_by "$sel" --arg decision 'allowed' \
-    '{mode:$mode,ts:$ts,direction:$direction,selected_by:$selected_by,decision:$decision}' \
+    --arg display_name "$dn" --arg proposal_id "$proposal_id" \
+    '{mode:$mode,ts:$ts,direction:$direction,selected_by:$selected_by,decision:$decision,display_name:$display_name}
+     + (if $proposal_id == "" then {} else {proposal_id:$proposal_id} end)' \
     | judgment_atomic_write "$d/judgment/selection.json"
   printf '%s' "$d/judgment/selection.json"
 }

@@ -31,8 +31,13 @@ source "$ROOT/lib/repl.sh"
 source "$ROOT/lib/render.sh"
 source "$ROOT/lib/workspace.sh"
 source "$ROOT/lib/judgment-gate.sh"
+source "$ROOT/lib/direction-gate.sh"
 source "$ROOT/lib/engagement-state.sh"
+source "$ROOT/lib/agent-cards.sh"
+source "$ROOT/lib/style-memory.sh"
+source "$ROOT/lib/experience-pool.sh"
 source "$ROOT/lib/role-envelope.sh"
+source "$ROOT/lib/run-loop.sh"
 
 score_color() { # $1=score → accent for the score, or nothing in between
   if awk -v s="$1" 'BEGIN{exit !(s>=9)}'; then printf '%s' "$G"
@@ -180,8 +185,10 @@ cmd_help() {
                                 Cold engagement stub + freeze stamp + workspace
     productteam baseline <client> [--allow-dirty <reason>]
                                 iter-0 via workspace + checks/score entrypoints
-    productteam gate <client> status|implement|select|direct|challenge|override
+    productteam gate <client> status|implement|select|direct|challenge|override|rebut
                                 Durable judgment decisions + machine status
+    productteam direction <client> propose|list|clear|rebut
+                                Guided direction proposals + Critic rebuttal (see gate rebut alias)
     productteam workspace <client> ensure|status|remove
                                 Isolated client worktree lifecycle
     productteam escalation <client> block <id> <summary> <option> [option...]
@@ -193,8 +200,23 @@ cmd_help() {
     productteam role <client> seal <iter> <input-file>
     productteam role <client> status [iter] | close <iter>
                                 Single-turn roles, sealed input, authorship gates
+    productteam card list [--json] | show <name|id|role> [client] [--json]
+    productteam card seed-specialist <client> [display_name]
+                                Named agent cards (state/agents/)
+    productteam style show [--json] | init | append <taste|risk|stack|never> <text…>
+    productteam style accept-lesson <path> | rewrite [--i-am-owner]
+                                Org taste/risk/stack/never (state/style/)
+    productteam project-memory show <client> [--json]
+    productteam project-memory append <client> <text…>
+                                Per-engagement notes (state/engagements/<client>/memory/)
+    productteam pool list [--domain …] [--kind worked|failed] [--json]
+    productteam pool show <id> | search <query> | add … | add-from-iter …
+                                Cross-engagement experience excerpts (state/experience-pool/)
     productteam score <client> --iter <n>
                                 Score via the declared scorer + Analyst stamp
+    productteam run-loop <client> --max-hours <n> --max-iters <m>
+                                Overnight loop driver (inspect→gate→roles→score→close)
+                                [--dry-run] [--resume] [--no-provider]
     productteam bench <client>      Benchmark contract + history + latest scores
     productteam bench <client> run --iter <n>
                                 Provider scoring with authorship gate
@@ -438,7 +460,17 @@ cmd_gate() {
       [[ -n "$want" ]] || want=$(judgment_bound_direction "$d" "$mode")
       refusal=$(judgment_implement_refusal "$d" "$mode" "$want"); [[ -z "$refusal" ]] || die "$refusal"
       printf '\n  %sGate: %s implement allowed%s\n\n' "$G" "$c" "$R" ;;
-    select) (($# == 1 || $# == 2)) || die 'usage: productteam gate <client> select <direction> [selected-by]'; [[ "$mode" == Guided || "$mode" == Challenge ]] || die "mode is $mode — select requires Guided or Challenge"; judgment_write_selection "$d" "$1" "${2:-principal}" >/dev/null ;;
+    select)
+      (($# == 1 || $# == 2)) || die 'usage: productteam gate <client> select <direction> [selected-by]'
+      [[ "$mode" == Guided || "$mode" == Challenge ]] || die "mode is $mode — select requires Guided or Challenge"
+      nonblank "$1" || die 'select direction must be non-blank (id or title)'
+      judgment_select_direction "$d" "$1" "${2:-principal}" >/dev/null
+      # Refuse writing empty bound direction (lookup/title must resolve)
+      [[ -n "$(jget "$d/judgment/selection.json" direction)" ]] || die "select left empty direction for '$1' — use a proposal id (d1…) or full title"
+      ;;
+    rebut)
+      (($# >= 3)) || die 'usage: productteam gate <client> rebut <iter> <ACCEPT|ACCEPT-WITH-NITS|REJECT> <text…>'
+      direction_cmd_rebut "$d" "$@" ;;
     direct)
       (($# >= 1)) || die 'usage: productteam gate <client> direct <direction> [risk...]'
       [[ "$mode" == Directive ]] || die "mode is $mode — direct requires Directive"
@@ -450,7 +482,83 @@ cmd_gate() {
       [[ "$mode" == Override ]] || die "mode is $mode — override requires Override"
       judgment_write_override "$d" "$1" "$2" "$3" "$4" >/dev/null ;;
     challenge) (($# == 3)) || die 'usage: productteam gate <client> challenge <harmful> <safer> <evidence>'; [[ "$mode" == Challenge ]] || die "mode is $mode — challenge requires Challenge"; judgment_write_challenge "$d" "$1" "$2" "$3" >/dev/null ;;
-    *) die 'usage: productteam gate <client> status|implement|select|direct|challenge|override …' ;;
+    *) die 'usage: productteam gate <client> status|implement|select|direct|challenge|override|rebut …' ;;
+  esac
+}
+
+direction_cmd_rebut() { # engagement dir, iter, verdict, rebuttal…
+  local d="$1" iter="$2" verdict="$3"; shift 3
+  local mode rebuttal path
+  [[ "$iter" =~ ^[0-9]+$ ]] || die 'rebut iter must be a non-negative integer'
+  case "$verdict" in
+    ACCEPT|ACCEPT-WITH-NITS|REJECT) ;;
+    *) die 'rebut verdict must be ACCEPT, ACCEPT-WITH-NITS, or REJECT' ;;
+  esac
+  mode=$(judgment_mode "$d")
+  [[ "$mode" == Guided ]] || die "direction rebut requires Guided mode (current: $mode)"
+  (($# >= 1)) || die 'usage: productteam direction rebut <client> <iter> <ACCEPT|ACCEPT-WITH-NITS|REJECT> <text…>'
+  rebuttal="$*"
+  path=$(judgment_write_critic_rebuttal "$d" "$iter" "$verdict" "$rebuttal") || die 'failed to write critic rebuttal'
+  printf '%s\n' "$path"
+}
+
+cmd_direction() {
+  local c="$1" action="$2" d; shift 2
+  d=$(client_dir "$c"); [[ -f "$d/engagement.md" ]] || die "missing $d/engagement.md"
+  case "$action" in
+    propose)
+      local title='' tradeoffs='' lift='' by='Meridian' evidence=()
+      while (( $# )); do
+        case "$1" in
+          --title) title="$2"; shift 2 ;;
+          --tradeoffs) tradeoffs="$2"; shift 2 ;;
+          --lift) lift="$2"; shift 2 ;;
+          --by) by="$2"; shift 2 ;;
+          --evidence) evidence+=("$2"); shift 2 ;;
+          *) die "unknown direction propose option '$1'" ;;
+        esac
+      done
+      nonblank "$title" && nonblank "$tradeoffs" && nonblank "$lift" || \
+        die 'usage: productteam direction <client> propose --title T --tradeoffs X --lift Y [--evidence path] [--by Meridian|Kai]'
+      local refusal path
+      refusal=$(direction_propose_refusal "$d")
+      [[ -z "$refusal" ]] || die "$refusal"
+      path=$(direction_propose "$d" "$title" "$tradeoffs" "$lift" "$by" "${evidence[@]}") || exit $?
+      printf '\n  %sDirection proposed:%s %s\n\n' "$G" "$R" "$path"
+      ;;
+    list)
+      local json=0 a
+      for a in "$@"; do
+        case "$a" in
+          --json) json=1 ;;
+          *) die "unknown option '$a' — usage: productteam direction <client> list [--json]" ;;
+        esac
+      done
+      if (( json )); then
+        direction_list "$d" 1
+      else
+        printf '\n  %sDirections — %s%s\n' "$B" "$c" "$R"
+        direction_list "$d" 0
+        printf '\n'
+      fi
+      ;;
+    clear)
+      local owner=0 a
+      for a in "$@"; do
+        case "$a" in
+          --i-am-owner) owner=1 ;;
+          *) die "unknown option '$a' — usage: productteam direction <client> clear --i-am-owner" ;;
+        esac
+      done
+      direction_clear "$d" "$owner" || exit $?
+      printf '\n  %sProposals cleared for %s%s\n\n' "$G" "$c" "$R"
+      ;;
+    rebut)
+      (($# >= 3)) || die 'usage: productteam direction <client> rebut <iter> <ACCEPT|ACCEPT-WITH-NITS|REJECT> <text…>'
+      direction_cmd_rebut "$d" "$@"
+      printf '\n  %sCritic rebuttal recorded%s\n\n' "$G" "$R"
+      ;;
+    *) die 'usage: productteam direction <client> propose|list|clear|rebut …' ;;
   esac
 }
 
@@ -470,6 +578,177 @@ cmd_inspect() {
   printf '\n  %sInspect pack regenerated:%s %s\n\n' "$B" "$R" "$out"
 }
 
+cmd_style() {
+  local action="${1:-}"; shift || true
+  case "$action" in
+    show) style_show "$@" ;;
+    init)
+      (($# == 0)) || die 'usage: productteam style init'
+      local path
+      path=$(style_init) || die "$path"
+      printf '\n  %sStyle initialized:%s %s\n\n' "$G" "$R" "$path"
+      ;;
+    append)
+      (($# >= 2)) || die 'usage: productteam style append <taste|risk|stack|never> <text…>'
+      style_append "$1" "${@:2}" || die 'style append failed'
+      printf '\n  %sAppended to %s%s\n\n' "$G" "$1" "$R"
+      ;;
+    accept-lesson)
+      (($# == 1)) || die 'usage: productteam style accept-lesson <path-to-lesson>'
+      style_accept_lesson "$1" || die 'accept-lesson failed'
+      printf '\n  %sLesson appended to Never (provenance recorded)%s\n\n' "$G" "$R"
+      ;;
+    rewrite)
+      style_rewrite_refuse "${1:-}" || die 'style rewrite refused'
+      ;;
+    *) die 'usage: productteam style show|init|append|accept-lesson|rewrite …' ;;
+  esac
+}
+
+cmd_project_memory() {
+  local action="${1:-}" d; shift || true
+  [[ -n "$action" ]] || die 'usage: productteam project-memory show|append <client> …'
+  case "$action" in
+    show)
+      (($# >= 1)) || die 'usage: productteam project-memory show <client> [--json]'
+      local c="$1"; shift
+      d=$(client_dir "$c")
+      project_memory_show "$d" "$@"
+      ;;
+    append)
+      (($# >= 2)) || die 'usage: productteam project-memory append <client> <text…>'
+      local c="$1"; shift
+      d=$(client_dir "$c")
+      project_memory_append "$d" "$@" || die 'project-memory append failed'
+      printf '\n  %sAppended project memory for %s%s\n\n' "$G" "$c" "$R"
+      ;;
+    *) die 'usage: productteam project-memory show|append <client> …' ;;
+  esac
+}
+
+cmd_pool() {
+  local action="${1:-}"; shift || true
+  [[ -n "$action" ]] || die 'usage: productteam pool list|show|search|add|add-from-iter …'
+  case "$action" in
+    list)
+      pool_list "$@"
+      ;;
+    show)
+      (($# == 1)) || die 'usage: productteam pool show <id>'
+      pool_show "$1"
+      ;;
+    search)
+      (($# >= 1)) || die 'usage: productteam pool search <query> [--json]'
+      pool_search "$@"
+      ;;
+    add)
+      local kind='' domain='' title='' client='' iter='' tags='' body='' body_file=''
+      while (( $# )); do
+        case "$1" in
+          --kind) kind="$2"; shift 2 ;;
+          --domain) domain="$2"; shift 2 ;;
+          --title) title="$2"; shift 2 ;;
+          --client) client="$2"; shift 2 ;;
+          --iter) iter="$2"; shift 2 ;;
+          --tags) tags="$2"; shift 2 ;;
+          --body) body="$2"; shift 2 ;;
+          --body-file) body_file="$2"; shift 2 ;;
+          *) die "unknown pool add option '$1'" ;;
+        esac
+      done
+      local id
+      id=$(pool_add --kind "$kind" --domain "$domain" --title "$title" \
+        ${client:+--client "$client"} ${iter:+--iter "$iter"} ${tags:+--tags "$tags"} \
+        ${body:+--body "$body"} ${body_file:+--body-file "$body_file"}) || die 'pool add failed'
+      printf '%s\n' "$id"
+      printf '\n  %sExperience sealed:%s %s\n\n' "$G" "$R" "$id" >&2
+      ;;
+    add-from-iter)
+      (($# >= 2)) || die 'usage: productteam pool add-from-iter <client> <iter> --kind … --domain … --title …'
+      local c="$1" iter="$2"; shift 2
+      local d id
+      d=$(client_dir "$c")
+      local kind='' domain='' title='' tags=''
+      while (( $# )); do
+        case "$1" in
+          --kind) kind="$2"; shift 2 ;;
+          --domain) domain="$2"; shift 2 ;;
+          --title) title="$2"; shift 2 ;;
+          --tags) tags="$2"; shift 2 ;;
+          *) die "unknown pool add-from-iter option '$1'" ;;
+        esac
+      done
+      id=$(pool_add_from_iter "$d" "$iter" --kind "$kind" --domain "$domain" --title "$title" \
+        ${tags:+--tags "$tags"}) || die 'pool add-from-iter failed'
+      printf '%s\n' "$id"
+      printf '\n  %sExperience sealed from iter:%s %s\n\n' "$G" "$R" "$id" >&2
+      ;;
+    *) die 'usage: productteam pool list|show|search|add|add-from-iter …' ;;
+  esac
+}
+
+cmd_card() {
+  local action="${1:-}"; shift || true
+  case "$action" in
+    list)
+      local json=0 a
+      for a in "$@"; do
+        case "$a" in
+          --json) json=1 ;;
+          *) die "unknown option '$a' — usage: productteam card list [--json]" ;;
+        esac
+      done
+      if (( json )); then agent_card_list --json
+      else
+        printf '\n  %sAgent cards%s\n' "$B" "$R"
+        agent_card_list | while IFS= read -r line; do
+          [[ -n "$line" ]] && printf '  %s\n' "$line"
+        done
+        printf '\n  %sRoot:%s state/agents/ · %sseed-specialist <client> [name]%s\n\n' "$D" "$R" "$D" "$R"
+      fi
+      ;;
+    show)
+      [[ $# -ge 1 ]] || die 'usage: productteam card show <name|id|role> [client] [--json]'
+      local key='' json=0 client='' client_dir='' a
+      for a in "$@"; do
+        case "$a" in
+          --json) json=1 ;;
+          -*) die "unknown option '$a'" ;;
+          *)
+            if [[ -z "$key" ]]; then key="$a"
+            elif [[ -z "$client" ]]; then client="$a"
+            else die 'usage: productteam card show <name|id|role> [client] [--json]' ; fi
+            ;;
+        esac
+      done
+      [[ -z "$client" ]] || client_dir=$(client_dir "$client")
+      if (( json )); then
+        if [[ -n "$client_dir" ]]; then
+          agent_card_show "$key" --json "$client_dir" || die "unknown agent card '$key' (client $client)"
+        else
+          agent_card_show "$key" --json || die "unknown agent card '$key'"
+        fi
+      else
+        printf '\n'
+        if [[ -n "$client_dir" ]]; then
+          agent_card_show "$key" "$client_dir" || die "unknown agent card '$key' (client $client)"
+        else
+          agent_card_show "$key" || die "unknown agent card '$key'"
+        fi
+        printf '\n'
+      fi
+      ;;
+    seed-specialist)
+      [[ $# -ge 1 ]] || die 'usage: productteam card seed-specialist <client> [display_name]'
+      local c="$1" name="${2:-Ada}" d path
+      d=$(client_dir "$c")
+      path=$(agent_card_seed_specialist "$d" "$name") || die "failed to seed specialist for $c"
+      printf '\n  %sSpecialist card seeded:%s %s\n\n' "$G" "$R" "$path"
+      ;;
+    *) die 'usage: productteam card list|show|seed-specialist …' ;;
+  esac
+}
+
 cmd_role() {
   local c="$1" action="$2" d; shift 2; d=$(client_dir "$c")
   case "$action" in
@@ -480,7 +759,34 @@ cmd_role() {
       if [[ "$role" == Builder ]]; then (($# == 0)) || die 'Builder task is the sealed input'; else (($# == 1)) || die "usage: productteam role <client> invoke $role <iter> <task>"; task="$1"; fi
       role_invoke "$c" "$d" "$role" "$iter" "$task" ;;
     status) (($# <= 1)) || die 'usage: productteam role <client> status [iter]'; role_status "$c" "$d" "${1:-}" ;;
-    close) (($# == 1)) || die 'usage: productteam role <client> close <iter>'; local close; close=$(role_close "$d" "$1") || die "$close"; printf '\n  %sIteration closed:%s %s\n\n' "$B" "$R" "$close" ;;
+    close)
+      (($# >= 1)) || die 'usage: productteam role <client> close <iter> [--seal-experience --kind … --domain … --title …]'
+      local iter seal=0 kind='' domain='' title='' tags='' a
+      iter="$1"; shift
+      while (( $# )); do
+        case "$1" in
+          --seal-experience) seal=1; shift ;;
+          --kind) kind="$2"; shift 2 ;;
+          --domain) domain="$2"; shift 2 ;;
+          --title) title="$2"; shift 2 ;;
+          --tags) tags="$2"; shift 2 ;;
+          *) die "unknown role close option '$1'" ;;
+        esac
+      done
+      local close
+      close=$(role_close "$d" "$iter") || die "$close"
+      printf '\n  %sIteration closed:%s %s\n' "$B" "$R" "$close"
+      if (( seal )); then
+        [[ -n "$kind" && -n "$domain" && -n "$title" ]] || die '--seal-experience requires --kind --domain --title'
+        local sealed_id
+        sealed_id=$(pool_add_from_iter "$d" "$iter" --kind "$kind" --domain "$domain" --title "$title" \
+          ${tags:+--tags "$tags"}) || die 'pool seal on close failed'
+        printf '  %sExperience sealed:%s %s\n' "$G" "$R" "$sealed_id"
+      else
+        printf '  %s%s%s\n' "$D" "$(pool_seal_hint "$c" "$iter")" "$R"
+      fi
+      printf '\n'
+      ;;
     *) die 'usage: productteam role <client> seal|invoke|status|close …' ;;
   esac
 }
@@ -1042,6 +1348,33 @@ json.dump({"ts": datetime.date.today().isoformat(), "iter": iter_n, "kind": kind
   printf '  %s%s%s\n\n' "$D" "$rd/scores.json" "$R"
 }
 
+cmd_run_loop() {
+  local c='' max_hours='' max_iters='' dry=0 no_prov=0 resume=0 d
+  while (( $# )); do
+    case "$1" in
+      --max-hours)
+        [[ $# -ge 2 && "$2" =~ ^[0-9]+([.][0-9]+)?$ ]] || die '--max-hours requires a positive number'
+        max_hours="$2"; shift 2 ;;
+      --max-iters)
+        [[ $# -ge 2 && "$2" =~ ^[0-9]+$ ]] || die '--max-iters requires a non-negative integer'
+        max_iters="$2"; shift 2 ;;
+      --dry-run) dry=1; shift ;;
+      --no-provider) no_prov=1; shift ;;
+      --resume) resume=1; shift ;;
+      -*) die "unknown run-loop option '$1'" ;;
+      *)
+        [[ -z "$c" ]] || die "unexpected argument '$1'"
+        c="$1"; shift ;;
+    esac
+  done
+  [[ -n "$c" ]] || die 'usage: productteam run-loop <client> --max-hours <n> --max-iters <m> [--dry-run] [--resume] [--no-provider]'
+  [[ -n "$max_hours" && -n "$max_iters" ]] || \
+    die 'run-loop requires explicit --max-hours and --max-iters (overnight intent must be honest)'
+  d=$(client_dir "$c")
+  [[ -f "$d/engagement.md" ]] || die "missing $d/engagement.md"
+  run_loop "$c" "$d" "$max_hours" "$max_iters" "$dry" "$no_prov" "$resume"
+}
+
 # ── dispatch ─────────────────────────────────────────────────────────
 main() {
   local cmd="${1:-status}"; shift || true
@@ -1082,8 +1415,11 @@ main() {
       [[ $# -ge 2 ]] || die 'usage: productteam workspace <client> ensure|status|remove'
       cmd_workspace "$@" ;;
     gate)
-      [[ $# -ge 2 ]] || die 'usage: productteam gate <client> status|implement|select|direct|challenge|override …'
+      [[ $# -ge 2 ]] || die 'usage: productteam gate <client> status|implement|select|direct|challenge|override|rebut …'
       cmd_gate "$@" ;;
+    direction)
+      [[ $# -ge 2 ]] || die 'usage: productteam direction <client> propose|list|clear|rebut …'
+      cmd_direction "$@" ;;
     escalation)
       [[ $# -ge 2 ]] || die 'usage: productteam escalation <client> block|status|resume …'
       cmd_escalation "$@" ;;
@@ -1093,9 +1429,23 @@ main() {
     role)
       [[ $# -ge 2 ]] || die 'usage: productteam role <client> seal|invoke|status|close …'
       cmd_role "$@" ;;
+    card)
+      [[ $# -ge 1 ]] || die 'usage: productteam card list|show|seed-specialist …'
+      cmd_card "$@" ;;
+    style)
+      [[ $# -ge 1 ]] || die 'usage: productteam style show|init|append|accept-lesson|rewrite …'
+      cmd_style "$@" ;;
+    project-memory)
+      [[ $# -ge 1 ]] || die 'usage: productteam project-memory show|append <client> …'
+      cmd_project_memory "$@" ;;
+    pool)
+      [[ $# -ge 1 ]] || die 'usage: productteam pool list|show|search|add|add-from-iter …'
+      cmd_pool "$@" ;;
     score)
       [[ $# -ge 1 ]] || die 'usage: productteam score <client> --iter <n>'
       cmd_score "$@" ;;
+    run-loop)
+      cmd_run_loop "$@" ;;
     checks)
       [[ $# -ge 1 ]] || die 'usage: productteam checks <client> [--allow-dirty <reason>]'
       cmd_checks "$@" ;;

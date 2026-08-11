@@ -270,16 +270,41 @@ inspect_derive_pack() { # client, client dir → regenerable file-derived pack J
   else
     pause=$(jq -nc --arg file "$pf" '{file:$file,missing:true}')
   fi
-  local lf='' lesson_file
-  while IFS= read -r lesson_file; do
-    [[ -f "$lesson_file" ]] && lf="$lesson_file"
-  done < <(printf '%s\n' "$d"/runs/iter-*/lessons.md | sort -V)
-  [[ -n "$lf" ]] || { [[ -f "$d/lessons.md" ]] && lf="$d/lessons.md"; }
-  if [[ -n "$lf" ]]; then
-    lessons=$(jq -nc --arg pointer "$lf" '{pointer:$pointer,missing:false}')
+  local style_json project_json
+  declare -F style_derive_pack >/dev/null 2>&1 || {
+    # shellcheck disable=SC1090
+    [[ -f "${CONSULT_ROOT}/lib/style-memory.sh" ]] && source "${CONSULT_ROOT}/lib/style-memory.sh"
+  }
+  declare -F pool_derive_pack >/dev/null 2>&1 || {
+    # shellcheck disable=SC1090
+    [[ -f "${CONSULT_ROOT}/lib/experience-pool.sh" ]] && source "${CONSULT_ROOT}/lib/experience-pool.sh"
+  }
+  if declare -F style_derive_pack >/dev/null 2>&1; then
+    style_json=$(style_derive_pack)
+    project_json=$(project_memory_derive_pack "$d")
+    lessons=$(lessons_derive_pack "$d")
   else
-    lessons=$(jq -nc '{pointer:null,missing:true}')
+    local lf='' lesson_file
+    while IFS= read -r lesson_file; do
+      [[ -f "$lesson_file" ]] && lf="$lesson_file"
+    done < <(printf '%s\n' "$d"/runs/iter-*/lessons.md | sort -V)
+    [[ -n "$lf" ]] || { [[ -f "$d/lessons.md" ]] && lf="$d/lessons.md"; }
+    if [[ -n "$lf" ]]; then
+      lessons=$(jq -nc --arg pointer "$lf" '{pointer:$pointer,missing:false,excerpt:null}')
+    else
+      lessons=$(jq -nc '{pointer:null,missing:true,excerpt:null}')
+    fi
+    style_json=$(jq -nc '{missing:true,pointer:null,taste:[],risk:[],stack:[],never:[]}')
+    project_json=$(jq -nc '{missing:true,pointer:null,excerpt:null}')
   fi
+  local experience_pool_json
+  if declare -F pool_derive_pack >/dev/null 2>&1; then
+    experience_pool_json=$(pool_derive_pack)
+  else
+    experience_pool_json=$(jq -nc '{missing:true,pointer:null,retrieved:[],index_count:0}')
+  fi
+  local lf=''
+  lf=$(jq -r '.pointer // empty' <<<"$lessons")
   if [[ -f "$cf" ]]; then
     cont=$(jq -c --arg file "$cf" '. + {file:$file,missing:false}' "$cf" 2>/dev/null) \
       || cont=$(jq -nc --arg file "$cf" '{file:$file,missing:true,invalid:true}')
@@ -299,6 +324,12 @@ inspect_derive_pack() { # client, client dir → regenerable file-derived pack J
   if [[ "$scores_missing" == true ]]; then missing=$(jq -c --arg m 'runs/iter-*/scores.json' '. + [$m]' <<<"$missing"); fi
   if [[ ! -f "$hf" ]]; then missing=$(jq -c --arg m 'history.jsonl' '. + [$m]' <<<"$missing"); fi
   if [[ "$mode_missing" == true ]]; then missing=$(jq -c --arg m 'engagement.md Mode:' '. + [$m]' <<<"$missing"); fi
+  if jq -e '.missing == true' <<<"$style_json" >/dev/null 2>&1; then
+    missing=$(jq -c --arg m 'state/style/style.md' '. + [$m]' <<<"$missing")
+  fi
+  if jq -e '.missing == true' <<<"$project_json" >/dev/null 2>&1; then
+    missing=$(jq -c --arg m 'memory/project.md' '. + [$m]' <<<"$missing")
+  fi
 
   local nsa='' open_ids oid
   open_ids=$(esc_open_ids "$d")
@@ -318,6 +349,10 @@ inspect_derive_pack() { # client, client dir → regenerable file-derived pack J
       nsa="continue the loop: consult bench $c run"
     fi
   fi
+  if jq -e '.missing == true' <<<"$style_json" >/dev/null 2>&1; then
+    [[ -z "$nsa" ]] || nsa+=" · "
+    nsa+="org style missing: productteam style init (owner sets state/style/style.md)"
+  fi
 
   local mode_json gate_json
   mode_json=$(jq -nc --arg value "$mode" --arg source "$d/engagement.md" \
@@ -331,8 +366,10 @@ inspect_derive_pack() { # client, client dir → regenerable file-derived pack J
     --argjson scores "$scores" --argjson history "$history" \
     --argjson escalations "$esc" --argjson pause "$pause" \
     --argjson lessons "$lessons" --argjson continuation "$cont" \
+    --argjson style "$style_json" --argjson project_memory "$project_json" \
+    --argjson experience_pool "$experience_pool_json" \
     --arg next_suggested_action "$nsa" --argjson missing "$missing" \
-    '{client:$client,mode:$mode,gate:$gate,scores:$scores,history:$history,escalations:$escalations,pause:$pause,lessons:$lessons,continuation:$continuation,next_suggested_action:$next_suggested_action,missing:$missing}'
+    '{client:$client,mode:$mode,gate:$gate,scores:$scores,history:$history,escalations:$escalations,pause:$pause,lessons:$lessons,continuation:$continuation,style:$style,project_memory:$project_memory,experience_pool:$experience_pool,next_suggested_action:$next_suggested_action,missing:$missing}'
 }
 
 inspect_write_pack() { # client, client dir, out → rewrites the pack atomically; stdout: out path

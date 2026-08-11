@@ -73,6 +73,13 @@ and evidence-linked.
 
 ## Lessons
 
+- 2026-08-11 · Agent-Socials overnight slice: named cards (Kai/Meridian/Forge/Vesper) +
+  style/project memory + file experience pool + Guided propose/rebut/seal +
+  `productteam run-loop` (resume after kill). Integration PASS under
+  `state/missions/overnight-named-org/`. Steal Room naming + GEA experience
+  excerpts only — no daemon/DB/RAG/code evolution. Nit fixed mid-rehearsal:
+  `direction list --json` must be machine-clean JSON.
+
 - 2026-08-11 · three-mission loop: `productteam checks` must ensure isolated worktrees and archive `runs/check-*/workspace.json`; restore check-induced dirt so role invokes aren't blocked. `productteam open` + `baseline` remove hand-written engagement trees. OSINT stop/resume must be one engine + exit 2 when max not raised.
 
 - 2026-08-10 · operability mission iter-6 Build 2: `consult gate` now

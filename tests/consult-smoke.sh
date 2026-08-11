@@ -117,6 +117,47 @@ else
   bad 'open→baseline cold bootstrap refuse/pass'
 fi
 
+if "$ROOT/tests/agent-cards-smoke.sh" >/dev/null; then
+  ok 'agent cards list/show/seed + envelope display_name'
+else
+  bad 'agent cards list/show/seed + envelope display_name'
+fi
+if "$C" help | grep -q 'productteam card list'; then ok 'help lists card'; else bad 'help lists card'; fi
+
+if "$ROOT/tests/style-memory-smoke.sh" >/dev/null; then
+  ok 'style/project memory inspect + role envelope fields'
+else
+  bad 'style/project memory inspect + role envelope fields'
+fi
+if "$C" help | grep -q 'productteam style show'; then ok 'help lists style'; else bad 'help lists style'; fi
+if "$C" help | grep -q 'productteam project-memory show'; then ok 'help lists project-memory'; else bad 'help lists project-memory'; fi
+
+if "$ROOT/tests/experience-pool-smoke.sh" >/dev/null; then
+  ok 'experience pool list/add/search + inspect/role wiring'
+else
+  bad 'experience pool list/add/search + inspect/role wiring'
+fi
+if "$C" help | grep -q 'productteam pool list'; then ok 'help lists pool'; else bad 'help lists pool'; fi
+
+if "$C" help | grep -q 'productteam direction'; then ok 'help lists direction'; else bad 'help lists direction'; fi
+if "$ROOT/tests/direction-path-smoke.sh" >/dev/null; then
+  ok 'direction propose→select→rebut→seal refuse/pass'
+else
+  bad 'direction propose→select→rebut→seal refuse/pass'
+fi
+if "$ROOT/tests/judgment-gate-smoke.sh" >/dev/null; then
+  ok 'judgment gate smoke (regression)'
+else
+  bad 'judgment gate smoke (regression)'
+fi
+
+if "$C" help | grep -q 'run-loop'; then ok 'help lists run-loop'; else bad 'help lists run-loop'; fi
+if "$ROOT/tests/run-loop-smoke.sh" >/dev/null; then
+  ok 'overnight run-loop smoke (limits/resume/hard-stops)'
+else
+  bad 'overnight run-loop smoke (limits/resume/hard-stops)'
+fi
+
 if (( fail == 0 )); then
   printf '\n  all smoke checks passed\n\n'
   exit 0

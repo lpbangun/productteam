@@ -75,9 +75,18 @@ role_manifest_ok() { # attempt directory
 }
 
 role_seal() { # client dir, iter, input file, sealed-by
-  local d="$1" iter="$2" input="$3" by="$4" seal abs sha
+  local d="$1" iter="$2" input="$3" by="$4" seal abs sha mode refusal
   role_iter_ok "$iter" || { printf 'iteration must be a non-negative integer\n'; return 1; }
   [[ -f "$input" ]] || { printf 'Builder input file not found: %s\n' "$input"; return 1; }
+  mode=$(judgment_mode "$d")
+  if declare -F judgment_critic_rebuttal_refusal >/dev/null 2>&1; then
+    refusal=$(judgment_critic_rebuttal_refusal "$d" "$mode" "$iter")
+    [[ -z "$refusal" ]] || { printf '%s\n' "$refusal"; return 1; }
+  fi
+  if declare -F role_seal_direction_refusal >/dev/null 2>&1; then
+    refusal=$(role_seal_direction_refusal "$d" "$input")
+    [[ -z "$refusal" ]] || { printf '%s\n' "$refusal"; return 1; }
+  fi
   seal=$(role_seal_path "$d" "$iter")
   [[ ! -e "$seal" ]] || { printf 'Builder input already sealed: %s\n' "$seal"; return 1; }
   abs=$(realpath "$input")
@@ -90,7 +99,12 @@ role_seal() { # client dir, iter, input file, sealed-by
 }
 
 role_seal_refusal() { # client dir, iter -> refusal or empty
-  local d="$1" iter="$2" seal input expected actual
+  local d="$1" iter="$2" seal input expected actual mode refusal
+  mode=$(judgment_mode "$d")
+  if declare -F judgment_critic_rebuttal_refusal >/dev/null 2>&1; then
+    refusal=$(judgment_critic_rebuttal_refusal "$d" "$mode" "$iter")
+    [[ -z "$refusal" ]] || { printf '%s' "$refusal"; return 0; }
+  fi
   seal=$(role_seal_path "$d" "$iter")
   [[ -f "$seal" ]] || { printf 'missing sealed Builder input: %s' "$seal"; return 0; }
   if ! jq -e --argjson iter "$iter" '.role == "Builder" and .iter == $iter and (.input_path | type == "string" and length > 0) and (.input_sha256 | test("^[0-9a-f]{64}$"))' "$seal" >/dev/null 2>&1; then
@@ -104,10 +118,38 @@ role_seal_refusal() { # client dir, iter -> refusal or empty
   printf ''
 }
 
+_role_cards_ready() {
+  declare -F agent_card_for_role >/dev/null 2>&1 && return 0
+  [[ -n "${CONSULT_ROOT:-}" && -f "${CONSULT_ROOT}/lib/agent-cards.sh" ]] || return 1
+  # shellcheck disable=SC1090
+  source "${CONSULT_ROOT}/lib/agent-cards.sh"
+}
+
+role_card_overlay() { # role client_dir → jq card object or null
+  local role="$1" d="$2" card=''
+  _role_cards_ready || { printf 'null'; return 0; }
+  card=$(agent_card_for_role "$role" "$d" 2>/dev/null || true)
+  [[ -n "$card" ]] || { printf 'null'; return 0; }
+  agent_card_jq_fields "$card"
+}
+
 role_write_attempt() { # d iter Role provider identity task input_ref input_sha exit refusal output
   local d="$1" iter="$2" role="$3" provider="$4" identity="$5" task="$6" input_ref="$7" input_sha="$8" exit_code="$9"
   shift 9
-  local refusal="$1" output="$2" rdir attempt ad requested ran reqsha ressha output_sha
+  local refusal="$1" output="$2" rdir attempt ad requested ran reqsha ressha output_sha card_overlay style_fields='{}' pool_fields='{}'
+  card_overlay=$(role_card_overlay "$role" "$d")
+  declare -F style_memory_request_fields >/dev/null 2>&1 || {
+    [[ -n "${CONSULT_ROOT:-}" && -f "${CONSULT_ROOT}/lib/style-memory.sh" ]] && source "${CONSULT_ROOT}/lib/style-memory.sh"
+  }
+  declare -F experience_pool_request_fields >/dev/null 2>&1 || {
+    [[ -n "${CONSULT_ROOT:-}" && -f "${CONSULT_ROOT}/lib/experience-pool.sh" ]] && source "${CONSULT_ROOT}/lib/experience-pool.sh"
+  }
+  if declare -F style_memory_request_fields >/dev/null 2>&1; then
+    style_fields=$(style_memory_request_fields "$d")
+  fi
+  if declare -F experience_pool_request_fields >/dev/null 2>&1; then
+    pool_fields=$(experience_pool_request_fields)
+  fi
   rdir=$(role_dir "$d" "$iter" "$role")
   attempt=$(role_next_attempt "$rdir")
   ad="$rdir/attempt-$attempt"
@@ -115,19 +157,26 @@ role_write_attempt() { # d iter Role provider identity task input_ref input_sha 
   mkdir -p "$ad"
   jq -n --arg role "$role" --argjson iter "$iter" --arg provider "$provider" --arg identity "$identity" \
     --arg task "$task" --arg input_ref "$input_ref" --arg input_sha "$input_sha" --arg ts "$requested" \
-    '{role:$role,iter:$iter,provider:$provider,identity:$identity,task:$task,input_ref:(if $input_ref=="" then null else $input_ref end),input_sha256:(if $input_sha=="" then null else $input_sha end),requested_at:$ts}' \
+    --argjson card "$card_overlay" --argjson style_fields "$style_fields" --argjson pool_fields "$pool_fields" \
+    '{role:$role,iter:$iter,provider:$provider,identity:$identity,task:$task,input_ref:(if $input_ref=="" then null else $input_ref end),input_sha256:(if $input_sha=="" then null else $input_sha end),requested_at:$ts}
+     + (if $card == null then {} else $card end)
+     + $style_fields + $pool_fields' \
     | role_atomic_write "$ad/request.json"
   ran=$(date -u +%Y-%m-%dT%H:%M:%SZ)
   output_sha=$(printf '%s' "$output" | sha256sum | cut -d' ' -f1)
   jq -n --arg role "$role" --argjson iter "$iter" --arg provider "$provider" --arg identity "$identity" \
     --argjson exit "$exit_code" --arg refusal "$refusal" --arg output "$output" --arg output_sha "$output_sha" --arg ts "$ran" \
-    '{role:$role,iter:$iter,provider:$provider,identity:$identity,exit:$exit,ran_at:$ts,refusal_reason:(if $refusal=="" then null else $refusal end),output:$output,output_sha256:$output_sha}' \
+    --argjson card "$card_overlay" \
+    '{role:$role,iter:$iter,provider:$provider,identity:$identity,exit:$exit,ran_at:$ts,refusal_reason:(if $refusal=="" then null else $refusal end),output:$output,output_sha256:$output_sha}
+     + (if $card == null then {} else $card end)' \
     | role_atomic_write "$ad/result.json"
   reqsha=$(role_sha "$ad/request.json")
   ressha=$(role_sha "$ad/result.json")
   jq -n --arg role "$role" --argjson iter "$iter" --arg provider "$provider" --arg identity "$identity" \
     --arg requested "$requested" --arg ran "$ran" --argjson exit "$exit_code" --arg req "$reqsha" --arg res "$ressha" \
-    '{role:$role,iter:$iter,provider:$provider,identity:$identity,requested_at:$requested,ran_at:$ran,exit:$exit,request_sha256:$req,result_sha256:$res}' \
+    --argjson card "$card_overlay" \
+    '{role:$role,iter:$iter,provider:$provider,identity:$identity,requested_at:$requested,ran_at:$ran,exit:$exit,request_sha256:$req,result_sha256:$res}
+     + (if $card == null then {} else $card end)' \
     | role_atomic_write "$ad/manifest.json"
   printf '%s' "$ad"
 }
@@ -152,6 +201,11 @@ role_invoke() { # client, dir, Role, iter, task -> stdout provider reply
 
   refusal=$(progress_blocked_reason "$d")
   if [[ "$role" == Builder && -z "$refusal" ]]; then
+    if declare -F judgment_critic_rebuttal_refusal >/dev/null 2>&1; then
+      refusal=$(judgment_critic_rebuttal_refusal "$d" "$(judgment_mode "$d")" "$iter")
+    fi
+  fi
+  if [[ "$role" == Builder && -z "$refusal" ]]; then
     refusal=$(role_seal_refusal "$d" "$iter")
     if [[ -z "$refusal" ]]; then
       input_ref=$(jq -r '.input_path' "$(role_seal_path "$d" "$iter")")
@@ -173,8 +227,34 @@ role_invoke() { # client, dir, Role, iter, task -> stdout provider reply
     return 1
   }
   repo=$(jq -r '.path' <<<"$snapshot")
+  local prompt card prompt_prefix style_block='' pool_block=''
+  declare -F style_memory_prompt_block >/dev/null 2>&1 || {
+    [[ -n "${CONSULT_ROOT:-}" && -f "${CONSULT_ROOT}/lib/style-memory.sh" ]] && source "${CONSULT_ROOT}/lib/style-memory.sh"
+  }
+  declare -F experience_pool_prompt_block >/dev/null 2>&1 || {
+    [[ -n "${CONSULT_ROOT:-}" && -f "${CONSULT_ROOT}/lib/experience-pool.sh" ]] && source "${CONSULT_ROOT}/lib/experience-pool.sh"
+  }
+  if declare -F style_memory_prompt_block >/dev/null 2>&1; then
+    style_block=$(style_memory_prompt_block "$d")
+  fi
+  if declare -F experience_pool_prompt_block >/dev/null 2>&1; then
+    pool_block=$(experience_pool_prompt_block)
+  fi
+  _role_cards_ready && card=$(agent_card_for_role "$role" "$d" 2>/dev/null || true)
+  if [[ -n "$card" ]]; then
+    prompt_prefix=$(agent_card_prompt_block "$card" "$role" "$c" "$iter")
+    prompt="${style_block}${pool_block}${prompt_prefix}${task}
+Return only your result for this role."
+  else
+    prompt="${style_block}${pool_block}Role: $role
+Client: $c
+Iteration: $iter
+Single-turn task:
+$task
+Return only your result for this role."
+  fi
   set +e
-  output=$(provider_ask "Role: $role\nClient: $c\nIteration: $iter\nSingle-turn task:\n$task\nReturn only your result for this role." "$repo" 2>&1)
+  output=$(provider_ask "$prompt" "$repo" 2>&1)
   rc=$?
   set -e
   [[ $rc -eq 0 ]] || refusal="provider $provider failed with exit $rc"
@@ -252,14 +332,20 @@ role_status() { # client dir [iter] -> stable JSON
       continue
     fi
     item=$(jq -c --arg request "$ad/request.json" \
-      '{role,identity,provider,task,input_ref,input_sha256,at:.requested_at,request:$request}' "$ad/request.json")
+      '{role,identity,provider,display_name,card_id,traits,characteristics:.traits,voice,task,input_ref,input_sha256,at:.requested_at,request:$request}' "$ad/request.json")
     asked=$(jq -c --argjson x "$item" '. + [$x]' <<<"$asked")
-    item=$(jq -c --arg result "$ad/result.json" \
-      '{role,identity,provider,exit,refusal_reason,output_sha256,at:.ran_at,result:$result}' "$ad/result.json")
+    item=$(jq -c --arg result "$ad/result.json" --arg request "$ad/request.json" \
+      --slurpfile req "$ad/request.json" \
+      '{role,identity,provider,exit,refusal_reason,output_sha256,at:.ran_at,result:$result,
+        display_name:$req[0].display_name,card_id:$req[0].card_id,traits:$req[0].traits,
+        characteristics:$req[0].traits,voice:$req[0].voice}' "$ad/result.json")
     ran=$(jq -c --argjson x "$item" '. + [$x]' <<<"$ran")
     if [[ "$(jq -r '.exit' "$ad/result.json")" == 0 ]]; then
-      item=$(jq -c --arg manifest "$ad/manifest.json" --arg result "$ad/result.json" \
-        '{role,identity,provider,exit,request_sha256,result_sha256,manifest:$manifest,result:$result}' "$ad/manifest.json")
+      item=$(jq -c --arg manifest "$ad/manifest.json" --arg result "$ad/result.json" --arg request "$ad/request.json" \
+        --slurpfile req "$ad/request.json" \
+        '{role,identity,provider,exit,request_sha256,result_sha256,manifest:$manifest,result:$result,
+          display_name:$req[0].display_name,card_id:$req[0].card_id,traits:$req[0].traits,
+          characteristics:$req[0].traits,voice:$req[0].voice}' "$ad/manifest.json")
       produced=$(jq -c --argjson x "$item" '. + [$x]' <<<"$produced")
     fi
   done

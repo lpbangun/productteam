@@ -1,0 +1,19 @@
+{
+  "role": "Analyst",
+  "iter": 1,
+  "provider": "/nonexistent/rehearsal",
+  "identity": "analyst",
+  "requested_at": "2026-08-11T07:40:12Z",
+  "ran_at": "2026-08-11T07:40:12Z",
+  "exit": 127,
+  "request_sha256": "860cfbaf759dfaf62a5139ce52ca1625136e147f3f2121d87275ab4f49734e2b",
+  "result_sha256": "850111153c92963ebe39be4461e2a5dd5bf8f3af2cbef9a7e87ea38bcd1f03cc",
+  "display_name": "Meridian",
+  "card_id": "analyst",
+  "traits": [
+    "evidence-first",
+    "path-citing",
+    "strict-scoring"
+  ],
+  "voice": "Terse, cites paths. Numbers follow evidence."
+}

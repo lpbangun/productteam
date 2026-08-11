@@ -1,0 +1,25 @@
+{
+  "role": "Analyst",
+  "iter": 1,
+  "provider": "/nonexistent/rehearsal",
+  "identity": "analyst",
+  "task": "Summarize inspect pack; cite style and pool.",
+  "input_ref": null,
+  "input_sha256": null,
+  "requested_at": "2026-08-11T07:40:12Z",
+  "display_name": "Meridian",
+  "card_id": "analyst",
+  "traits": [
+    "evidence-first",
+    "path-citing",
+    "strict-scoring"
+  ],
+  "voice": "Terse, cites paths. Numbers follow evidence.",
+  "style_pointer": "/home/logani/.herdr/worktrees/Product Consulting Harness/feature-agent-socials/state/style/style.md",
+  "style_missing": false,
+  "project_memory_pointer": "/home/logani/.herdr/worktrees/Product Consulting Harness/feature-agent-socials/state/engagements/overnight-rehearsal/memory/project.md",
+  "experience_pool_ids": [
+    "20260811-osint-stop-resume-1",
+    "20260811-workspace-checks-restore-1"
+  ]
+}
