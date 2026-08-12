@@ -82,7 +82,7 @@ pool_missing() {
 }
 
 pool_cite_line() { # entry md path → first non-empty cite line or title
-  local path="$1" line title=''
+  local path="$1" line title='' in_cite=''
   [[ -f "$path" ]] || { printf ''; return 0; }
   title=$(sed -n '1s/^# //p' "$path")
   while IFS= read -r line; do
@@ -125,6 +125,10 @@ pool_add() { # --kind --domain --title [--client] [--iter] [--tags] [--body|--bo
     body=$(cat "$body_file")
   fi
   [[ -n "${body//[[:space:]]/}" ]] || { printf 'body required via --body or --body-file\n' >&2; return 1; }
+  if [[ -n "$iter" && ! "$iter" =~ ^[0-9]+$ ]]; then
+    printf 'iter must be a non-negative integer (got: %s)\n' "$iter" >&2
+    return 1
+  fi
 
   local id ts path index tags_json worked failed root readme
   root=$(pool_root)

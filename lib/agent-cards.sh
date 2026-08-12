@@ -190,7 +190,9 @@ agent_card_seed_specialist() { # client_dir [display_name] → paths created
   tpl_md="$(agent_cards_root)/_templates/specialist.md"
   [[ -f "$tpl_json" && -f "$tpl_md" ]] || return 1
   jq --arg name "$name" '.display_name = $name' "$tpl_json" > "$dir/specialist.json"
-  sed "s/^name: Ada$/name: $name/" "$tpl_md" > "$dir/specialist.md"
+  local esc_name
+  esc_name=$(printf '%s' "$name" | sed 's/[&\\|]/\\&/g')
+  sed "s|^name: Ada$|name: $esc_name|; s|^# Ada$|# $esc_name|" "$tpl_md" > "$dir/specialist.md" || return 1
   printf '%s/specialist.json\n' "$dir"
 }
 
