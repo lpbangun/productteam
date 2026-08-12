@@ -1,0 +1,9 @@
+{
+  "contract": "proj-b-v1",
+  "frozen": "20260807T084826Z",
+  "subject": "/home/logani/.herdr/worktrees/Product Consulting Harness/fix-new-user-tui/state/engagements/harness-cli/tmp-projects/proj-b",
+  "target": 8.0,
+  "dimensions": ["correctness","usability","documentation","developer-experience","product-clarity","simplicity"],
+  "source": "BENCHMARK-CONTRACT.md",
+  "skill": "benchmark"
+}

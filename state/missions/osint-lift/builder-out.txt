@@ -1,0 +1,11 @@
+## Builder attestation (iter 1) — report only
+
+All required paths present under workspace cwd; no missing files; no product changes made.
+
+- `loops/__init__.py`, `loops/__main__.py` — package CLI (`python -m loops` / path bootstrap).
+- `loops/main_loop.py` — resume with raised `--max-iterations` continues; else `sys.exit(2)`; writes `termination.json`; dossier confidence section is target-generic/store-derived.
+- `loops/evidence_store.py` — `update()` + `persist()` (durable rewrite of `evidence.jsonl`).
+- `loops/verification_loop.py` — multi-source upgrades call `store.update` then `store.persist()`.
+- `README.md` — Stopping Criteria point at `termination_engine.py` + exit 2 on resume without raised max.
+
+**Cites (shell blocked in this session):** `git status --porcelain` — *not runnable here*; `python3 -m loops.main_loop --help` exit — *not runnable here* (argparse `--help` in `main()` implies expected **0** once shell is available).

@@ -1,0 +1,9 @@
+PASS gate-guided-refuse
+PASS gate-guided-pass
+PASS gate-directive-refuse
+PASS gate-directive-pass
+PASS gate-challenge-refuse
+PASS gate-challenge-alternative
+PASS gate-override-refuse
+PASS gate-override-pass
+gate smoke: all 8 gate paths exercised

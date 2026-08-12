@@ -1,0 +1,1 @@
+PASS bash -n bin/productteam lib/*.sh tests/*.sh

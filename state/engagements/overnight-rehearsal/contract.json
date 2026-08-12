@@ -1,0 +1,25 @@
+{
+  "contract": "overnight-rehearsal-v1",
+  "frozen": "2026-08-11",
+  "scorer": "provider",
+  "client": "overnight-rehearsal",
+  "target": 9.0,
+  "convergence": "every dimension >= 9.0",
+  "max_iterations": 5,
+  "source": "BENCHMARK-CONTRACT.md",
+  "dimensions": [
+    "correctness",
+    "simplicity",
+    "maintainability",
+    "usability",
+    "educational-quality",
+    "developer-experience",
+    "architecture",
+    "documentation",
+    "product-clarity"
+  ],
+  "baseline_rules": {
+    "iter_0": "Before any engagement change.",
+    "immutable": "Never re-scored retroactively."
+  }
+}

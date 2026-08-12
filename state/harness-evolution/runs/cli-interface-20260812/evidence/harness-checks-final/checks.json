@@ -1,0 +1,238 @@
+{
+  "ts": "2026-08-12",
+  "contract": "harness-apc-v1",
+  "suite": "harness-objective",
+  "checks": {
+    "workspace-default-isolated": {
+      "status": "pass",
+      "detail": "real-git-worktree"
+    },
+    "workspace-lifecycle-cli": {
+      "status": "pass",
+      "detail": "real-git-worktree"
+    },
+    "workspace-dirty-refusal": {
+      "status": "pass",
+      "detail": "real-git-worktree"
+    },
+    "workspace-dirty-escape-evidence": {
+      "status": "pass",
+      "detail": "real-git-worktree"
+    },
+    "workspace-safe-remove": {
+      "status": "pass",
+      "detail": "real-git-worktree"
+    },
+    "open-repo-missing": {
+      "status": "pass",
+      "detail": "real-open-baseline"
+    },
+    "open-repo-not-absolute": {
+      "status": "pass",
+      "detail": "real-open-baseline"
+    },
+    "open-cold-stub": {
+      "status": "pass",
+      "detail": "real-open-baseline"
+    },
+    "open-exists": {
+      "status": "pass",
+      "detail": "real-open-baseline"
+    },
+    "baseline-honest-default": {
+      "status": "pass",
+      "detail": "real-open-baseline"
+    },
+    "baseline-exists": {
+      "status": "pass",
+      "detail": "real-open-baseline"
+    },
+    "baseline-provider-requires-analyst": {
+      "status": "pass",
+      "detail": "real-open-baseline"
+    },
+    "gate-guided-refuse": {
+      "status": "pass",
+      "detail": "real-cli-engagement"
+    },
+    "gate-guided-pass": {
+      "status": "pass",
+      "detail": "real-cli-engagement"
+    },
+    "gate-directive-refuse": {
+      "status": "pass",
+      "detail": "real-cli-engagement"
+    },
+    "gate-directive-pass": {
+      "status": "pass",
+      "detail": "real-cli-engagement"
+    },
+    "gate-challenge-refuse": {
+      "status": "pass",
+      "detail": "real-cli-engagement"
+    },
+    "gate-challenge-alternative": {
+      "status": "pass",
+      "detail": "real-cli-engagement"
+    },
+    "gate-override-refuse": {
+      "status": "pass",
+      "detail": "real-cli-engagement"
+    },
+    "gate-override-pass": {
+      "status": "pass",
+      "detail": "real-cli-engagement"
+    },
+    "escalation-block-state": {
+      "status": "pass",
+      "detail": "real-cli-continuation"
+    },
+    "escalation-pauses-progress": {
+      "status": "pass",
+      "detail": "real-cli-continuation"
+    },
+    "escalation-resume-refuse": {
+      "status": "pass",
+      "detail": "real-cli-continuation"
+    },
+    "escalation-resume-authorized": {
+      "status": "pass",
+      "detail": "real-cli-continuation"
+    },
+    "escalation-memory-continuation": {
+      "status": "pass",
+      "detail": "real-cli-continuation"
+    },
+    "inspect-pack-regenerable": {
+      "status": "pass",
+      "detail": "real-cli-continuation"
+    },
+    "inspect-pack-missing-honest": {
+      "status": "pass",
+      "detail": "real-cli-continuation"
+    },
+    "role-invoke-provider-seam": {
+      "status": "pass",
+      "detail": "real-provider-envelope"
+    },
+    "role-builder-seal-refusal": {
+      "status": "pass",
+      "detail": "real-provider-envelope"
+    },
+    "role-builder-seal-mismatch": {
+      "status": "pass",
+      "detail": "real-provider-envelope"
+    },
+    "role-envelope-request-result-manifest": {
+      "status": "pass",
+      "detail": "real-provider-envelope"
+    },
+    "role-score-no-analyst-stamp": {
+      "status": "pass",
+      "detail": "real-provider-envelope"
+    },
+    "role-close-no-critic": {
+      "status": "pass",
+      "detail": "real-provider-envelope"
+    },
+    "role-implementer-evaluator-rejected": {
+      "status": "pass",
+      "detail": "real-provider-envelope"
+    },
+    "role-status-file-derived": {
+      "status": "pass",
+      "detail": "real-provider-envelope"
+    },
+    "help-lists-runtime": {
+      "status": "pass",
+      "detail": "ok"
+    },
+    "smoke-green": {
+      "status": "pass",
+      "detail": "  \u2713 auth: lpbangun"
+    },
+    "status-runs": {
+      "status": "pass",
+      "detail": "ok"
+    },
+    "runtime-detect": {
+      "status": "pass",
+      "detail": "ok"
+    },
+    "runtime-honest-fail": {
+      "status": "pass",
+      "detail": "ok"
+    },
+    "lock-files-present": {
+      "status": "pass",
+      "detail": "ok"
+    },
+    "lock-hashes-stable": {
+      "status": "pass",
+      "detail": "unchanged"
+    },
+    "learning-schema": {
+      "status": "pass",
+      "detail": "ok"
+    },
+    "judgment-examples": {
+      "status": "pass",
+      "detail": "ok"
+    },
+    "harness-engagement-mode": {
+      "status": "pass",
+      "detail": "ok"
+    },
+    "memory-harness-lesson": {
+      "status": "pass",
+      "detail": "ok"
+    },
+    "github-seam": {
+      "status": "pass",
+      "detail": "ok"
+    },
+    "merge-refuses-without-auth": {
+      "status": "pass",
+      "detail": "refused_ok"
+    },
+    "skills-present": {
+      "status": "pass",
+      "detail": "ok"
+    },
+    "skill-critique-runs": {
+      "status": "pass",
+      "detail": "ok"
+    },
+    "skill-benchmark-runs": {
+      "status": "pass",
+      "detail": "ok"
+    },
+    "skill-design-sprint-runs": {
+      "status": "pass",
+      "detail": "ok"
+    },
+    "lessons-closed-iters": {
+      "status": "pass",
+      "detail": "ok"
+    },
+    "phases-artifact": {
+      "status": "pass",
+      "detail": "loop-sequence-only"
+    },
+    "org-self-review-recent": {
+      "status": "pass",
+      "detail": "ok"
+    },
+    "secrets-scan": {
+      "status": "pass",
+      "detail": "clean"
+    },
+    "provider-seam": {
+      "status": "pass",
+      "detail": "ok"
+    }
+  },
+  "passed": 57,
+  "failed": 0,
+  "validation": "real-commands"
+}

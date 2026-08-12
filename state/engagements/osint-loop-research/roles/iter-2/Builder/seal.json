@@ -1,0 +1,9 @@
+{
+  "role": "Builder",
+  "iter": 2,
+  "input_path": "/home/logani/.herdr/worktrees/Product Consulting Harness/test-rapid-basics/state/missions/osint-lift/builder-input-iter-2.txt",
+  "input_sha256": "0bf69dbc51f1aae456b1e9af55e1f78dfb55f4cf9636cdf09dc3498efc16d025",
+  "sealed_by": "principal",
+  "sealed_at": "2026-08-11T05:22:59Z",
+  "write_once": true
+}

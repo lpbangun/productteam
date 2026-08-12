@@ -1,0 +1,10 @@
+Single-turn Builder task for OFC foundation proof (iter 2).
+
+Scope (do exactly this, nothing else):
+1. Work only in the isolated workspace already provided as the cwd/repo for this role.
+2. Do NOT change product vision, add backends/auth/AI, or expand integrations.
+3. Confirm the ofc-v1 client is still operable: note package.json scripts, README clone-run section, and that src/ exists.
+4. Do not modify tracked product files. If you must create anything, write only a short verification note under /tmp or return it in your reply.
+5. Return a concise result with: workspace HEAD (git rev-parse HEAD), whether package.json has build/test scripts, and confirmation that no product files were changed.
+
+This is a foundation-proof iteration: sealed verification, not a product lift.

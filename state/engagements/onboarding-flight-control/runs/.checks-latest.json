@@ -1,5 +1,5 @@
 {
-  "ts": "2026-08-06",
+  "ts": "2026-08-11",
   "client": "onboarding-flight-control",
   "contract": "ofc-v1",
   "checks": {
@@ -93,7 +93,7 @@
     },
     "typescript-build": {
       "status": "pass",
-      "detail": "dist/assets/index-CXfkuQ1D.js   256.17 kB \u2502 gzip: 76.56 kB  \u2713 built in 586ms "
+      "detail": "dist/assets/index-CXfkuQ1D.js   256.17 kB \u2502 gzip: 76.56 kB  \u2713 built in 362ms "
     },
     "test-suite-green": {
       "status": "pass",

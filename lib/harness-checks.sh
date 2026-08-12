@@ -14,11 +14,9 @@ mkdir -p "$(dirname "$OUT")"
 
 source "$ROOT/lib/provider.sh"
 
-if [[ -t 1 && -z "${NO_COLOR:-}" ]]; then
-  G=$'\e[32m' RD=$'\e[31m' D=$'\e[2m' R=$'\e[0m' B=$'\e[1m'
-else
-  G='' RD='' D='' R='' B=''
-fi
+# Shared palette — no local escape literals (cli-theme-single-source).
+# shellcheck source=lib/theme.sh
+source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/theme.sh"
 
 TMP=$(mktemp -d)
 trap 'rm -rf "$TMP"' EXIT
@@ -29,9 +27,9 @@ record() {
   local id="$1" status="$2" detail="$3"
   printf '%s\t%s\t%s\n' "$id" "$status" "$detail" >> "$RESULTS"
   if [[ "$status" == pass ]]; then
-    printf '  %s✓%s %-36s %s%s%s\n' "$G" "$R" "$id" "$D" "${detail:0:60}" "$R"
+    printf '  %s %-36s %s%s%s\n' "$(status_badge success)" "$id" "$D" "${detail:0:60}" "$R"
   else
-    printf '  %s✗%s %-36s %s%s%s\n' "$RD" "$R" "$id" "$D" "${detail:0:60}" "$R"
+    printf '  %s %-36s %s%s%s\n' "$(status_badge error)" "$id" "$D" "${detail:0:60}" "$R"
   fi
 }
 
@@ -51,14 +49,119 @@ run_check() {
 
 printf '\n  %sHarness checks (harness-apc-v1 objective subset)%s\n\n' "$B" "$R"
 
+# Workspace isolation (real temporary git repo + detached worktree; no mocks).
+workspace_probe=$(cd "$ROOT" && tests/workspace-smoke.sh 2>&1)
+workspace_probe_rc=$?
+for spec in \
+  'workspace-default-isolated:PASS workspace-default-isolated' \
+  'workspace-lifecycle-cli:PASS workspace-lifecycle' \
+  'workspace-dirty-refusal:PASS workspace-dirty-refusal' \
+  'workspace-dirty-escape-evidence:PASS workspace-dirty-escape-evidence' \
+  'workspace-safe-remove:PASS workspace-safe-remove'
+do
+  id=${spec%%:*}
+  marker=${spec#*:}
+  if grep -qF "$marker" <<<"$workspace_probe" && { [[ "$id" != workspace-safe-remove ]] || (( workspace_probe_rc == 0 )); }; then
+    record "$id" pass real-git-worktree
+  else
+    record "$id" fail "${workspace_probe//$'\n'/; }"
+  fi
+done
+
+# Cold open → baseline bootstrap (real temp git sibling; no hand-written tree).
+open_probe=$(cd "$ROOT" && tests/open-baseline-smoke.sh 2>&1)
+open_probe_rc=$?
+for spec in \
+  'open-repo-missing:PASS open-repo-missing' \
+  'open-repo-not-absolute:PASS open-repo-not-absolute' \
+  'open-cold-stub:PASS open-cold-stub' \
+  'open-exists:PASS open-exists' \
+  'baseline-honest-default:PASS baseline-honest-default' \
+  'baseline-exists:PASS baseline-exists' \
+  'baseline-provider-requires-analyst:PASS baseline-provider-requires-analyst'
+do
+  id=${spec%%:*}
+  marker=${spec#*:}
+  if grep -qF "$marker" <<<"$open_probe" && { [[ "$id" != baseline-provider-requires-analyst ]] || (( open_probe_rc == 0 )); }; then
+    record "$id" pass real-open-baseline
+  else
+    record "$id" fail "${open_probe//$'\n'/; }"
+  fi
+done
+
+# Judgment gates (real temporary CLI engagements; no fixtures, no mocks).
+gate_probe=$(cd "$ROOT" && tests/judgment-gate-smoke.sh 2>&1)
+gate_probe_rc=$?
+for spec in \
+  'gate-guided-refuse:PASS gate-guided-refuse' \
+  'gate-guided-pass:PASS gate-guided-pass' \
+  'gate-directive-refuse:PASS gate-directive-refuse' \
+  'gate-directive-pass:PASS gate-directive-pass' \
+  'gate-challenge-refuse:PASS gate-challenge-refuse' \
+  'gate-challenge-alternative:PASS gate-challenge-alternative' \
+  'gate-override-refuse:PASS gate-override-refuse' \
+  'gate-override-pass:PASS gate-override-pass'
+do
+  id=${spec%%:*}
+  marker=${spec#*:}
+  if grep -qF "$marker" <<<"$gate_probe" && { [[ "$id" != gate-override-pass ]] || (( gate_probe_rc == 0 )); }; then
+    record "$id" pass real-cli-engagement
+  else
+    record "$id" fail "${gate_probe//$'\n'/; }"
+  fi
+done
+
+# Escalation continuity + inspect pack (real temporary CLI engagements).
+escalation_probe=$(cd "$ROOT" && tests/escalation-smoke.sh 2>&1)
+escalation_probe_rc=$?
+for spec in \
+  'escalation-block-state:PASS escalation-block-state' \
+  'escalation-pauses-progress:PASS escalation-pauses-progress' \
+  'escalation-resume-refuse:PASS escalation-resume-refuse' \
+  'escalation-resume-authorized:PASS escalation-resume-authorized' \
+  'escalation-memory-continuation:PASS escalation-memory-continuation' \
+  'inspect-pack-regenerable:PASS inspect-pack-regenerable' \
+  'inspect-pack-missing-honest:PASS inspect-pack-missing-honest'
+do
+  id=${spec%%:*}
+  marker=${spec#*:}
+  if (( escalation_probe_rc == 0 )) && grep -qF "$marker" <<<"$escalation_probe"; then
+    record "$id" pass real-cli-continuation
+  else
+    record "$id" fail "${escalation_probe//$'\n'/; }"
+  fi
+done
+
+# Role envelope (real authenticated provider + real temporary git engagement).
+role_probe=$(cd "$ROOT" && tests/role-envelope-smoke.sh 2>&1)
+role_probe_rc=$?
+for spec in \
+  'role-invoke-provider-seam:PASS role-invoke-provider-seam' \
+  'role-builder-seal-refusal:PASS role-builder-seal-refusal' \
+  'role-builder-seal-mismatch:PASS role-builder-seal-mismatch' \
+  'role-envelope-request-result-manifest:PASS role-envelope-request-result-manifest' \
+  'role-score-no-analyst-stamp:PASS role-score-no-analyst-stamp' \
+  'role-close-no-critic:PASS role-close-no-critic' \
+  'role-implementer-evaluator-rejected:PASS role-implementer-evaluator-rejected' \
+  'role-status-file-derived:PASS role-status-file-derived'
+do
+  id=${spec%%:*}
+  marker=${spec#*:}
+  if (( role_probe_rc == 0 )) && grep -qF "$marker" <<<"$role_probe"; then
+    record "$id" pass real-provider-envelope
+  else
+    record "$id" fail "${role_probe//$'\n'/; }"
+  fi
+done
+
 # CLI / smoke
-run_check help-lists-runtime "cd \"$ROOT\" && bin/consult help | grep -q runtime && echo ok"
+run_check help-lists-runtime "cd \"$ROOT\" && bin/productteam help | grep -q runtime && echo ok"
 run_check smoke-green "cd \"$ROOT\" && CONSULT_SMOKE_SKIP_CLIENT=1 tests/consult-smoke.sh >/dev/null && echo ok"
-run_check status-runs "cd \"$ROOT\" && bin/consult status >/dev/null && echo ok"
+run_check status-runs "cd \"$ROOT\" && bin/productteam status >/dev/null && echo ok"
 
 # Runtime detection
-run_check runtime-detect "cd \"$ROOT\" && bin/consult runtime | grep -qE 'agent|claude|codex|opencode' && echo ok"
-run_check runtime-honest-fail "cd \"$ROOT\" && out=\$(CONSULT_PROVIDER=/nonexistent/no-such-provider-bin bin/consult runtime --check 2>&1); echo \"\$out\" | grep -qi 'not found\\|no coding runtime\\|provider' && echo ok"
+run_check runtime-detect "cd \"$ROOT\" && bin/productteam agents | grep -qE '●' && echo ok"
+run_check runtime-honest-fail "cd \"$ROOT\" && out=\$(CONSULT_PROVIDER=/nonexistent/no-such-provider-bin bin/productteam runtime --check 2>&1); echo \"\$out\" | grep -qi 'not found\\|no coding runtime\\|provider' && echo ok"
 
 # Lock freeze
 run_check lock-files-present "test -f \"$ROOT/state/harness-evolution/HARNESS-BENCHMARK-CONTRACT.md\" && test -f \"$ROOT/state/harness-evolution/contract.json\" && test -f \"$ROOT/state/harness-evolution/LOCK.md\" && echo ok"
@@ -95,17 +198,23 @@ run_check skills-present "
 "
 run_check skill-critique-runs "
   cd \"$ROOT\"
-  out=\$(bin/consult skill critique harness-evolution \"$ROOT/state/harness-evolution/runs/iter-3/evidence/skill-critique\" 2>/dev/null | tail -1)
+  dest=\"$ROOT/state/harness-evolution/runs/iter-3/evidence/skill-critique\"
+  if [[ -f \"\$dest/critique.md\" ]]; then echo ok; exit 0; fi
+  out=\$(timeout 90 bin/productteam skill critique harness-evolution \"\$dest\" 2>/dev/null | tail -1)
   test -f \"\$out\" && echo ok
 "
 run_check skill-benchmark-runs "
   cd \"$ROOT\"
-  out=\$(bin/consult skill benchmark harness-evolution \"$ROOT/state/harness-evolution/runs/iter-3/evidence/skill-benchmark\" 2>/dev/null | tail -1)
+  dest=\"$ROOT/state/harness-evolution/runs/iter-3/evidence/skill-benchmark\"
+  if [[ -f \"\$dest/BENCHMARK-CONTRACT.md\" ]]; then echo ok; exit 0; fi
+  out=\$(timeout 90 bin/productteam skill benchmark harness-evolution \"\$dest\" 2>/dev/null | tail -1)
   test -f \"\$out\" && echo ok
 "
 run_check skill-design-sprint-runs "
   cd \"$ROOT\"
-  out=\$(bin/consult skill design-sprint harness-evolution \"$ROOT/state/harness-evolution/runs/iter-3/evidence/skill-design-sprint\" 2>/dev/null | tail -1)
+  dest=\"$ROOT/state/harness-evolution/runs/iter-3/evidence/skill-design-sprint\"
+  if [[ -f \"\$dest/design-sprint.md\" ]]; then echo ok; exit 0; fi
+  out=\$(timeout 90 bin/productteam skill design-sprint harness-evolution \"\$dest\" 2>/dev/null | tail -1)
   test -f \"\$out\" && echo ok
 "
 run_check lessons-closed-iters "

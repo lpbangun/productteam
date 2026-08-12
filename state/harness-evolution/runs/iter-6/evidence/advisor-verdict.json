@@ -1,0 +1,96 @@
+{
+  "verdict": "PASS",
+  "build": 1,
+  "scope": "Build 1 — workspace isolation for score/check/build paths (iter-6)",
+  "audited_head": "1f6f17e3ca5bdd4f9b4900df31251549009bb315",
+  "audited_tree": "upgrade-basic-funcionalities",
+  "audited": "2026-08-10T06:13:00Z",
+  "suite_exits": {
+    "smoke": {
+      "command": "bin/consult smoke",
+      "exit": 0,
+      "transcript": "state/harness-evolution/runs/iter-6/evidence/acceptance-smoke.txt",
+      "client_check_path": "real, not skipped — CONSULT_SMOKE_SKIP_CLIENT unset",
+      "client_check_evidence": "state/engagements/onboarding-flight-control/runs/check-20260810T061017889894029/workspace.json",
+      "result": "all smoke checks passed"
+    },
+    "harness_checks": {
+      "command": "bin/consult harness-checks state/harness-evolution/runs/iter-6",
+      "exit": 0,
+      "transcript": "state/harness-evolution/runs/iter-6/evidence/acceptance-harness-checks.txt",
+      "result": "27 passed · 0 failed",
+      "result_json": "state/harness-evolution/runs/iter-6/checks.json"
+    }
+  },
+  "pointers": {
+    "p1_default_isolated_workspace": {
+      "status": "PASS",
+      "checks": {
+        "c1.1_discoverable": "PASS — `bin/consult help | grep -qi workspace` matched (help lists workspace verb)",
+        "c1.2_ensure_status": "PASS — `bin/consult workspace onboarding-flight-control ensure` created metadata + detached real worktree at tmp/workspaces/onboarding-flight-control; `status` JSON: exists=true, path=/home/logani/.herdr/worktrees/Product Consulting Harness/upgrade-basic-funcionalities/tmp/workspaces/onboarding-flight-control, source_repo=/home/logani/projects/onboarding-flight-control, sha=6a8db8e260a38851f62ec92bcd681d2010a0e75a (a real Git commit, detached HEAD, registered in source `git worktree list`), dirty=false. Path is distinct from live Repo; live ofc tree is itself dirty (M tsconfig.tsbuildinfo) yet resolved workspace is clean — proving the run never used the live tree.",
+        "c1.3_no_live_fallback": "PASS — static audit of the only two scoring/checking call sites (bin/consult:326, bin/consult:473) shows `repo` is always derived from the workspace_ensure snapshot (`jq -r '.path' <<<\"$snapshot\"`), never from the live Repo; no fallback branch exists. Runtime proof: clean resolved workspace (dirty=false) while live ofc tree was dirty."
+      },
+      "evidence": [
+        "state/engagements/onboarding-flight-control/workspace.json",
+        "state/engagements/onboarding-flight-control/runs/check-20260810T061017889894029/workspace.json"
+      ]
+    },
+    "p2_lifecycle_cli": {
+      "status": "PASS",
+      "checks": {
+        "c2.1_discoverable": "PASS — `bin/consult help | grep -q 'workspace <client> ensure|status|remove'` matched",
+        "c2.2_mutates_and_reports": "PASS — ensure created worktree + metadata (lib/workspace.sh:54-95, dispatch bin/consult:96-118/563-567); status emits live machine-readable JSON (verified, see p1 evidence); remove removes clean worktree + metadata (lib/workspace.sh:97-116; exercised with exit 0 by tests/workspace-smoke.sh 'PASS workspace-safe-remove' inside both suites). Metadata persists source_repo/path/sha/dirty/created_at and a later session (this audit, next day) inspected and continued it."
+      },
+      "evidence": [
+        "state/engagements/onboarding-flight-control/workspace.json",
+        "evidence/acceptance-harness-checks.txt (workspace-lifecycle-cli real-git-worktree)",
+        "evidence/acceptance-smoke.txt (workspace isolation real-worktree refuse/pass)"
+      ]
+    },
+    "p3_per_score_check_evidence": {
+      "status": "PASS",
+      "checks": {
+        "c3.1_checks_evidence": "PASS — `bin/consult checks onboarding-flight-control` (real, unskipped) wrote unique run dir runs/check-20260810T061017889894029/ with workspace.json containing path (resolved worktree), sha (6a8db8e…), dirty=false, plus operation=checks and recorded_at (bin/consult:325-330).",
+        "c3.2_provider_evidence": "PASS by static audit — `cmd_bench_run` (bin/consult:463-479) writes the same snapshot fields to runs/iter-N/workspace.json with operation=score (bin/consult:479) before any provider invocation, in the same directory as scores.json. Provider scoring was NOT invoked to test this (see limit below)."
+      },
+      "evidence": [
+        "state/engagements/onboarding-flight-control/runs/check-20260810T061017889894029/workspace.json"
+      ],
+      "limit": "Provider score path (C3.2) audited statically only; provider scoring was not invoked (per assignment: no provider invocation merely to test routing)."
+    },
+    "p4_named_dirty_refusal_escape": {
+      "status": "PASS",
+      "checks": {
+        "c4.1_dirty_reuse_refuses_named": "PASS — with scratch.txt in the resolved worktree: `bin/consult workspace onboarding-flight-control ensure` exited 2 with 'workspace-dirty: onboarding-flight-control (<path>); retry with --allow-dirty' and `bin/consult checks onboarding-flight-control` exited 2 with the same named refusal. Both name the client workspace. Automated probe: workspace-dirty-refusal (real-git-worktree) in harness-checks; workspace smoke run in consult smoke.",
+        "c4.2_explicit_reason_escape_archived": "PASS — `bin/consult checks onboarding-flight-control --allow-dirty 'audit requested'` exited 0 and archived runs/check-20260810T061159572636558/workspace.json with dirty=true and allow_dirty_reason='audit requested' (operation=checks).",
+        "c4.3_remove_refuses_dirty": "PASS — `bin/consult workspace onboarding-flight-control remove` on the dirty worktree exited 2 with 'workspace-dirty: onboarding-flight-control (<path>); remove refused'. Automated probe: workspace-safe-remove (real-git-worktree)."
+      },
+      "evidence": [
+        "state/engagements/onboarding-flight-control/runs/check-20260810T061159572636558/workspace.json",
+        "evidence/acceptance-harness-checks.txt (workspace-dirty-refusal, workspace-dirty-escape-evidence, workspace-safe-remove)"
+      ],
+      "note": "The C4.2 probe run's client suite reported 22 passed · 18 failed because the deliberately added scratch.txt broke ofc build/test and client-side content checks (build-green/test-suite-green etc.). That is the expected effect of scoring a deliberately dirtied worktree and is not a defect in Build 1; the acceptance contract for C4.2 is the command's exit 0 and the archived dirty=true + allow_dirty_reason, both satisfied. All probe artifacts (scratch.txt) were removed afterwards; the resolved workspace was restored to clean (status --porcelain empty)."
+    },
+    "p5_automated_refusal_pass_documentation": {
+      "status": "PASS",
+      "checks": {
+        "c5.1_harness_checks": "PASS — `bin/consult harness-checks state/harness-evolution/runs/iter-6` exit 0, 27 passed · 0 failed, including five real-worktree workspace checks (workspace-default-isolated, workspace-lifecycle-cli, workspace-dirty-refusal, workspace-dirty-escape-evidence, workspace-safe-remove), each driven by tests/workspace-smoke.sh against a real temporary git repo + detached worktree (no mocks).",
+        "c5.2_docs": "PASS — grep -ic workspace: README.md=11 (lines 14, 39-52: lifecycle verbs, dirty refusal, --allow-dirty escape, per-run workspace.json, CONSULT_WORKSPACE_ROOT), ARCHITECTURE.md=9 (lines 27, 39-40, 60-69: workspace.json schema, plain-file seam, all scoring paths cross lib/workspace.sh)."
+      },
+      "evidence": [
+        "state/harness-evolution/runs/iter-6/checks.json",
+        "evidence/acceptance-harness-checks.txt",
+        "tests/workspace-smoke.sh"
+      ]
+    }
+  },
+  "frozen_guard": "PASS — `git status --short state/harness-evolution/` shows only the pre-existing iter-3 regenerated skill scaffolds (modified before this audit, restored-to-committed per baseline-notes) and untracked runs/iter-6/. No frozen file (HARNESS-BENCHMARK-CONTRACT.md, contract.json, LOCK.md, FREEZE.md, FREEZE-SHA.txt, engagement.md, LOOP-SEQUENCE.md, authorize-merge, iter-0..2/4..5) is modified.",
+  "overall": "PASS — all five pointers PASS",
+  "limits": [
+    "Provider score path (C3.2) was audited statically (bin/consult:463-479) and NOT exercised: provider scoring was never invoked merely to test routing, per assignment. The assignment's static-audit instruction for that single path was followed.",
+    "The dirty-escape probe (C4.2) was exercised against the real onboarding-flight-control workspace with the benchmark's exact command `bin/consult checks <client> --allow-dirty 'audit requested'`; the client suite it ran reported 22/18 because the deliberate probe file broke ofc build/tests — accepted as expected collateral, see p4 note.",
+    "C2.2 remove was exercised with exit 0 only via the automated real-worktree probe (tests/workspace-smoke.sh, PASS workspace-safe-remove); a manual remove of the real ofc workspace was not performed (would have destroyed the reusable worktree).",
+    "No product code or documentation was edited; no formatters, linters, or unrelated suites were run."
+  ],
+  "preserved": "Existing Build 1 evidence (evidence/smoke.txt, evidence/harness-checks.txt, checks.json, evidence/baseline-notes.md) was preserved untouched; only additive acceptance-*.txt transcripts and this verdict were written."
+}

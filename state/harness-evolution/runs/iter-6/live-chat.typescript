@@ -1,0 +1,30 @@
+Script started on 2026-08-10 07:34:50+02:00 [COMMAND="env CONSULT_PROVIDER=agent bin/productteam chat" <not executed on terminal>]
+Reply with a heading named Live, a bold Verdict PASS line, and a fenced code block containing echo ok.
+/exit
+
+  ProductTeam
+
+   ▄██▄═════▄██▄═════▄██▄    Getting started
+  █ ██ █   █ ██ █   █ ██ █   linked agents · one team
+  █▄▄▄▄█═══█▄▄▄▄█═══█▄▄▄▄█   ──────────────
+   ▐▌▐▌     ▐▌▐▌     ▐▌▐▌    /agents  /score  /skill
+
+  provider:agent · /help · ctrl+d exit
+
+  engagement: — · mode: — · provider: agent · last-iter: — · overall: —
+  ◆ Principal › <S line, and a fenced code block containing echo ok.
+  …
+  ⠋ Reply with a heading named Live, a bold Verdict… · agent · 0s  ⠙ Reply with a heading named Live, a bold Verdict… · agent · 1s  ⠹ Reply with a heading named Live, a bold Verdict… · agent · 1s  ⠸ Reply with a heading named Live, a bold Verdict… · agent · 1s  ⠼ Reply with a heading named Live, a bold Verdict… · agent · 1s  ⠴ Reply with a heading named Live, a bold Verdict… · agent · 1s  ⠦ Reply with a heading named Live, a bold Verdict… · agent · 1s  ⠧ Reply with a heading named Live, a bold Verdict… · agent · 2s  ⠇ Reply with a heading named Live, a bold Verdict… · agent · 2s  ⠏ Reply with a heading named Live, a bold Verdict… · agent · 2s  ⠋ Reply with a heading named Live, a bold Verdict… · agent · 2s  ⠙ Reply with a heading named Live, a bold Verdict… · agent · 2s  ⠹ Reply with a heading named Live, a bold Verdict… · agent · 2s  ⠸ Reply with a heading named Live, a bold Verdict… · agent · 3s  ⠼ Reply with a heading named Live, a bold Verdict… · agent · 3s  ⠴ Reply with a heading named Live, a bold Verdict… · agent · 3s  ⠦ Reply with a heading named Live, a bold Verdict… · agent · 3s  ⠧ Reply with a heading named Live, a bold Verdict… · agent · 3s  ⠇ Reply with a heading named Live, a bold Verdict… · agent · 4s  ⠏ Reply with a heading named Live, a bold Verdict… · agent · 4s  ⠋ Reply with a heading named Live, a bold Verdict… · agent · 4s  ⠙ Reply with a heading named Live, a bold Verdict… · agent · 4s  ⠹ Reply with a heading named Live, a bold Verdict… · agent · 4s  ⠸ Reply with a heading named Live, a bold Verdict… · agent · 4s  ⠼ Reply with a heading named Live, a bold Verdict… · agent · 5s  ⠴ Reply with a heading named Live, a bold Verdict… · agent · 5s  ⠦ Reply with a heading named Live, a bold Verdict… · agent · 5s  ⠧ Reply with a heading named Live, a bold Verdict… · agent · 5s  ⠇ Reply with a heading named Live, a bold Verdict… · agent · 5s  ⠏ Reply with a heading named Live, a bold Verdict… · agent · 5s  ⠋ Reply with a heading named Live, a bold Verdict… · agent · 6s  ⠙ Reply with a heading named Live, a bold Verdict… · agent · 6s  ⠹ Reply with a heading named Live, a bold Verdict… · agent · 6s  ⠸ Reply with a heading named Live, a bold Verdict… · agent · 6s  ⠼ Reply with a heading named Live, a bold Verdict… · agent · 6s  ⠴ Reply with a heading named Live, a bold Verdict… · agent · 7s  ⠦ Reply with a heading named Live, a bold Verdict… · agent · 7s  ⠧ Reply with a heading named Live, a bold Verdict… · agent · 7s  ⠇ Reply with a heading named Live, a bold Verdict… · agent · 7s  ⠏ Reply with a heading named Live, a bold Verdict… · agent · 7s  ⠋ Reply with a heading named Live, a bold Verdict… · agent · 7s  ⠙ Reply with a heading named Live, a bold Verdict… · agent · 8s  ⠹ Reply with a heading named Live, a bold Verdict… · agent · 8s  ⠸ Reply with a heading named Live, a bold Verdict… · agent · 8s                                                                   ✓ done 1   ◇ Analyst · Reply with a heading named Live, a bold Verdict PASS li…
+  agent · 8s · 1.txt
+  ✓ done ◇ Analyst · 8s · 1.txt
+  ## Live
+  
+  **Verdict PASS**
+  
+  ```
+  echo ok
+  ```
+  engagement: — · mode: — · provider: agent · last-iter: — · overall: —
+  ◆ Principal › /exit
+
+Script done on 2026-08-10 07:34:58+02:00 [COMMAND_EXIT_CODE="0"]

@@ -1,0 +1,11 @@
+## Builder result — OFC foundation proof (iter 2)
+
+**HEAD:** `6a8db8e260a38851f62ec92bcd681d2010a0e75a`
+
+**Operability check**
+- `package.json` scripts: `dev`, `build` (`tsc -b && vite build`), `preview`, `test` (`vitest run`) — **build and test present**
+- README **Clone and run**: `git clone` → `npm ci` → `npm run dev` (plus build/test/preview)
+- `src/` present (`App.tsx`, `domain.ts`, components, tests)
+
+**Product files changed:** none
+/home/logani/.herdr/worktrees/Product Consulting Harness/test-rapid-basics/bin/productteam: line 931: unexpected EOF while looking for matching `"'

@@ -1,0 +1,10 @@
+Single-turn Builder attestation for osint-loop-research iter 1 (already implemented in isolated workspace).
+
+Report only (do not re-implement): confirm these files exist/changed under the workspace cwd and summarize in ≤12 lines:
+- loops/__init__.py, loops/__main__.py (package CLI)
+- loops/main_loop.py (resume exit 2 / raised max continue; termination.json; target-generic dossier)
+- loops/evidence_store.py (update/persist)
+- loops/verification_loop.py (durable upgrades)
+- README.md stop criteria aligned to termination_engine
+
+Cite `git status --porcelain` and `python3 -m loops.main_loop --help` exit. No ethics/contact-hunting work. No further product changes unless a file is missing.

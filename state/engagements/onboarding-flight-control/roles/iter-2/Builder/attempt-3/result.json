@@ -1,0 +1,11 @@
+{
+  "role": "Builder",
+  "iter": 2,
+  "provider": "agent",
+  "identity": "builder",
+  "exit": 0,
+  "ran_at": "2026-08-11T04:12:47Z",
+  "refusal_reason": null,
+  "output": "## Builder result — OFC foundation proof (iter 2)\n\n**HEAD:** `6a8db8e260a38851f62ec92bcd681d2010a0e75a`\n\n**Operability check**\n- `package.json` scripts: `dev`, `build` (`tsc -b && vite build`), `preview`, `test` (`vitest run`) — **build and test present**\n- README **Clone and run**: `git clone` → `npm ci` → `npm run dev` (plus build/test/preview)\n- `src/` present (`App.tsx`, `domain.ts`, components, tests)\n\n**Product files changed:** none",
+  "output_sha256": "ca80219e0306b675ae9fb9833216be26d13b15d0d08476fa2459b16efbddc188"
+}

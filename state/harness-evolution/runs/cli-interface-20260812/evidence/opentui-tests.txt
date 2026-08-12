@@ -1,0 +1,200 @@
+
+> opentui-spike@0.1.0 test
+> node --test test/adapter.test.js test/model.test.js test/palette.test.js test/snapshot.test.js
+
+TAP version 13
+# Subtest: findRepoRoot locates bin/productteam above the prototype
+ok 1 - findRepoRoot locates bin/productteam above the prototype
+  ---
+  duration_ms: 1.603051
+  type: 'test'
+  ...
+# Subtest: loadScreenData consumes live CLI JSON with the frozen contract shapes
+ok 2 - loadScreenData consumes live CLI JSON with the frozen contract shapes
+  ---
+  duration_ms: 2768.599114
+  type: 'test'
+  ...
+# Subtest: loadInspect reads a real inspect-pack.json (onboarding-flight-control)
+ok 3 - loadInspect reads a real inspect-pack.json (onboarding-flight-control)
+  ---
+  duration_ms: 4.665499
+  type: 'test'
+  ...
+# Subtest: loadInspect reports explicit missing for an unknown client
+ok 4 - loadInspect reports explicit missing for an unknown client
+  ---
+  duration_ms: 1.650913
+  type: 'test'
+  ...
+# Subtest: loadActivity reads real sessions or reports explicit empty
+ok 5 - loadActivity reads real sessions or reports explicit empty
+  ---
+  duration_ms: 9.005147
+  type: 'test'
+  ...
+# Subtest: spawnJson never uses a shell and reports failures honestly
+ok 6 - spawnJson never uses a shell and reports failures honestly
+  ---
+  duration_ms: 61.590292
+  type: 'test'
+  ...
+# Subtest: non-TTY without --snapshot refuses honestly (exit 1, remedy on stderr)
+ok 7 - non-TTY without --snapshot refuses honestly (exit 1, remedy on stderr)
+  ---
+  duration_ms: 54.144112
+  type: 'test'
+  ...
+# Subtest: non-TTY with --snapshot renders a deterministic screen, NO_COLOR => zero ESC
+ok 8 - non-TTY with --snapshot renders a deterministic screen, NO_COLOR => zero ESC
+  ---
+  duration_ms: 3068.16461
+  type: 'test'
+  ...
+# Subtest: displayState maps canonical states and preserves unknown
+ok 9 - displayState maps canonical states and preserves unknown
+  ---
+  duration_ms: 1.046644
+  type: 'test'
+  ...
+# Subtest: parseActivityTsv reads header + rows and pads short rows
+ok 10 - parseActivityTsv reads header + rows and pads short rows
+  ---
+  duration_ms: 2.699231
+  type: 'test'
+  ...
+# Subtest: parseActivityTsv handles empty and header-only files
+ok 11 - parseActivityTsv handles empty and header-only files
+  ---
+  duration_ms: 0.37878
+  type: 'test'
+  ...
+# Subtest: normalizeActivity tags sessions and reports explicit empty
+ok 12 - normalizeActivity tags sessions and reports explicit empty
+  ---
+  duration_ms: 0.358349
+  type: 'test'
+  ...
+# Subtest: normalizeEngagements maps status --json shape and degrades
+ok 13 - normalizeEngagements maps status --json shape and degrades
+  ---
+  duration_ms: 0.294484
+  type: 'test'
+  ...
+# Subtest: normalizeRegistry keeps the frozen contract fields
+ok 14 - normalizeRegistry keeps the frozen contract fields
+  ---
+  duration_ms: 0.31859
+  type: 'test'
+  ...
+# Subtest: normalizeProviders counts found vs missing
+ok 15 - normalizeProviders counts found vs missing
+  ---
+  duration_ms: 0.211317
+  type: 'test'
+  ...
+# Subtest: normalizeInspect derives evidence with explicit missing sections
+ok 16 - normalizeInspect derives evidence with explicit missing sections
+  ---
+  duration_ms: 0.273642
+  type: 'test'
+  ...
+# Subtest: empty query returns the full registry in registry order
+ok 17 - empty query returns the full registry in registry order
+  ---
+  duration_ms: 1.756392
+  type: 'test'
+  ...
+# Subtest: query filters by name and by usage, case-insensitively
+ok 18 - query filters by name and by usage, case-insensitively
+  ---
+  duration_ms: 1.918706
+  type: 'test'
+  ...
+# Subtest: no match and unavailable registry are explicit
+ok 19 - no match and unavailable registry are explicit
+  ---
+  duration_ms: 0.33878
+  type: 'test'
+  ...
+# Subtest: filtering never mutates the registry (frozen input)
+ok 20 - filtering never mutates the registry (frozen input)
+  ---
+  duration_ms: 0.23254
+  type: 'test'
+  ...
+# Subtest: commandDetail explains classification and never offers dispatch
+ok 21 - commandDetail explains classification and never offers dispatch
+  ---
+  duration_ms: 0.474824
+  type: 'test'
+  ...
+# Subtest: width utilities: CJK wide, combining zero, ellipsis truncation
+ok 22 - width utilities: CJK wide, combining zero, ellipsis truncation
+  ---
+  duration_ms: 1.855291
+  type: 'test'
+  ...
+# Subtest: wrap handles CJK hard breaks and word wrapping
+ok 23 - wrap handles CJK hard breaks and word wrapping
+  ---
+  duration_ms: 1.525825
+  type: 'test'
+  ...
+# Subtest: narrow widths 40 and 20: every row is exactly the target width
+ok 24 - narrow widths 40 and 20: every row is exactly the target width
+  ---
+  duration_ms: 11.442364
+  type: 'test'
+  ...
+# Subtest: unicode content wraps without exceeding narrow width
+ok 25 - unicode content wraps without exceeding narrow width
+  ---
+  duration_ms: 2.201622
+  type: 'test'
+  ...
+# Subtest: all six provider states render with distinct markers
+ok 26 - all six provider states render with distinct markers
+  ---
+  duration_ms: 1.250331
+  type: 'test'
+  ...
+# Subtest: state markers are the canonical STATE_ICON set
+ok 27 - state markers are the canonical STATE_ICON set
+  ---
+  duration_ms: 0.408305
+  type: 'test'
+  ...
+# Subtest: color disabled => zero ESC bytes; color enabled => ESC present
+ok 28 - color disabled => zero ESC bytes; color enabled => ESC present
+  ---
+  duration_ms: 1.956374
+  type: 'test'
+  ...
+# Subtest: explicit missing states: header, evidence, activity
+ok 29 - explicit missing states: header, evidence, activity
+  ---
+  duration_ms: 0.465861
+  type: 'test'
+  ...
+# Subtest: determinism: identical input renders byte-identical output
+ok 30 - determinism: identical input renders byte-identical output
+  ---
+  duration_ms: 1.027125
+  type: 'test'
+  ...
+# Subtest: palette filter query appears in the snapshot and filters matches
+ok 31 - palette filter query appears in the snapshot and filters matches
+  ---
+  duration_ms: 1.103
+  type: 'test'
+  ...
+1..31
+# tests 31
+# suites 0
+# pass 31
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 6060.822915

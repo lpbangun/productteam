@@ -1,0 +1,114 @@
+{
+  "artifact": "build-3-advisor-verdict.json",
+  "scope": "Build 3 — durable escalations, pause/authorized resume, file-derived inspect (mission-benchmark.md §7)",
+  "verdict": "PASS",
+  "verdict_rule": "5 pointers × their checks, all PASS → Build 3 PASS (mission-benchmark.md §7.4 Final verdict)",
+  "audited_by": "Independent Advisor (Build3Acceptance) — independent of Builder",
+  "audited_at": "2026-08-10",
+  "head": "1f6f17e",
+  "tree": "upgrade-basic-funcionalities",
+  "pointer_results": {
+    "1_engagement_escalation_state": {
+      "result": "PASS",
+      "evidence": [
+        "B3.1.1: tests/escalation-smoke.sh blocks a real temporary engagement: `consult escalation <client> block owner-1 'Owner must choose deployment policy' 'keep local only' 'allow gated remote'` → escalations.json written with 1 entry, status=blocked, 2 non-empty options, non-empty resume_token (jq assertions in smoke); marker 'PASS escalation-block-state' (evidence/acceptance-build-3-escalation-smoke.txt)",
+        "B3.1.2: `bin/consult escalation <client> status` on a real engagement exits 0 and emits machine JSON {client, paused, open, resolved, missing, escalations_artifact, pause_artifact} — blocked/resolved state, options, and token are durable and machine readable",
+        "B3.1.3: `consult escalation onboarding-flight-control status` (no escalation state) is a valid exit-0 payload with missing=true, paused=false, open=[] — missing inputs explicit, never invented"
+      ]
+    },
+    "2_inspectable_pause": {
+      "result": "PASS",
+      "evidence": [
+        "B3.2.1: block also writes pause.json {paused:true, status:'paused', id, reason, resume_token, paused_at, escalated:true}; smoke asserts `.paused == true and .status == \"paused\" and .id == \"owner-1\"` (marker 'PASS escalation-block-state')",
+        "B3.2.2: one shared predicate (progress_blocked_reason in lib/engagement-state.sh) blocks all three progress paths — real CLI probe on a fresh temporary engagement while paused: `gate implement` exit 1, `bench run` (provider score path) exit 1, `checks` exit 1 — each names the blocking artifacts ('open escalation … in …/escalations.json; paused (…/pause.json)')",
+        "B3.2.3: smoke marker 'PASS escalation-pauses-progress' — implement refuses with 'progress blocked for <client>' and checks refuses naming owner-1/pause.json; `inspect` remains read-only allowed while paused"
+      ]
+    },
+    "3_authorized_resume_and_memory": {
+      "result": "PASS",
+      "evidence": [
+        "B3.3.1: resume without authorization file refuses (exit non-zero, 'missing authorization file'); wrong-token authorize-resume.json refuses ('do not exactly match'); both smoke markers 'PASS escalation-resume-refuse'",
+        "B3.3.2: exact-match owner authorize-resume.json {id, token, authorized_by:'owner', decision:'keep local only'} → resume exit 0; smoke jq asserts escalation entry status=resolved with resolved_at, pause.json {paused:false, status:'resumed', resumed_at}, authorize-resume.json {status:'consumed', consumed_at}, continuation.json {event:'resumed', escalation_resolved:true, pause_resumed:true, auth_consumed:true}; marker 'PASS escalation-resume-authorized'",
+        "B3.3.3: consumed authorization cannot resume again ('authorization already consumed'); MEMORY continuation pointer appended under ## Lessons via CONSULT_MEMORY_FILE override ('<client> authorized resume — escalation owner-1 resolved…'); marker 'PASS escalation-memory-continuation'; implement passes after resume (marker 'PASS inspect-pack-regenerable' step)"
+      ]
+    },
+    "4_file_derived_inspect_pack": {
+      "result": "PASS",
+      "evidence": [
+        "B3.4.1: `bin/consult inspect harness-evolution` (worktree path contains spaces: '…/Product Consulting Harness/upgrade-basic-funcionalities/…') regenerates state/harness-evolution/inspect-pack.json from files only: mode {value:Directive, source:…/engagement.md}, gate status derived from judgment/directive.json (allowed=true, bound_direction, artifact, artifact_ts, required/present), scores {missing:false, latest_run:…/runs/iter-5, latest_overall:8.4, history:6 runs all resolving to real iter-0..5 scores.json}, history from history.jsonl (6 entries), escalations/pause/continuation explicit missing:true with missing list, lessons {pointer:…/runs/iter-6/lessons.md, missing:false}, next_suggested_action derived from file state (evidence/acceptance-build-3-inspect.txt + live pack jq)",
+        "B3.4.2: regenerability — two consecutive `consult inspect harness-evolution` runs produce byte-identical pack (cmp empty) and inspect-pack-regenerable asserts .pause/.escalations/.continuation/.next_suggested_action consistency ('first measurement' after resumed clean state)",
+        "B3.4.3: missing-input honesty — `consult inspect` on a fresh real engagement with only engagement.md exits 0 and marks every absent required source: scores.missing=true, history.missing=true, escalations.missing=true, pause.missing=true, continuation.missing=true, lessons.missing=true, missing=[escalations.json, pause.json, continuation.json, lessons.md, judgment/, runs/iter-*/scores.json, history.jsonl]; smoke marker 'PASS inspect-pack-missing-honest' asserts the pack has escalations/pause/scores/history/lessons/continuation missing markers and indexes escalations.json + history.jsonl"
+      ]
+    },
+    "5_real_lifecycle_proof": {
+      "result": "PASS",
+      "evidence": [
+        "B3.5.1: tests/escalation-smoke.sh (real CLI, real temp engagements, CONSULT_MEMORY_FILE-isolated MEMORY) exit 0 with all 7 markers: escalation-block-state, escalation-pauses-progress, escalation-resume-refuse, escalation-resume-authorized, escalation-memory-continuation, inspect-pack-regenerable, inspect-pack-missing-honest (evidence/acceptance-build-3-escalation-smoke.txt)",
+        "B3.5.2: `CONSULT_SMOKE_SKIP_CLIENT=1 bin/consult smoke` exit 0 — 'all smoke checks passed' incl. help lists escalation/resume/inspect, escalation status missing honesty, 'escalation real lifecycle (block/refuse/resume/inspect)', workspace isolation real-worktree refuse/pass (evidence/acceptance-build-3-smoke.txt)",
+        "B3.5.3: `bin/consult harness-checks state/harness-evolution/runs/iter-6` exit 0 — 42 passed · 0 failed; checks.json records the 7 required Build 3 ids all pass with detail real-cli-continuation: escalation-block-state, escalation-pauses-progress, escalation-resume-refuse, escalation-resume-authorized, escalation-memory-continuation, inspect-pack-regenerable, inspect-pack-missing-honest (evidence/acceptance-build-3-harness-checks.txt + iter-6/checks.json)"
+      ]
+    }
+  },
+  "suite_exits": {
+    "escalation_smoke": {
+      "command": "tests/escalation-smoke.sh",
+      "exit": 0,
+      "artifact": "state/harness-evolution/runs/iter-6/evidence/acceptance-build-3-escalation-smoke.txt",
+      "output_summary": "PASS escalation-block-state / escalation-pauses-progress / escalation-resume-refuse / escalation-resume-authorized / escalation-memory-continuation / inspect-pack-regenerable / inspect-pack-missing-honest"
+    },
+    "consult_smoke": {
+      "command": "CONSULT_SMOKE_SKIP_CLIENT=1 bin/consult smoke",
+      "exit": 0,
+      "artifact": "state/harness-evolution/runs/iter-6/evidence/acceptance-build-3-smoke.txt",
+      "output_summary": "all smoke checks passed; skip marker 'client checks skipped (CONSULT_SMOKE_SKIP_CLIENT)' present; Build 3 surface incl. escalation real lifecycle (block/refuse/resume/inspect)"
+    },
+    "harness_checks": {
+      "command": "bin/consult harness-checks state/harness-evolution/runs/iter-6",
+      "exit": 0,
+      "artifact": "state/harness-evolution/runs/iter-6/evidence/acceptance-build-3-harness-checks.txt",
+      "output_summary": "42 passed · 0 failed → state/harness-evolution/runs/iter-6/checks.json; all 7 escalation-*/inspect-* ids pass with detail real-cli-continuation"
+    },
+    "inspect": {
+      "command": "bin/consult inspect harness-evolution",
+      "exit": 0,
+      "artifact": "state/harness-evolution/runs/iter-6/evidence/acceptance-build-3-inspect.txt",
+      "output_summary": "Inspect pack regenerated from files: …/state/harness-evolution/inspect-pack.json (path contains spaces); pack verified: scores/history/lessons resolved from real iter files"
+    }
+  },
+  "required_markers": [
+    "PASS escalation-block-state",
+    "PASS escalation-pauses-progress",
+    "PASS escalation-resume-refuse",
+    "PASS escalation-resume-authorized",
+    "PASS escalation-memory-continuation",
+    "PASS inspect-pack-regenerable",
+    "PASS inspect-pack-missing-honest"
+  ],
+  "required_markers_status": "all 7 present in acceptance-build-3-escalation-smoke.txt with suite exit 0 and re-asserted in iter-6/checks.json (status=pass, detail=real-cli-continuation); 0 failed checks in suite",
+  "real_state_evidence": {
+    "live_pack": "state/harness-evolution/inspect-pack.json regenerated by `consult inspect harness-evolution` — mode=Directive (source engagement.md), gate.allowed=true from judgment/directive.json (ts 2026-08-10T06:59:04Z), scores.missing=false with latest_run=runs/iter-5 (overall 8.4) and history of 6 runs each resolving to a real runs/iter-N/scores.json, history.missing=false (history.jsonl, 6 entries), lessons.pointer=runs/iter-6/lessons.md (missing=false), escalations/pause/continuation missing:true (harness-evolution has no Build 3 state), missing=[escalations.json, pause.json, continuation.json]; deterministic across two consecutive regenerations (byte-identical cmp)",
+    "paused_refusals": "fresh real temp engagement paused via `escalation block`: `gate implement` exit 1, `bench run` exit 1, `checks` exit 1 — all name 'open escalation 'pause-1' in …/escalations.json; paused (…/pause.json)'",
+    "temporary_engagements": "escalation-smoke.sh uses state/engagements/escalation-smoke-$$ + inspect-missing-$$ with CONSULT_MEMORY_FILE under mktemp and cleans up on exit; 0 escalation-smoke-*/inspect-missing-*/acceptance-* dirs remain; org MEMORY.md untouched by all Build 3 real lifecycle runs (override seam verified in use)"
+  },
+  "frozen_guard": {
+    "status": "OK",
+    "detail": "git status --short state/harness-evolution/ shows changes only under runs/iter-6/, plus untracked inspect-pack.json and judgment/ (Build 2's own durable gate state, explicitly not touched by Build 3 per §7.1). iter-0/…iter-5/ and frozen harness-apc-v1 files unmodified. LOCK hashes: sha256sum of HARNESS-BENCHMARK-CONTRACT.md + contract.json + LOCK.md matches iter-5/evidence/lock-hashes-pre.txt exactly (harness-checks 'lock-hashes-stable' = unchanged). Pre-existing regenerated artifacts (iter-3 skill scaffolds with worktree path relocation, onboarding-flight-control .checks-latest.json + check-*/workspace.json) were already modified before this audit — my runs added no new side effects.",
+    "temporary_engagements": "all audit mutations ran in temporary engagements that were removed; state/engagements/ contains only agcode-learning and onboarding-flight-control"
+  },
+  "honest_limits": [
+    "Per-mission constraint, provider scoring (`bench … run`) is never invoked against a real provider — no provider present. The score path's pause refusal was proven with the real CLI (bench run refused while paused, exit 1); no scores were produced.",
+    "`bin/consult smoke` was run with CONSULT_SMOKE_SKIP_CLIENT=1 (client check-run skipped, not mocked) per the mission's own harness-check convention (smoke-green check uses the same env).",
+    "This verdict covers Build 3 (§7) only; Builds 1–2 verdicts (§2–§6) are not re-scored; Build 4 (role-envelope inspection) untouched per §7.5.",
+    "The inspect pack is asserted regenerable and byte-deterministic within a session; its score/history content is derived from the frozen iter-0..5 records, which are not re-scored or amended.",
+    "No formatters or linters run (explicitly skipped per mission §7.5).",
+    "harness-evolution engagement state was not mutated by the audit (inspect + read-only status only); all escalation/pause/resume mutations ran in temporary engagements removed on exit."
+  ],
+  "evidence_artifacts": [
+    "state/harness-evolution/runs/iter-6/evidence/acceptance-build-3-escalation-smoke.txt",
+    "state/harness-evolution/runs/iter-6/evidence/acceptance-build-3-smoke.txt",
+    "state/harness-evolution/runs/iter-6/evidence/acceptance-build-3-harness-checks.txt",
+    "state/harness-evolution/runs/iter-6/evidence/acceptance-build-3-inspect.txt",
+    "state/harness-evolution/runs/iter-6/checks.json",
+    "state/harness-evolution/inspect-pack.json"
+  ]
+}

@@ -1,0 +1,12 @@
+
+  Coding runtimes
+  ● agent      /home/logani/.local/bin/agent  (active)
+  ● claude     /home/logani/.local/bin/claude
+  ● codex      /home/logani/.local/bin/codex
+  ● opencode   /home/logani/.opencode/bin/opencode
+  ○ gemini     missing
+  ● cursor     /home/logani/.local/bin/cursor
+
+  Active provider: agent
+  Swap: CONSULT_PROVIDER=<bin> · seam: lib/provider.sh
+

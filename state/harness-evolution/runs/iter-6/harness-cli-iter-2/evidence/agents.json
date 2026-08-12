@@ -1,0 +1,100 @@
+[
+  {
+    "name": "agent",
+    "status": "found",
+    "path": "/home/logani/.local/bin/agent",
+    "version": "2026.08.04-aaa8809",
+    "note": "on PATH or a known install dir"
+  },
+  {
+    "name": "claude",
+    "status": "found",
+    "path": "/home/logani/.local/bin/claude",
+    "version": "2.1.222",
+    "note": "on PATH or a known install dir"
+  },
+  {
+    "name": "codex",
+    "status": "found",
+    "path": "/home/logani/.local/bin/codex",
+    "version": "0.146.0",
+    "note": "on PATH or a known install dir"
+  },
+  {
+    "name": "opencode",
+    "status": "found",
+    "path": "/home/logani/.opencode/bin/opencode",
+    "version": "1.17.20",
+    "note": "on PATH or a known install dir"
+  },
+  {
+    "name": "gemini",
+    "status": "missing",
+    "path": "",
+    "version": "unknown",
+    "note": "not installed"
+  },
+  {
+    "name": "cursor",
+    "status": "found",
+    "path": "/home/logani/.local/bin/cursor",
+    "version": "unknown",
+    "note": "on PATH or a known install dir"
+  },
+  {
+    "name": "droid",
+    "status": "found",
+    "path": "/home/logani/.local/bin/droid",
+    "version": "0.189.0",
+    "note": "on PATH or a known install dir"
+  },
+  {
+    "name": "aider",
+    "status": "missing",
+    "path": "",
+    "version": "unknown",
+    "note": "not installed"
+  },
+  {
+    "name": "goose",
+    "status": "missing",
+    "path": "",
+    "version": "unknown",
+    "note": "not installed"
+  },
+  {
+    "name": "crush",
+    "status": "missing",
+    "path": "",
+    "version": "unknown",
+    "note": "not installed"
+  },
+  {
+    "name": "amp",
+    "status": "missing",
+    "path": "",
+    "version": "unknown",
+    "note": "not installed"
+  },
+  {
+    "name": "copilot",
+    "status": "missing",
+    "path": "",
+    "version": "unknown",
+    "note": "not installed"
+  },
+  {
+    "name": "plandex",
+    "status": "missing",
+    "path": "",
+    "version": "unknown",
+    "note": "not installed"
+  },
+  {
+    "name": "qwen",
+    "status": "missing",
+    "path": "",
+    "version": "unknown",
+    "note": "not installed"
+  }
+]

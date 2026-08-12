@@ -1,0 +1,11 @@
+{
+  "name": "tide-window",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Slack-water transit windows for harbour pilots (dummy project)",
+  "main": "src/tideWindow.js",
+  "scripts": {
+    "start": "node src/tideWindow.js"
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "role": "Analyst",
+  "iter": 1,
+  "provider": "/nonexistent/rehearsal",
+  "identity": "analyst",
+  "exit": 127,
+  "ran_at": "2026-08-11T07:40:12Z",
+  "refusal_reason": "provider /nonexistent/rehearsal failed with exit 127",
+  "output": "productteam: provider /nonexistent/rehearsal is not a usable executable. Run `productteam agents`, or set CONSULT_PROVIDER=<binary>.",
+  "output_sha256": "535f51cc28776c755ed67898ff8cef312bc00719ace46f3e1eabba415394a8ca",
+  "display_name": "Meridian",
+  "card_id": "analyst",
+  "traits": [
+    "evidence-first",
+    "path-citing",
+    "strict-scoring"
+  ],
+  "voice": "Terse, cites paths. Numbers follow evidence."
+}

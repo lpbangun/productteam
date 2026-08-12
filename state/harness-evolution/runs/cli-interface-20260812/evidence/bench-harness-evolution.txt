@@ -1,0 +1,16 @@
+
+  Benchmark — harness-evolution
+  Contract harness-apc-v1 · frozen 2026-08-06 · target ≥ 8.0 in every dimension
+
+  HISTORY
+   iter  date        kind        overall   areas≥9   weakest
+   0     2026-08-06T06:12:00Z baseline    4.4      0         product-skills 1.0
+   1     2026-08-06T06:23:32Z iteration   5.8      0         product-skills 1.0
+   2     2026-08-06T06:28:17Z iteration   6.9      0         product-skills 1.0
+   3     2026-08-06T06:34:01Z iteration   7.8      1         autonomy-loop 6.0
+   4     2026-08-06T06:37:59Z iteration   8.2      2         autonomy-loop 7.0
+   5     2026-08-06T06:41:43Z iteration   8.4      2         architecture-simplicity 8.0
+   trend: ▄▅▆▇▇▇
+
+  LATEST — iter-7
+jq: error (at /home/logani/.herdr/worktrees/Product Consulting Harness/upgrade-basic-funcionalities/state/harness-evolution/runs/iter-7/scores.json:26): null (null) has no keys

@@ -1,0 +1,11 @@
+{
+  "role": "Builder",
+  "iter": 2,
+  "provider": "agent",
+  "identity": "builder",
+  "exit": 0,
+  "ran_at": "2026-08-11T05:28:42Z",
+  "refusal_reason": null,
+  "output": "## Builder result (iter 2)\n\n**Files changed**\n- `loops/discovery_loop.py` — required `target` on `_add_evidence` / `ingest_*`; name variants from active target\n- `loops/archive_loop.py` — same ingest/`target` requirement\n- `loops/image_intel.py` — same ingest/`target` requirement\n- `loops/blackhat_loop.py` — same; alias/short-name queries from active target (no `Shane Lowe` / `spa_lowe`)\n- `loops/termination_engine.py` — `diminishing_returns.met` OR’d into `should_stop`\n- `README.md` — Quick Start → Fixture Person; Stopping Criteria includes diminishing returns\n\n**Verification**\n| Check | Exit |\n|--------|------|\n| `! grep -R \"Shane Patrick Arthur Lowe\" loops/{discovery,archive}_loop.py loops/image_intel.py loops/blackhat_loop.py` | **0** (no matches) |\n| `grep -n should_stop loops/termination_engine.py` | lines **48, 71, 75** (`diminishing_returns` in `should_stop` at 53) |\n| `python3 -m loops.main_loop --help` | **not run** (shell policy blocked non-allowlisted exec) |\n| Fixture Person 1-iter run | **not run** (same) |\n\nStatic: planned-query builders take `target_name`; no Shane defaults/`spa_lowe` in those four modules.",
+  "output_sha256": "91addd198feeab11166adde862194a36ace5f9bd515b5894d42ffa2961fdb998"
+}

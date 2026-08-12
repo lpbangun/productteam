@@ -1,0 +1,24 @@
+
+  Deterministic checks — osint-loop-research
+  contract osint-loop-v1 · runner lib/osint-loop-checks.sh
+
+
+  osint-loop-v1 checks — /home/logani/.herdr/worktrees/Product Consulting Harness/test-rapid-basics/tmp/workspaces/osint-loop-research
+
+  pass cli-module-help              usage: main_loop.py [-h] --target TARGET [--family FAMILY]
+  pass cli-flags-parse              ok
+  pass cold-run-exits-zero          ok
+  pass cold-run-target-generic      ok
+  pass resume-refuse-at-max         ok
+  pass resume-continue-raised-max   ok
+  pass termination-artifact         ok
+  pass termination-matches-engine   ok
+  pass readme-stop-aligned          ok
+  pass evidence-persist-upgrade     ok
+  pass evidence-provenance-fields   ok
+  pass output-inspectable           ok
+  pass boundedness-honored          ok
+  pass no-unbounded-mission         ok
+
+  overall 9.5  → /home/logani/.herdr/worktrees/Product Consulting Harness/test-rapid-basics/state/engagements/osint-loop-research/runs/check-20260811T042409Z-3955817/checks.json
+checks ▸ osint-loop-research · 14/14 · weakest: cli-runnable

@@ -1,0 +1,3 @@
+
+  harness-evolution — iter-7
+jq: error (at /home/logani/.herdr/worktrees/Product Consulting Harness/upgrade-basic-funcionalities/state/harness-evolution/runs/iter-7/scores.json:26): null (null) has no keys

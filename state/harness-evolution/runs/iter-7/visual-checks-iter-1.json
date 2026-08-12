@@ -1,0 +1,25 @@
+{
+  "contract": "visual-cli-v2",
+  "ts": "2026-08-10",
+  "passed": 12,
+  "failed": 2,
+  "skipped": 0,
+  "converged": false,
+  "results": {
+    "role-chrome": "pass",
+    "worker-strip": "pass",
+    "live-loading-card": "pass",
+    "two-accent-language": "pass",
+    "evidence-path-highlight": "pass",
+    "markdown-lite": "pass",
+    "session-footer": "pass",
+    "agents-provider-cycle": "pass",
+    "grouped-check-progress": "pass",
+    "judgment-mode-badge": "pass",
+    "honest-partial-output": "fail",
+    "slash-palette-hints": "fail",
+    "transcript-export": "pass",
+    "header-score-spark": "pass"
+  },
+  "live_provider_proof": {"required": true, "status": "pass", "path": "state/harness-evolution/runs/iter-6/live-chat-cycle.typescript"}
+}

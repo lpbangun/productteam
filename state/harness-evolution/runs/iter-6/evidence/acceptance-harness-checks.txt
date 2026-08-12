@@ -1,0 +1,34 @@
+$ bin/consult harness-checks state/harness-evolution/runs/iter-6
+
+  Harness checks (harness-apc-v1 objective subset)
+
+  ✓ workspace-default-isolated           real-git-worktree
+  ✓ workspace-lifecycle-cli              real-git-worktree
+  ✓ workspace-dirty-refusal              real-git-worktree
+  ✓ workspace-dirty-escape-evidence      real-git-worktree
+  ✓ workspace-safe-remove                real-git-worktree
+  ✓ help-lists-runtime                   ok
+  ✓ smoke-green                          Preparing worktree (detached HEAD 814a88a)
+  ✓ status-runs                          ok
+  ✓ runtime-detect                       ok
+  ✓ runtime-honest-fail                  ok
+  ✓ lock-files-present                   ok
+  ✓ lock-hashes-stable                   unchanged
+  ✓ learning-schema                      ok
+  ✓ judgment-examples                    ok
+  ✓ harness-engagement-mode              ok
+  ✓ memory-harness-lesson                ok
+  ✓ github-seam                          ok
+  ✓ merge-refuses-without-auth           refused_ok
+  ✓ skills-present                       ok
+  ✓ skill-critique-runs                  ok
+  ✓ skill-benchmark-runs                 ok
+  ✓ skill-design-sprint-runs             ok
+  ✓ lessons-closed-iters                 ok
+  ✓ phases-artifact                      loop-sequence-only
+  ✓ org-self-review-recent               ok
+  ✓ secrets-scan                         clean
+  ✓ provider-seam                        ok
+
+  27 passed · 0 failed  → state/harness-evolution/runs/iter-6/checks.json
+exit=0

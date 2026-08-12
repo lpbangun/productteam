@@ -1,17 +1,21 @@
 #!/usr/bin/env bash
-# run-skill.sh — invoke first-party product skills.
+# run-skill.sh — invoke first-party product skills via the real provider seam.
 # Usage: run-skill.sh <skill> <target> [out-dir]
 # Skills: critique | benchmark | design-sprint
+# No templates-as-answers. Every artifact is model output from provider_ask.
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+# shellcheck source=lib/provider.sh
+source "$ROOT/lib/provider.sh"
+
 SKILL="${1:-}"
 TARGET="${2:-}"
 OUT="${3:-}"
 
-die() { printf 'consult skill: %s\n' "$1" >&2; exit 1; }
+die() { printf 'productteam skill: %s\n' "$1" >&2; exit 1; }
 
-[[ -n "$SKILL" && -n "$TARGET" ]] || die "usage: consult skill <critique|benchmark|design-sprint> <repo-or-client> [out-dir]"
+[[ -n "$SKILL" && -n "$TARGET" ]] || die "usage: productteam skill <critique|benchmark|design-sprint> <repo-or-client> [out-dir]"
 
 case "$SKILL" in
   critique|benchmark|design-sprint) ;;
@@ -21,7 +25,6 @@ esac
 SKILL_DIR="$ROOT/skills/$SKILL"
 [[ -f "$SKILL_DIR/SKILL.md" ]] || die "missing $SKILL_DIR/SKILL.md"
 
-# Resolve target to a repo path
 REPO=""
 if [[ -d "$TARGET" ]]; then
   REPO="$(cd "$TARGET" && pwd)"
@@ -29,17 +32,17 @@ elif [[ -d "$ROOT/state/engagements/$TARGET" ]]; then
   REPO=$(awk -F': ' '/^Repo:/{print $2; exit}' "$ROOT/state/engagements/$TARGET/engagement.md")
 elif [[ "$TARGET" == harness-evolution || "$TARGET" == harness ]]; then
   REPO="$ROOT"
+elif [[ -d "/home/logani/projects/$TARGET" ]]; then
+  REPO="/home/logani/projects/$TARGET"
 else
-  # sibling under projects
-  if [[ -d "/home/logani/projects/$TARGET" ]]; then
-    REPO="/home/logani/projects/$TARGET"
-  else
-    die "cannot resolve target '$TARGET' to a repo"
-  fi
+  die "cannot resolve target '$TARGET' to a repo"
 fi
 [[ -d "$REPO" ]] || die "repo not found: $REPO"
 
 TS=$(date -u +%Y%m%dT%H%M%SZ)
+RUNTIME=$(runtime_default 2>/dev/null || true)
+[[ -n "$RUNTIME" ]] || die "no coding runtime found — run productteam agents, install one, or set CONSULT_PROVIDER"
+
 if [[ -z "$OUT" ]]; then
   OUT="$ROOT/state/harness-evolution/runs/skills/${SKILL}-${TS}"
 fi
@@ -47,145 +50,124 @@ mkdir -p "$OUT"
 cp "$SKILL_DIR/SKILL.md" "$OUT/SKILL.md"
 
 NAME=$(basename "$REPO")
+GUIDANCE=""
+[[ -f "$REPO/GUIDANCE.md" ]] && GUIDANCE=$(cat "$REPO/GUIDANCE.md")
 README=""
 [[ -f "$REPO/README.md" ]] && README=$(head -80 "$REPO/README.md")
-TREE=$(find "$REPO" -maxdepth 2 -type f ! -path '*/.git/*' ! -path '*/node_modules/*' ! -path '*/dist/*' 2>/dev/null | head -60)
+TREE=$(find "$REPO" -maxdepth 3 -type f ! -path '*/.git/*' ! -path '*/node_modules/*' ! -path '*/dist/*' ! -path '*/__pycache__/*' 2>/dev/null | head -80)
+
+skill_header() {
+  printf 'Runtime: %s\nTimestamp: %s\nRepo: %s\nSkill: %s\n' "$RUNTIME" "$TS" "$REPO" "$SKILL"
+}
 
 case "$SKILL" in
   critique)
-    cat > "$OUT/critique.md" <<EOF
-# Product critique — $NAME
+    prompt=$(cat <<EOF
+You are running the /critique skill for the Product Consulting Harness.
+Write a product critique of the repository below. Cite at least two real
+file paths that appear in the tree. If GUIDANCE.md is present, use at least
+one distinctive term from it. Prefer deletion over addition. No filler.
 
-**Skill:** /critique · **Repo:** $REPO · **When:** $TS
+$(skill_header)
 
-## Method
-Structured audit from README + shallow tree. Findings cite paths.
+## GUIDANCE.md
+$GUIDANCE
 
-## Product clarity
-$( [[ -f "$REPO/README.md" ]] && echo "README present — skim first 80 lines for identity/audience." || echo "Missing README.md — clarity at risk." )
-
-## Target user
-Infer from README "Who" / audience sections; flag if absent.
-
-## UX / navigation / onboarding
-Inspect entry docs and primary UI/docs paths in the tree below.
-
-## Accessibility
-Note whether a11y tests or guidance exist in tree.
-
-## Product direction / friction / priorities / risks
-Prioritize by impact-per-change. Prefer deletion. Do not rewrite vision.
-
-## Tree (depth 2, truncated)
-\`\`\`
-$TREE
-\`\`\`
-
-## README excerpt
-\`\`\`
+## README (excerpt)
 $README
-\`\`\`
 
-## Prioritized recommendations
-1. (Fill from evidence above — highest leverage first)
-2. …
-3. …
+## Tree (depth ≤3)
+$TREE
 
-## Evidence rule
-Every recommendation must cite a path from this repo.
+Output markdown with sections: Product clarity, Target user, Friction,
+Prioritized recommendations (each citing a path), Evidence.
 EOF
+)
+    reply=$(provider_ask "$prompt" "$REPO") || die "provider_ask failed (runtime=$RUNTIME) — no artifact written"
+    {
+      printf '# Product critique — %s\n\n' "$NAME"
+      skill_header
+      printf '\n%s\n' "$reply"
+    } > "$OUT/critique.md"
     printf '%s\n' "$OUT/critique.md"
     ;;
   benchmark)
-    cat > "$OUT/BENCHMARK-CONTRACT.md" <<EOF
-# BENCHMARK-CONTRACT — $NAME (FROZEN draft)
+    prompt=$(cat <<EOF
+You are running the /benchmark skill. Draft a FROZEN-style benchmark contract
+for this specific repository — not a generic six-item starter list.
+Name dimensions that reflect THIS project's domain and GUIDANCE.md risks.
+Cite at least two real paths from the tree in the contract body.
+Include acceptance threshold ≥9.0 and "no mocks" validation.
 
-**Frozen:** $TS · **Subject:** $REPO
+$(skill_header)
 
-Implementers must not amend mid-run. Proposals → proposed-benchmark-changes.md.
+## GUIDANCE.md
+$GUIDANCE
 
-## What success means
-Measurable improvement on the dimensions below without changing product vision.
+## README (excerpt)
+$README
 
-## Dimensions (starter — tailor with evidence)
-1. correctness
-2. usability
-3. documentation
-4. developer-experience
-5. product-clarity
-6. simplicity
+## Tree
+$TREE
 
-## Scoring
-0–10 one decimal. Score without path/check evidence is void.
-- ≤5 broken/missing
-- 6–8 usable with gaps
-- 9–10 excellent with evidence
-
-## Acceptance threshold
-Every dimension ≥ 8.0 (adjust per engagement before freeze).
-
-## Failure conditions
-Secrets in artifacts; fake/mocked validation; vision rewrite; no Critic verdict.
-
-## Validation methods
-Real tests/builds/docs checks against $REPO. No mocks.
-
-## Convergence
-All dimensions ≥ threshold on one scored iteration + Critic accept.
+Output:
+1) A markdown BENCHMARK-CONTRACT body
+2) After a line that is exactly ---JSON---
+3) A JSON object: {"contract":"<name>-v1","dimensions":["..."],"target":9.0}
 EOF
-    cat > "$OUT/contract.json" <<EOF
-{
-  "contract": "${NAME}-v1",
-  "frozen": "$TS",
-  "subject": "$REPO",
-  "target": 8.0,
-  "dimensions": ["correctness","usability","documentation","developer-experience","product-clarity","simplicity"],
-  "source": "BENCHMARK-CONTRACT.md",
-  "skill": "benchmark"
-}
-EOF
+)
+    reply=$(provider_ask "$prompt" "$REPO") || die "provider_ask failed (runtime=$RUNTIME) — no artifact written"
+    md="$reply"
+    json_part=""
+    if grep -q '^---JSON---$' <<<"$reply"; then
+      md=$(sed '/^---JSON---$/,$d' <<<"$reply")
+      json_part=$(sed -n '/^---JSON---$/,$p' <<<"$reply" | sed '1d')
+    fi
+    {
+      printf '# BENCHMARK-CONTRACT — %s\n\n' "$NAME"
+      skill_header
+      printf '\n%s\n' "$md"
+      if [[ -n "$json_part" ]]; then
+        printf '\n## Machine-readable dimensions\n\n```json\n'
+        printf '%s\n' "$json_part" | jq -c --arg r "$RUNTIME" --arg t "$TS" --arg s "$REPO" \
+          '. + {runtime:$r, frozen:$t, subject:$s, skill:"benchmark", source:"BENCHMARK-CONTRACT.md"}' 2>/dev/null \
+          || printf '%s\n' "$json_part"
+        printf '```\n'
+      fi
+    } > "$OUT/BENCHMARK-CONTRACT.md"
+    # No separate contract.json — no-mock-provider requires Runtime: on every
+    # *.json, which cannot be valid JSON. Dimensions stay in the markdown.
     printf '%s\n' "$OUT/BENCHMARK-CONTRACT.md"
     ;;
   design-sprint)
-    cat > "$OUT/design-sprint.md" <<EOF
-# Design sprint — $NAME
+    prompt=$(cat <<EOF
+You are running the /design-sprint skill. Propose one bounded product direction
+for this repository. Cite at least two real paths from the tree. Reflect
+GUIDANCE.md language. Smallest diff. No vision rewrite.
 
-**Skill:** /design-sprint · **Repo:** $REPO · **When:** $TS
+$(skill_header)
 
-## Problem framing
-What friction blocks users from the product's promised value?
+## GUIDANCE.md
+$GUIDANCE
 
-## Target users
-Who is this for (from README / evidence)? Who is it deliberately not for?
+## README (excerpt)
+$README
 
-## Product direction
-One sentence direction that respects existing vision.
-
-## Implementation scope
-Smallest diff that can move a frozen benchmark. List in/out of scope.
-
-## Milestones
-1. Inspect + lock benchmark
-2. Implement bounded improvement
-3. Real tests + review
-4. PR (+ merge only if gates pass)
-
-## Risks
-Vision drift · scope creep · secrets · flaky validation
-
-## Validation plan
-Command-level evidence (test/build/docs checks) archived in run dir.
-
-## Expected impact
-Which benchmark dimensions should rise, and why?
-
-## Evidence base
-\`\`\`
+## Tree
 $TREE
-\`\`\`
+
+Output markdown: Problem, Users, Direction, Scope in/out, Milestones, Risks,
+Validation, Expected impact.
 EOF
+)
+    reply=$(provider_ask "$prompt" "$REPO") || die "provider_ask failed (runtime=$RUNTIME) — no artifact written"
+    {
+      printf '# Design sprint — %s\n\n' "$NAME"
+      skill_header
+      printf '\n%s\n' "$reply"
+    } > "$OUT/design-sprint.md"
     printf '%s\n' "$OUT/design-sprint.md"
     ;;
 esac
 
-printf 'consult skill: wrote artifacts under %s\n' "$OUT" >&2
+printf 'productteam skill: wrote artifacts under %s (runtime=%s)\n' "$OUT" "$RUNTIME" >&2

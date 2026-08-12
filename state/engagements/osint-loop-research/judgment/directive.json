@@ -1,0 +1,11 @@
+{
+  "mode": "Directive",
+  "ts": "2026-08-11T05:22:59Z",
+  "direction": "Iter-2: promote operability to live + remove Shane ingest defaults + deepen target-generic checks + resolve diminishing_returns",
+  "risks": [
+    "lift only in workspace 8af078f",
+    "dossier-only target-generic false-green",
+    "diminishing_returns dead criterion"
+  ],
+  "decision": "allowed"
+}

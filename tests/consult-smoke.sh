@@ -3,12 +3,12 @@
 # Run from repo root: tests/consult-smoke.sh
 set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-C="$ROOT/bin/consult"
+C="$ROOT/bin/productteam"
 fail=0
 ok() { printf '  PASS  %s\n' "$1"; }
 bad() { printf '  FAIL  %s\n' "$1"; fail=1; }
 
-printf '\n  consult smoke\n\n'
+printf '\n  productteam smoke\n\n'
 
 "$C" help >/dev/null && ok 'help' || bad 'help'
 "$C" status >/dev/null && ok 'status' || bad 'status'
@@ -21,8 +21,11 @@ if grep -q 'ofc-v1' <<<"$bench_out"; then ok 'bench contract id'; else bad 'benc
 "$C" help | grep -q 'score' && ok 'help lists score' || bad 'help lists score'
 "$C" help | grep -q 'runtime' && ok 'help lists runtime' || bad 'help lists runtime'
 "$C" help | grep -q 'harness-checks' && ok 'help lists harness-checks' || bad 'help lists harness-checks'
-"$C" help | grep -q 'consult gh' && ok 'help lists gh' || bad 'help lists gh'
-"$C" help | grep -q 'consult skill' && ok 'help lists skill' || bad 'help lists skill'
+"$C" help | grep -q 'productteam gh' && ok 'help lists gh' || bad 'help lists gh'
+"$C" help | grep -q 'productteam skill' && ok 'help lists skill' || bad 'help lists skill'
+"$C" help | grep -q 'productteam chat' && ok 'help lists chat' || bad 'help lists chat'
+[[ -f "$ROOT/lib/repl.sh" ]] && ok 'repl.sh present' || bad 'repl.sh present'
+if "$C" chat </dev/null >/dev/null 2>&1; then bad 'chat refuses non-TTY'; else ok 'chat refuses non-TTY'; fi
 [[ -f "$ROOT/skills/critique/SKILL.md" ]] && ok 'skill critique present' || bad 'skill critique present'
 [[ -f "$ROOT/skills/benchmark/SKILL.md" ]] && ok 'skill benchmark present' || bad 'skill benchmark present'
 [[ -f "$ROOT/skills/design-sprint/SKILL.md" ]] && ok 'skill design-sprint present' || bad 'skill design-sprint present'
@@ -30,7 +33,7 @@ if grep -q 'ofc-v1' <<<"$bench_out"; then ok 'bench contract id'; else bad 'benc
 "$C" judge harness-evolution >/dev/null && ok 'judge harness-evolution' || bad 'judge harness-evolution'
 "$C" gh preflight "$ROOT" >/dev/null && ok 'gh preflight' || bad 'gh preflight'
 # merge without auth must refuse
-if CONSULT_AUTHORIZE_MERGE=/tmp/consult-no-auth-$$ "$C" gh merge "$ROOT" >/dev/null 2>&1; then
+if CONSULT_AUTHORIZE_MERGE=/tmp/productteam-no-auth-$$ "$C" gh merge "$ROOT" >/dev/null 2>&1; then
   bad 'gh merge refuses without auth'
 else
   ok 'gh merge refuses without auth'
@@ -54,11 +57,106 @@ if "$C" notacommand >/dev/null 2>&1; then bad 'unknown rejects'; else ok 'unknow
 
 # help mentions judgment modes
 if "$C" help | grep -q 'judge'; then ok 'help lists judge'; else bad 'help lists judge'; fi
+if "$C" help | grep -q 'gate <client> status|implement'; then ok 'help lists gate'; else bad 'help lists gate'; fi
+
+# Build 3 surface: escalation lifecycle + file-derived inspect
+if "$C" help | grep -q 'escalation <client> block'; then ok 'help lists escalation'; else bad 'help lists escalation'; fi
+if "$C" help | grep -q 'resume <id> <token>'; then ok 'help lists resume'; else bad 'help lists resume'; fi
+if "$C" help | grep -q 'inspect <client>'; then ok 'help lists inspect'; else bad 'help lists inspect'; fi
+"$C" escalation onboarding-flight-control status >/dev/null && ok 'escalation status' || bad 'escalation status'
+# Escalation status on a client with no escalation state is a valid machine payload (exit 0).
+esc_status=$("$C" escalation onboarding-flight-control status)
+if jq -e '.missing == true and .paused == false and (.open | type) == "array"' <<<"$esc_status" >/dev/null; then
+  ok 'escalation status missing honesty'
+else
+  bad 'escalation status missing honesty'
+fi
+# Full real block → refuse → authorized resume lifecycle lives in escalation-smoke.sh
+if "$ROOT/tests/escalation-smoke.sh" >/dev/null; then
+  ok 'escalation real lifecycle (block/refuse/resume/inspect)'
+else
+  bad 'escalation real lifecycle (block/refuse/resume/inspect)'
+fi
+
+# Build 4 surface: status is file-derived and never invokes a provider.
+if "$C" help | grep -q 'role <client> invoke'; then ok 'help lists role'; else bad 'help lists role'; fi
+# Prefer a client with no role envelopes yet; OFC may already have closed iters.
+role_client=agcode-learning
+if [[ -d "$ROOT/state/engagements/agcode-learning/roles" ]]; then
+  role_client=harness-cli
+fi
+role_status=$("$C" role "$role_client" status)
+if jq -e '(.asked|type)=="array" and (.ran|type)=="array" and (.produced|type)=="array" and (.missing|type)=="array" and ((.asked|length) + (.missing|length)) >= 1' <<<"$role_status" >/dev/null; then
+  ok 'role status file-derived'
+else
+  bad 'role status file-derived'
+fi
+# Explicit missing honesty on a disposable slug that has engagement stub only when present;
+# otherwise assert OFC status still returns valid JSON with produced roles.
+ofc_role=$("$C" role onboarding-flight-control status 2)
+if jq -e '.iter == 2 and (.produced|length) == 3 and (.missing|length) == 0' <<<"$ofc_role" >/dev/null; then
+  ok 'role status closed-iter honesty'
+else
+  bad 'role status closed-iter honesty'
+fi
 
 # learning schema + judgment examples
 [[ -f "$ROOT/docs/learning-schema.md" ]] && ok 'learning schema' || bad 'learning schema'
 [[ -f "$ROOT/state/harness-evolution/examples/challenge-refusal.md" ]] && ok 'challenge example' || bad 'challenge example'
 [[ -f "$ROOT/state/harness-evolution/examples/override-risks.md" ]] && ok 'override example' || bad 'override example'
+
+if "$ROOT/tests/workspace-smoke.sh" >/dev/null; then
+  ok 'workspace isolation real-worktree refuse/pass'
+else
+  bad 'workspace isolation real-worktree refuse/pass'
+fi
+
+if "$ROOT/tests/open-baseline-smoke.sh" >/dev/null; then
+  ok 'open→baseline cold bootstrap refuse/pass'
+else
+  bad 'open→baseline cold bootstrap refuse/pass'
+fi
+
+if "$ROOT/tests/agent-cards-smoke.sh" >/dev/null; then
+  ok 'agent cards list/show/seed + envelope display_name'
+else
+  bad 'agent cards list/show/seed + envelope display_name'
+fi
+if "$C" help | grep -q 'productteam card list'; then ok 'help lists card'; else bad 'help lists card'; fi
+
+if "$ROOT/tests/style-memory-smoke.sh" >/dev/null; then
+  ok 'style/project memory inspect + role envelope fields'
+else
+  bad 'style/project memory inspect + role envelope fields'
+fi
+if "$C" help | grep -q 'productteam style show'; then ok 'help lists style'; else bad 'help lists style'; fi
+if "$C" help | grep -q 'productteam project-memory show'; then ok 'help lists project-memory'; else bad 'help lists project-memory'; fi
+
+if "$ROOT/tests/experience-pool-smoke.sh" >/dev/null; then
+  ok 'experience pool list/add/search + inspect/role wiring'
+else
+  bad 'experience pool list/add/search + inspect/role wiring'
+fi
+if "$C" help | grep -q 'productteam pool list'; then ok 'help lists pool'; else bad 'help lists pool'; fi
+
+if "$C" help | grep -q 'productteam direction'; then ok 'help lists direction'; else bad 'help lists direction'; fi
+if "$ROOT/tests/direction-path-smoke.sh" >/dev/null; then
+  ok 'direction propose→select→rebut→seal refuse/pass'
+else
+  bad 'direction propose→select→rebut→seal refuse/pass'
+fi
+if "$ROOT/tests/judgment-gate-smoke.sh" >/dev/null; then
+  ok 'judgment gate smoke (regression)'
+else
+  bad 'judgment gate smoke (regression)'
+fi
+
+if "$C" help | grep -q 'run-loop'; then ok 'help lists run-loop'; else bad 'help lists run-loop'; fi
+if "$ROOT/tests/run-loop-smoke.sh" >/dev/null; then
+  ok 'overnight run-loop smoke (limits/resume/hard-stops)'
+else
+  bad 'overnight run-loop smoke (limits/resume/hard-stops)'
+fi
 
 if (( fail == 0 )); then
   printf '\n  all smoke checks passed\n\n'

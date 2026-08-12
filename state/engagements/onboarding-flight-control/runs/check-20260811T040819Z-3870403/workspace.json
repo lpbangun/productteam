@@ -1,0 +1,11 @@
+{
+  "client": "onboarding-flight-control",
+  "source_repo": "/home/logani/projects/onboarding-flight-control",
+  "path": "/home/logani/.herdr/worktrees/Product Consulting Harness/test-rapid-basics/tmp/workspaces/onboarding-flight-control",
+  "sha": "6a8db8e260a38851f62ec92bcd681d2010a0e75a",
+  "exists": true,
+  "dirty": false,
+  "allow_dirty_reason": null,
+  "operation": "checks",
+  "recorded_at": "2026-08-11T04:08:19Z"
+}

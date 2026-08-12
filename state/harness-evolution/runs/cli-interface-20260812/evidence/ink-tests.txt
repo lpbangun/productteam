@@ -1,0 +1,224 @@
+
+> productteam-ink-prototype@0.0.0 test
+> node --test test/*.test.js
+
+TAP version 13
+# Subtest: parseStatusJson maps the frozen status --json shape
+ok 1 - parseStatusJson maps the frozen status --json shape
+  ---
+  duration_ms: 1.839537
+  type: 'test'
+  ...
+# Subtest: parseStatusJson keeps explicit errors for bad input
+ok 2 - parseStatusJson keeps explicit errors for bad input
+  ---
+  duration_ms: 0.403186
+  type: 'test'
+  ...
+# Subtest: parseStatusJson honors a selected engagement
+ok 3 - parseStatusJson honors a selected engagement
+  ---
+  duration_ms: 0.312491
+  type: 'test'
+  ...
+# Subtest: parseHelpJson maps the frozen help --json registry shape
+ok 4 - parseHelpJson maps the frozen help --json registry shape
+  ---
+  duration_ms: 1.094566
+  type: 'test'
+  ...
+# Subtest: parseHelpJson rejects shapes without commands/chat_only
+ok 5 - parseHelpJson rejects shapes without commands/chat_only
+  ---
+  duration_ms: 0.202806
+  type: 'test'
+  ...
+# Subtest: parseAgentsJson maps the agents --json catalog
+ok 6 - parseAgentsJson maps the agents --json catalog
+  ---
+  duration_ms: 0.20628
+  type: 'test'
+  ...
+# Subtest: parseWorkersTsv maps rows and normalizes worker states
+ok 7 - parseWorkersTsv maps rows and normalizes worker states
+  ---
+  duration_ms: 0.520373
+  type: 'test'
+  ...
+# Subtest: parseWorkersTsv handles header-only, empty, and CRLF bodies
+ok 8 - parseWorkersTsv handles header-only, empty, and CRLF bodies
+  ---
+  duration_ms: 0.223847
+  type: 'test'
+  ...
+# Subtest: worker state vocabulary: interrupted is never a recorded row state
+ok 9 - worker state vocabulary: interrupted is never a recorded row state
+  ---
+  duration_ms: 0.489226
+  type: 'test'
+  ...
+# Subtest: digestInspectPack produces the evidence surface
+ok 10 - digestInspectPack produces the evidence surface
+  ---
+  duration_ms: 0.634603
+  type: 'test'
+  ...
+# Subtest: digestInspectPack keeps missing sub-surfaces explicit
+ok 11 - digestInspectPack keeps missing sub-surfaces explicit
+  ---
+  duration_ms: 0.534945
+  type: 'test'
+  ...
+# Subtest: buildPalette/filterPalette filter the registry only
+ok 12 - buildPalette/filterPalette filter the registry only
+  ---
+  duration_ms: 0.401504
+  type: 'test'
+  ...
+# Subtest: runCli spawns with an argv array, captures stdout, surfaces exit codes
+ok 13 - runCli spawns with an argv array, captures stdout, surfaces exit codes
+  ---
+  duration_ms: 88.128476
+  type: 'test'
+  ...
+# Subtest: runCli reports spawn failures without throwing
+ok 14 - runCli reports spawn failures without throwing
+  ---
+  duration_ms: 3.506244
+  type: 'test'
+  ...
+# Subtest: loadActivity reads sessions, picks the newest, and stays explicit
+ok 15 - loadActivity reads sessions, picks the newest, and stays explicit
+  ---
+  duration_ms: 5.059551
+  type: 'test'
+  ...
+# Subtest: loadActivity reports a missing runs dir as an explicit state
+ok 16 - loadActivity reports a missing runs dir as an explicit state
+  ---
+  duration_ms: 1.68801
+  type: 'test'
+  ...
+# Subtest: loadInspect reads the pack and reports absence explicitly
+ok 17 - loadInspect reads the pack and reports absence explicitly
+  ---
+  duration_ms: 2.049473
+  type: 'test'
+  ...
+# Subtest: engagementDir resolves the harness-evolution special case
+ok 18 - engagementDir resolves the harness-evolution special case
+  ---
+  duration_ms: 1.465936
+  type: 'test'
+  ...
+# Subtest: loadScreenData parses the real repo surfaces (live)
+ok 19 - loadScreenData parses the real repo surfaces (live)
+  ---
+  duration_ms: 2916.21425
+  type: 'test'
+  ...
+# Subtest: narrow widths: every rendered line fits the column budget
+ok 20 - narrow widths: every rendered line fits the column budget
+  ---
+  duration_ms: 116.459645
+  type: 'test'
+  ...
+# Subtest: unicode: CJK missions wrap/truncate without exceeding the width
+ok 21 - unicode: CJK missions wrap/truncate without exceeding the width
+  ---
+  duration_ms: 13.031905
+  type: 'test'
+  ...
+# Subtest: unicode: truncateWidth respects double-width code points
+ok 22 - unicode: truncateWidth respects double-width code points
+  ---
+  duration_ms: 0.336496
+  type: 'test'
+  ...
+# Subtest: state labels render from worker rows with the frozen vocabulary
+ok 23 - state labels render from worker rows with the frozen vocabulary
+  ---
+  duration_ms: 11.642864
+  type: 'test'
+  ...
+# Subtest: missing states are explicit: no sessions and no inspect pack
+ok 24 - missing states are explicit: no sessions and no inspect pack
+  ---
+  duration_ms: 7.563837
+  type: 'test'
+  ...
+# Subtest: registry adapter errors render explicitly
+ok 25 - registry adapter errors render explicitly
+  ---
+  duration_ms: 8.089009
+  type: 'test'
+  ...
+# Subtest: palette filters the registry and previews without executing
+ok 26 - palette filters the registry and previews without executing
+  ---
+  duration_ms: 9.682025
+  type: 'test'
+  ...
+# Subtest: unsupported commands carry their registry chat_reason
+ok 27 - unsupported commands carry their registry chat_reason
+  ---
+  duration_ms: 11.75864
+  type: 'test'
+  ...
+# Subtest: snapshot output is deterministic and ANSI-free
+ok 28 - snapshot output is deterministic and ANSI-free
+  ---
+  duration_ms: 21.250338
+  type: 'test'
+  ...
+# Subtest: content derivation: evidence lines cover inspect + transcript
+ok 29 - content derivation: evidence lines cover inspect + transcript
+  ---
+  duration_ms: 0.814225
+  type: 'test'
+  ...
+# Subtest: content derivation: activity labels and interrupted note
+ok 30 - content derivation: activity labels and interrupted note
+  ---
+  duration_ms: 11.203895
+  type: 'test'
+  ...
+# Subtest: non-TTY without --snapshot refuses honestly with exit 2
+ok 31 - non-TTY without --snapshot refuses honestly with exit 2
+  ---
+  duration_ms: 443.536708
+  type: 'test'
+  ...
+# Subtest: --help exits 0 with usage regardless of TTY
+ok 32 - --help exits 0 with usage regardless of TTY
+  ---
+  duration_ms: 445.85071
+  type: 'test'
+  ...
+# Subtest: unknown flags exit non-zero with a usage error
+ok 33 - unknown flags exit non-zero with a usage error
+  ---
+  duration_ms: 442.173017
+  type: 'test'
+  ...
+# Subtest: --columns validation rejects out-of-range values
+ok 34 - --columns validation rejects out-of-range values
+  ---
+  duration_ms: 453.557453
+  type: 'test'
+  ...
+# Subtest: live snapshot renders the real repo surfaces (skipped off-repo)
+ok 35 - live snapshot renders the real repo surfaces (skipped off-repo)
+  ---
+  duration_ms: 2943.352133
+  type: 'test'
+  ...
+1..35
+# tests 35
+# suites 0
+# pass 35
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 5494.291728

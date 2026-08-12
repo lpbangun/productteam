@@ -1,0 +1,8 @@
+**READY_TO_SCORE** — Analyst stamp, osint-loop-v1 iter 2
+
+| Gate | Verdict | Evidence |
+|---|---|---|
+| Shane defaults gone (discovery/archive/image_intel/blackhat) | PASS | `loops/discovery_loop.py`, `loops/archive_loop.py`, `loops/image_intel.py`, `loops/blackhat_loop.py`: `_add_evidence` / `ingest_*` require `target: str` (no default); no `Shane Patrick Arthur Lowe` / `"Shane Lowe"` / `spa_lowe`; blackhat aliases from active `target_name` (`_plan_alias_inference`) |
+| `diminishing_returns` in `should_stop` | PASS | `loops/termination_engine.py:38` (check), `:53` (OR’d into `should_stop`), `:65–66` (reasons) |
+| `ingest-target-generic` check exists | PASS | `lib/osint-loop-checks.sh:79–105`; live pass in `state/engagements/osint-loop-research/runs/.checks-latest.json` + `runs/check-20260811T052915Z-4168029/checks.json` + `state/missions/osint-lift/checks-iter2.txt` (15/15) |
+| Workspace SHA `e16c4ce` | PASS | `state/engagements/osint-loop-research/workspace.json` + `runs/check-20260811T052915Z-4168029/workspace.json` → `e16c4ce2ebd1df32771e3218461a7fbaa8117dfc` (`dirty: false`) |

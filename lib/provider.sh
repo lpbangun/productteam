@@ -1,41 +1,97 @@
 # Provider + runtime seam — the only place the system knows which model runs.
-# Default: authenticated Cursor `agent` CLI (headless). No API keys, no mocks.
-# Swap by setting CONSULT_PROVIDER to any binary that answers a prompt
-# on stdout:  CONSULT_PROVIDER=mytool bin/consult bench <client> run
+# Default: the authenticated Cursor `agent` CLI (headless). No API keys, no mocks.
+# Swap by setting CONSULT_PROVIDER to any binary that answers a prompt on
+# stdout:  CONSULT_PROVIDER=mytool bin/productteam bench <client> run
 #
-# Supported coding runtimes (detected when present on PATH):
-#   agent (Cursor) · claude · codex · opencode · gemini · cursor
-#
-# Cursor agent flags used by default wrapper:
-#   -p/--print  headless · --trust workspace · --sandbox disabled for real checks
+# Detection rules (documented in README "Agent detection"):
+#   1. $PATH decides first. A file on PATH carrying a catalog name but no
+#      execute bit is reported missing, never silently replaced by a copy
+#      found elsewhere — a broken install is not a working one.
+#   2. Otherwise the extra install dirs below are scanned and the absolute
+#      path is reported, so agents installed off a login shell's PATH show up.
+#   3. Versions come from `<bin> --version`, time-bounded; anything unreadable
+#      prints `unknown` rather than a guess.
 
-# Ordered preference for auto-pick when CONSULT_PROVIDER is unset.
-CONSULT_RUNTIME_CANDIDATES=(agent claude codex opencode gemini)
+# The single agent catalog (auto-pick order). Do not duplicate this list elsewhere.
+AGENT_CATALOG=(agent claude codex opencode gemini cursor droid aider goose crush amp copilot plandex qwen)
 
-runtime_have() { # $1=bin → 0 if on PATH
-  command -v "$1" >/dev/null 2>&1
+# Extra directories scanned after $PATH. Override with CONSULT_AGENT_DIRS.
+AGENT_SCAN_DIRS="$HOME/.local/bin:$HOME/bin:/usr/local/bin:/opt/homebrew/bin"
+AGENT_SCAN_DIRS+=":$HOME/.bun/bin:$HOME/.cargo/bin:$HOME/go/bin:/snap/bin"
+AGENT_SCAN_DIRS+=":$HOME/.npm-global/bin:$HOME/.deno/bin"
+AGENT_SCAN_DIRS+=":$HOME/.opencode/bin:$HOME/.cursor/bin"
+AGENT_SCAN_DIRS+=":$HOME/.claude/local"
+
+# Seconds allowed for one `--version` probe.
+AGENT_VERSION_TIMEOUT=1
+
+agent_locate() { # $1=name → "found<TAB>/abs/path" | "shadowed<TAB>" | "missing<TAB>"
+  local name="$1" dir p
+  local -a dirs=()
+  IFS=: read -ra dirs <<<"$PATH"
+  for dir in "${dirs[@]}"; do
+    [[ -n "$dir" ]] || continue
+    p="$dir/$name"
+    if [[ -e "$p" && ! -d "$p" ]]; then
+      if [[ -x "$p" ]]; then printf 'found\t%s\n' "$p"; else printf 'shadowed\t\n'; fi
+      return 0
+    fi
+  done
+  IFS=: read -ra dirs <<<"${CONSULT_AGENT_DIRS:-$AGENT_SCAN_DIRS}"
+  for dir in "${dirs[@]}"; do
+    [[ -n "$dir" ]] || continue
+    p="$dir/$name"
+    if [[ -x "$p" && ! -d "$p" ]]; then printf 'found\t%s\n' "$p"; return 0; fi
+  done
+  printf 'missing\t\n'
+}
+
+agent_version() { # $1=path → "1.2.3" or "unknown"
+  local v
+  v=$(timeout "$AGENT_VERSION_TIMEOUT" "$1" --version </dev/null 2>/dev/null \
+        | head -3 | grep -oE '[0-9]+\.[0-9]+(\.[0-9]+)?([.-][A-Za-z0-9]+)?' | head -1)
+  printf '%s' "${v:-unknown}"
 }
 
 runtime_detect() {
-  # Print TSV: name<TAB>status<TAB>path_or_note
-  local name
-  for name in agent claude codex opencode gemini cursor; do
-    if runtime_have "$name"; then
-      printf '%s\tfound\t%s\n' "$name" "$(command -v "$name")"
-    else
-      printf '%s\tmissing\tnot on PATH\n' "$name"
-    fi
+  # Print TSV: name<TAB>found|missing<TAB>path<TAB>version<TAB>note
+  local name status path
+  for name in "${AGENT_CATALOG[@]}"; do
+    IFS=$'\t' read -r status path < <(agent_locate "$name")
+    case "$status" in
+      found)    printf '%s\tfound\t%s\t%s\ton PATH or a known install dir\n' \
+                  "$name" "$path" "$(agent_version "$path")" ;;
+      shadowed) printf '%s\tmissing\t\tunknown\ta file of this name on PATH is not executable\n' "$name" ;;
+      *)        printf '%s\tmissing\t\tunknown\tnot installed\n' "$name" ;;
+    esac
   done
 }
 
+runtime_have() { # $1=bin or path → 0 when it is a usable executable
+  if [[ "$1" == */* ]]; then
+    [[ -x "$1" && ! -d "$1" ]]
+    return
+  fi
+  local st rest
+  IFS=$'\t' read -r st rest < <(agent_locate "$1")
+  [[ "$st" == found ]]
+}
+
+runtime_path() { # $1=bin or path → absolute path when known, else the name
+  if [[ "$1" == */* ]]; then printf '%s' "$1"; return 0; fi
+  local st p
+  IFS=$'\t' read -r st p < <(agent_locate "$1")
+  if [[ "$st" == found ]]; then printf '%s' "$p"; else printf '%s' "$1"; fi
+}
+
 runtime_default() {
-  # Resolve default provider binary name.
+  # Resolve the provider binary: CONSULT_PROVIDER, else first present catalog entry.
   if [[ -n "${CONSULT_PROVIDER:-}" ]]; then
     printf '%s' "$CONSULT_PROVIDER"
     return 0
   fi
   local name
-  for name in "${CONSULT_RUNTIME_CANDIDATES[@]}"; do
+  for name in "${AGENT_CATALOG[@]}"; do
     if runtime_have "$name"; then
       printf '%s' "$name"
       return 0
@@ -44,28 +100,43 @@ runtime_default() {
   return 1
 }
 
-provider_ask() { # $1=prompt  $2=cwd (optional)
-  local prompt="$1" cwd="${2:-$PWD}"
-  local bin
-  if [[ -n "${CONSULT_PROVIDER:-}" ]]; then
-    bin="$CONSULT_PROVIDER"
+runtime_cycle() { # → next installed catalog entry (wrap-around); exports CONSULT_PROVIDER, prints it
+  local cur base name idx=-1 n=0 tries=0 total=${#AGENT_CATALOG[@]}
+  cur="${CONSULT_PROVIDER:-}"
+  if [[ -n "$cur" ]]; then
+    base=$(basename "$cur")
   else
-    bin="$(runtime_default)" || {
-      printf 'consult: no coding runtime found (tried: %s). Install one or set CONSULT_PROVIDER.\n' \
-        "${CONSULT_RUNTIME_CANDIDATES[*]}" >&2
-      return 127
-    }
+    base=$(basename "$(runtime_default 2>/dev/null || true)")
   fi
-  if ! runtime_have "$bin" && [[ "$bin" != /* || ! -x "$bin" ]]; then
-    # Allow absolute path to an executable even if not on PATH basename lookup
-    if [[ "$bin" == /* && -x "$bin" ]]; then
-      :
-    else
-      printf 'consult: provider %s not found on PATH. Set CONSULT_PROVIDER to a working binary, or install agent|claude|codex|opencode|gemini.\n' "$bin" >&2
-      return 127
+  for name in "${AGENT_CATALOG[@]}"; do
+    if [[ "$name" == "$base" ]]; then idx=$n; break; fi
+    n=$((n + 1))
+  done
+  while (( tries < total )); do
+    idx=$(( (idx + 1) % total ))
+    name="${AGENT_CATALOG[idx]}"
+    if runtime_have "$name"; then
+      export CONSULT_PROVIDER="$name"
+      printf '%s\n' "$name"
+      return 0
     fi
-  fi
-  if [[ "$bin" == "agent" || "$bin" == "cursor-agent" || "$(basename "$bin")" == "agent" ]]; then
+    tries=$((tries + 1))
+  done
+  return 1
+}
+
+provider_ask() { # $1=prompt  $2=cwd (optional)
+  local prompt="$1" cwd="${2:-$PWD}" bin base
+  bin="$(runtime_default)" || {
+    printf 'productteam: no coding agent found. Run `productteam agents` for the catalog, install one, or set CONSULT_PROVIDER=<binary>.\n' >&2
+    return 127
+  }
+  runtime_have "$bin" || {
+    printf 'productteam: provider %s is not a usable executable. Run `productteam agents`, or set CONSULT_PROVIDER=<binary>.\n' "$bin" >&2
+    return 127
+  }
+  base=$(basename "$bin")
+  if [[ "$base" == agent || "$base" == cursor-agent ]]; then
     ( cd "$cwd" && "$bin" -p --trust --sandbox disabled --output-format text "$prompt" )
   else
     ( cd "$cwd" && "$bin" -p "$prompt" --output-format text )

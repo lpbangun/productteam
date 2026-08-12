@@ -1,0 +1,4 @@
+
+  Deterministic checks — onboarding-flight-control
+workspace-dirty: onboarding-flight-control (/home/logani/.herdr/worktrees/Product Consulting Harness/test-rapid-basics/tmp/workspaces/onboarding-flight-control); retry with --allow-dirty 'reason'
+dirty_rc=2

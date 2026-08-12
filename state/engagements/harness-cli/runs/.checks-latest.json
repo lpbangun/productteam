@@ -1,0 +1,270 @@
+{
+  "ts": "2026-08-07",
+  "client": "harness-cli",
+  "contract": "ofc-v1",
+  "checks": {
+    "readme-exists": {
+      "status": "pass",
+      "detail": "present"
+    },
+    "readme-required-sections": {
+      "status": "fail",
+      "detail": "missing: What this is"
+    },
+    "walkthrough-covers-maya": {
+      "status": "fail",
+      "detail": ""
+    },
+    "docs-honest-prototype": {
+      "status": "fail",
+      "detail": ""
+    },
+    "cross-role-demo-script": {
+      "status": "fail",
+      "detail": ""
+    },
+    "architecture-notes": {
+      "status": "fail",
+      "detail": ""
+    },
+    "readme-non-goals-explicit": {
+      "status": "fail",
+      "detail": ""
+    },
+    "dev-script-documented": {
+      "status": "fail",
+      "detail": ""
+    },
+    "node-version-noted": {
+      "status": "fail",
+      "detail": ""
+    },
+    "deps-pinned": {
+      "status": "fail",
+      "detail": "node:internal/modules/cjs/loader:1433"
+    },
+    "test-script-exists": {
+      "status": "fail",
+      "detail": "node:internal/modules/cjs/loader:1433"
+    },
+    "deps-minimal": {
+      "status": "fail",
+      "detail": "node:internal/modules/cjs/loader:1433"
+    },
+    "domain-pure": {
+      "status": "pass",
+      "detail": "grep: src/domain.ts: No such file or directory"
+    },
+    "app-not-monolith": {
+      "status": "fail",
+      "detail": "bash: line 2: src/App.tsx: No such file or directory"
+    },
+    "lean-src-tree": {
+      "status": "pass",
+      "detail": "find: \u2018src\u2019: No such file or directory"
+    },
+    "single-derive-support": {
+      "status": "fail",
+      "detail": "grep: src/: No such file or directory"
+    },
+    "demo-constants-centralized": {
+      "status": "fail",
+      "detail": "grep: src/: No such file or directory"
+    },
+    "home-states-fictional": {
+      "status": "fail",
+      "detail": "grep: src/App.tsx: No such file or directory"
+    },
+    "topbar-prototype-chip": {
+      "status": "fail",
+      "detail": "grep: src/App.tsx: No such file or directory"
+    },
+    "copilot-not-ai": {
+      "status": "fail",
+      "detail": "grep: src/App.tsx: No such file or directory"
+    },
+    "three-role-labels": {
+      "status": "fail",
+      "detail": "grep: src/App.tsx: No such file or directory"
+    },
+    "build-green": {
+      "status": "fail",
+      "detail": ""
+    },
+    "typescript-build": {
+      "status": "pass",
+      "detail": "npm error enoent This is related to npm not being able to find a file. npm error enoent npm error A complete log of this run can be found in: /home/logani/.npm/_logs/2026-08-07T08_48_32_012Z-debug-0.log "
+    },
+    "test-suite-green": {
+      "status": "fail",
+      "detail": ""
+    },
+    "maya-intro-flow": {
+      "status": "fail",
+      "detail": ""
+    },
+    "initial-handoffs-complete": {
+      "status": "fail",
+      "detail": ""
+    },
+    "domain-transitions-generic": {
+      "status": "fail",
+      "detail": ""
+    },
+    "derive-support-seed": {
+      "status": "fail",
+      "detail": ""
+    },
+    "status-signal-consistency": {
+      "status": "fail",
+      "detail": ""
+    },
+    "override-requires-reason": {
+      "status": "fail",
+      "detail": ""
+    },
+    "board-pills-require-reason": {
+      "status": "fail",
+      "detail": ""
+    },
+    "coordinator-signal-matches-domain": {
+      "status": "fail",
+      "detail": ""
+    },
+    "home-to-workspace": {
+      "status": "fail",
+      "detail": ""
+    },
+    "role-switcher-three-roles": {
+      "status": "fail",
+      "detail": ""
+    },
+    "reset-demo-restores-seed": {
+      "status": "fail",
+      "detail": ""
+    },
+    "a11y-smoke": {
+      "status": "fail",
+      "detail": ""
+    },
+    "no-duplicate-status-meta": {
+      "status": "fail",
+      "detail": ""
+    },
+    "no-dead-seed-fields": {
+      "status": "fail",
+      "detail": ""
+    },
+    "ci-local-parity": {
+      "status": "fail",
+      "detail": "build or test failed"
+    },
+    "readme-clone-run-verified": {
+      "status": "fail",
+      "detail": "readme, build, or test missing"
+    }
+  },
+  "scores": {
+    "onboarding-quality": {
+      "score": 3.0,
+      "evidence": "0/5 checks pass; fail: test-suite-green, maya-intro-flow, initial-handoffs-complete, domain-transitions-generic",
+      "passed": 0,
+      "total": 5,
+      "failed": [
+        "test-suite-green",
+        "maya-intro-flow",
+        "initial-handoffs-complete",
+        "domain-transitions-generic",
+        "derive-support-seed"
+      ]
+    },
+    "workflow-clarity": {
+      "score": 3.0,
+      "evidence": "0/5 checks pass; fail: status-signal-consistency, override-requires-reason, board-pills-require-reason, coordinator-signal-matches-domain",
+      "passed": 0,
+      "total": 5,
+      "failed": [
+        "status-signal-consistency",
+        "override-requires-reason",
+        "board-pills-require-reason",
+        "coordinator-signal-matches-domain",
+        "cross-role-demo-script"
+      ]
+    },
+    "usability": {
+      "score": 2.0,
+      "evidence": "0/5 checks pass; fail: build-green, home-to-workspace, role-switcher-three-roles, reset-demo-restores-seed",
+      "passed": 0,
+      "total": 5,
+      "failed": [
+        "build-green",
+        "home-to-workspace",
+        "role-switcher-three-roles",
+        "reset-demo-restores-seed",
+        "a11y-smoke"
+      ]
+    },
+    "maintainability": {
+      "score": 4.0,
+      "evidence": "2/5 checks pass; fail: app-not-monolith, demo-constants-centralized, architecture-notes",
+      "passed": 2,
+      "total": 5,
+      "failed": [
+        "app-not-monolith",
+        "demo-constants-centralized",
+        "architecture-notes"
+      ]
+    },
+    "documentation": {
+      "score": 4.0,
+      "evidence": "1/5 checks pass; fail: readme-required-sections, readme-clone-run-verified, walkthrough-covers-maya, docs-honest-prototype",
+      "passed": 1,
+      "total": 5,
+      "failed": [
+        "readme-required-sections",
+        "readme-clone-run-verified",
+        "walkthrough-covers-maya",
+        "docs-honest-prototype"
+      ]
+    },
+    "developer-experience": {
+      "score": 4.0,
+      "evidence": "0/5 checks pass; fail: deps-pinned, test-script-exists, ci-local-parity, dev-script-documented",
+      "passed": 0,
+      "total": 5,
+      "failed": [
+        "deps-pinned",
+        "test-script-exists",
+        "ci-local-parity",
+        "dev-script-documented",
+        "node-version-noted"
+      ]
+    },
+    "product-clarity": {
+      "score": 4.0,
+      "evidence": "0/5 checks pass; fail: home-states-fictional, topbar-prototype-chip, copilot-not-ai, three-role-labels",
+      "passed": 0,
+      "total": 5,
+      "failed": [
+        "home-states-fictional",
+        "topbar-prototype-chip",
+        "copilot-not-ai",
+        "three-role-labels",
+        "readme-non-goals-explicit"
+      ]
+    },
+    "simplicity": {
+      "score": 4.0,
+      "evidence": "1/5 checks pass; fail: single-derive-support, no-duplicate-status-meta, deps-minimal, no-dead-seed-fields",
+      "passed": 1,
+      "total": 5,
+      "failed": [
+        "single-derive-support",
+        "no-duplicate-status-meta",
+        "deps-minimal",
+        "no-dead-seed-fields"
+      ]
+    }
+  },
+  "overall": 3.5
+}

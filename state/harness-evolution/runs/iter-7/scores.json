@@ -1,0 +1,26 @@
+{
+  "ts": "2026-08-10",
+  "iter": 7,
+  "kind": "full",
+  "visual": {
+    "contract": "visual-cli-v2",
+    "passed": 14,
+    "total": 14,
+    "failed": 0,
+    "skipped": 0,
+    "live_provider_proof": "pass",
+    "converged": true,
+    "evidence": "visual-checks-final.json"
+  },
+  "harness": {
+    "contract": "harness-cli-v1",
+    "passed": 49,
+    "total": 49,
+    "failed": 0,
+    "skipped": 0,
+    "overall": 9.5,
+    "kind": "full",
+    "evidence": "harness-cli-final/checks.json"
+  },
+  "converged": true
+}

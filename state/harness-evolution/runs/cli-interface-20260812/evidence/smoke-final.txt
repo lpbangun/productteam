@@ -1,0 +1,61 @@
+
+  productteam smoke
+
+  PASS  help
+  PASS  status
+  PASS  org
+  PASS  memory
+  PASS  judge show
+  PASS  bench
+  PASS  bench contract id
+  PASS  help lists score
+  PASS  help lists runtime
+  PASS  help lists harness-checks
+  PASS  help lists gh
+  PASS  help lists skill
+  PASS  help lists chat
+  PASS  repl.sh present
+  PASS  chat refuses non-TTY
+  PASS  skill critique present
+  PASS  skill benchmark present
+  PASS  skill design-sprint present
+  PASS  runtime
+  PASS  judge harness-evolution
+  PASS  gh preflight
+  PASS  gh merge refuses without auth
+  PASS  runtime --check refuses missing provider
+  PASS  checks
+  PASS  ofc refuses provider run
+  PASS  agcode refuses checks
+  PASS  unknown rejects
+  PASS  help lists judge
+  PASS  help lists gate
+  PASS  help lists escalation
+  PASS  help lists resume
+  PASS  help lists inspect
+  PASS  escalation status
+  PASS  escalation status missing honesty
+  PASS  escalation real lifecycle (block/refuse/resume/inspect)
+  PASS  help lists role
+  PASS  role status file-derived
+  PASS  role status closed-iter honesty
+  PASS  learning schema
+  PASS  challenge example
+  PASS  override example
+  PASS  workspace isolation real-worktree refuse/pass
+  PASS  open→baseline cold bootstrap refuse/pass
+  PASS  agent cards list/show/seed + envelope display_name
+  PASS  help lists card
+  PASS  style/project memory inspect + role envelope fields
+  PASS  help lists style
+  PASS  help lists project-memory
+  PASS  experience pool list/add/search + inspect/role wiring
+  PASS  help lists pool
+  PASS  help lists direction
+  PASS  direction propose→select→rebut→seal refuse/pass
+  PASS  judgment gate smoke (regression)
+  PASS  help lists run-loop
+  PASS  overnight run-loop smoke (limits/resume/hard-stops)
+
+  all smoke checks passed
+

@@ -1,0 +1,18 @@
+{
+  "taste": [
+    "rehearsal prefers file evidence",
+    "rehearsal prefers file evidence",
+    "prefer smallest diffs; evidence over prose"
+  ],
+  "risk": [
+    "escalate auth/architecture; no force-push"
+  ],
+  "stack": [
+    "bash CLI + plain state files; no DB/daemon"
+  ],
+  "never": [
+    "auto-Implement past judgment gates; invent permanent workers"
+  ],
+  "updated": "2026-08-11T07:40:09Z",
+  "source": "owner"
+}

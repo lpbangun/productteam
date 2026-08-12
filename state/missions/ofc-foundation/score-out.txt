@@ -1,0 +1,10 @@
+
+  Deterministic checks — onboarding-flight-control
+  contract ofc-v1 · workspace /home/logani/.herdr/worktrees/Product Consulting Harness/test-rapid-basics/tmp/workspaces/onboarding-flight-control · runner lib/run-checks.sh
+
+
+  overall 9.5  → /home/logani/.herdr/worktrees/Product Consulting Harness/test-rapid-basics/state/engagements/onboarding-flight-control/runs/.checks-latest.json
+checks ▸ onboarding-flight-control · 40/40 · weakest: onboarding-quality
+  Recorded iter 2 — overall 9.5
+  Analyst stamp: /home/logani/.herdr/worktrees/Product Consulting Harness/test-rapid-basics/state/engagements/onboarding-flight-control/roles/iter-2/Analyst/stamp.json
+

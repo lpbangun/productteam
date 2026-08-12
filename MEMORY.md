@@ -6,6 +6,21 @@ and evidence-linked.
 
 ## Engagements
 
+- **osint-loop-research** (opened + closed 2026-08-11) — operable loop engine lift.
+  Repo: `/home/logani/projects/osint-loop-research` · Mode: Directive · Contract: osint-loop-v1 · Scorer: checks.
+  Isolated workspace commit `8af078f`. Baseline→iter-1 overall **9.5** (14/14). Critic ACCEPT-WITH-NITS.
+  Evidence: `state/engagements/osint-loop-research/`. Live sibling not mutated.
+- **onboarding-flight-control** foundation proof iter-2 (2026-08-11) — closed seams:
+  workspace isolation for checks/score, judgment gate, sealed roles, Analyst stamp, Critic close.
+  Evidence: `state/engagements/onboarding-flight-control/roles/iter-2/`.
+
+
+- **harness-cli** (opened + closed 2026-08-07) — Product Consulting Harness
+  **CLI** (not JobOS). Mode: Directive · Contract: harness-cli-v1 · Scorer: checks.
+  Baseline 3.4 → **9.5** in 1 iteration; all 9 dims ≥9.5; 49/49 checks live.
+  CONVERGED. Evidence: `state/engagements/harness-cli/`. Mis-scope note: an
+  early turn targeted JobOS; owner corrected to CLI-only before baseline.
+
 ## Validations (frozen harness)
 
 - **2026-08-06 · harness CONVERGED** harness-apc-v1 iter-5 overall 8.4 ·
@@ -58,6 +73,46 @@ and evidence-linked.
 
 ## Lessons
 
+- 2026-08-11 · Agent-Socials overnight slice: named cards (Kai/Meridian/Forge/Vesper) +
+  style/project memory + file experience pool + Guided propose/rebut/seal +
+  `productteam run-loop` (resume after kill). Integration PASS under
+  `state/missions/overnight-named-org/`. Steal Room naming + GEA experience
+  excerpts only — no daemon/DB/RAG/code evolution. Nit fixed mid-rehearsal:
+  `direction list --json` must be machine-clean JSON.
+
+- 2026-08-11 · three-mission loop: `productteam checks` must ensure isolated worktrees and archive `runs/check-*/workspace.json`; restore check-induced dirt so role invokes aren't blocked. `productteam open` + `baseline` remove hand-written engagement trees. OSINT stop/resume must be one engine + exit 2 when max not raised.
+
+- 2026-08-10 · operability mission iter-6 Build 2: `consult gate` now
+  re-derives implementability from engagement `judgment/*.json`. Guided
+  needs selection; Directive a durable direction; Challenge refuses the
+  harmful path and permits only its selected safer alternative; Override
+  requires risks plus critic/evidence/frozen-contract non-waivers. Eight
+  real CLI refuse/pass paths passed; active Directive gate points to the
+  owner mission. Evidence: `state/harness-evolution/runs/iter-6/`.
+- 2026-08-10 - operability mission iter-6 Build 3: `consult escalation` now
+  persists blocked/resolved state, pauses all progress paths, requires separate
+  owner authorization for resume, consumes it, and appends continuation memory.
+  `consult inspect` regenerates an honest file-only pack with missing markers
+  and path-safe score/lesson discovery. Seven lifecycle markers pass; Advisor
+  5/5 PASS; Critic ACCEPT-WITH-NITS, no blockers. Evidence:
+  `state/harness-evolution/runs/iter-6/`.
+- 2026-08-10 · operability mission iter-6 Build 4: `productteam role`
+  invokes Analyst/Builder/Critic through the existing provider seam with
+  write-once Builder seals and hash-indexed request/result/manifest envelopes.
+  Analyst-stamped scores reject self-evaluation; close requires Critic evidence.
+  File-derived status reports asked/ran/produced without chat. Fast-forwarded
+  `Fix/New-User-TUI` and ported all four operability seams to the visual
+  `bin/productteam` surface while retaining `bin/consult` compatibility.
+  Advisor 5/5 PASS; Critic ACCEPT-WITH-NITS; integrated harness 50/50.
+  Evidence: `state/harness-evolution/runs/iter-6/`.
+- 2026-08-10 · operability mission iter-6 Build 1: all score/check paths
+  now resolve a detached client worktree through `lib/workspace.sh`; the
+  owner's live `Repo:` tree is never a fallback. Dirty reuse refuses by
+  client name unless `--allow-dirty <reason>` is explicit and archived.
+  `workspace <client> ensure|status|remove` plus run-dir path/SHA/dirty
+  evidence lets the next session continue from files. Advisor: 5/5 PASS;
+  Critic: ACCEPT-WITH-NITS. Evidence:
+  `state/harness-evolution/runs/iter-6/`.
 - 2026-08-06 · harness-evolution iter-5: close memory/autonomy residuals via
   org self-reviews + phases.json + harness-checks — no new CLI verbs.
   Evidence: `state/harness-evolution/runs/iter-5/`.
@@ -162,3 +217,38 @@ and evidence-linked.
      path.
   The org recommends option 2 or 3 but will not apply either without
   owner sign-off (Constitution: product-behavior change = escalate).
+
+- **2026-08-07** · CLI command renamed `consult` → `productteam` (`bin/consult` remains a shim).
+
+- **2026-08-10 · Visual/runtime proof discipline.** Loading chrome must preserve
+  provider output and exit status on both success and refusal; render captured
+  failure text before the compact card. Deterministic visual criteria may be
+  green without live convergence: a runner must validate the required real
+  provider transcript before writing `converged: true`.
+
+- **2026-08-10 · Interactive CLI honesty.** A blocking provider turn must say it
+  is working rather than imply streaming; Ctrl+C must terminate the whole
+  provider process group, retain any bytes and their path, mark the worker
+  failed, and return to the prompt. PTY probes need wall-clock-bounded drains
+  or spinner output can starve the intended signal window. Keep `/help` and
+  slash-prefix hints on one verb list; keep exported sessions as markdown
+  under `state/.cli/sessions/`.
+
+- **2026-08-12 · CLI metadata and frontend boundary.** Keep canonical
+  command name/aliases, usage, handler, chat classification/reason, and
+  machine-output capability in one descriptive table. Human help, JSON help,
+  top-level dispatch, slash hints, and slash routing must consume it. Parse
+  slash input into an argv array without `eval`; PTY-test required options,
+  quoting, metacharacter inertness, and paths containing spaces.
+- **2026-08-12 · Framework evidence gate.** A working TUI spike is not adoption
+  evidence. Ink and OpenTUI both consumed the plain-file/JSON boundary and
+  passed focused tests, but added more than 1,100 source lines, large runtime
+  trees, higher runtime floors, no provider streaming, no screen-reader proof,
+  and zero Bash deletion. Delete candidates that miss the 25–30% net-deletion
+  gate; reconsider only after measured multiline, scrolling, focus, streaming,
+  Unicode, or repaint defects.
+- **2026-08-12 · Benchmark integrity over cosmetic convergence.** Do not rewrite
+  immutable historical evidence merely to satisfy a portability rubric that
+  rejects machine-local paths. Record the blind spot and finish honestly
+  non-converged at the iteration cap rather than inflate a score or erase
+  provenance.

@@ -1,0 +1,11 @@
+{
+  "role": "Analyst",
+  "iter": 2,
+  "provider": "agent",
+  "identity": "analyst",
+  "exit": 0,
+  "ran_at": "2026-08-11T04:13:44Z",
+  "refusal_reason": null,
+  "output": "**READY_TO_SCORE** — stamped 2026-08-11T04:13Z (Analyst, iter 2)\n\n| Check | Verdict | Evidence |\n|---|---|---|\n| (1) Isolated workspace ≠ source | PASS | `state/engagements/onboarding-flight-control/workspace.json`: `path` = `.../tmp/workspaces/onboarding-flight-control`, `source_repo` = `/home/logani/projects/onboarding-flight-control`; mirrored in `runs/check-20260811T041005Z-3881502/workspace.json` (`dirty: false`, `sha` `6a8db8e…`) |\n| (2) Builder sealed verification | PASS | `roles/iter-2/Builder/seal.json` (`sealed_by: principal`, `write_once: true`); sealed result `roles/iter-2/Builder/attempt-3/result.json` cites **HEAD** `6a8db8e260a38851f62ec92bcd681d2010a0e75a` and **Product files changed: none** (matches workspace SHA; attempt-2 refused for unavailable workspace) |\n| (3) ofc-v1 still scoring path | PASS | `contract.json` (`contract: ofc-v1`, `scorer: checks`); `BENCHMARK-CONTRACT.md`; `judgment/selection.json` direction re-verify ofc-v1; live checks `runs/.checks-latest.json` + `runs/check-20260811T041005Z-3881502/checks.json` both `contract: ofc-v1` |\n\nNo blockers. Proceed to score against ofc-v1 checks on the isolated workspace.",
+  "output_sha256": "ae63d33c8d68a78570e97d966a51cf3812fc4ddde2b5990c253dde4e5ecddd58"
+}

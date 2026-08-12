@@ -1,0 +1,4 @@
+
+  error: scores invalid: missing Analyst stamp /home/logani/.herdr/worktrees/Product Consulting Harness/test-rapid-basics/state/engagements/onboarding-flight-control/roles/iter-99/Analyst/stamp.json
+
+missing_stamp_rc=1

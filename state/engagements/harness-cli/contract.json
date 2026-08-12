@@ -1,0 +1,184 @@
+{
+  "contract": "harness-cli-v1",
+  "frozen": "2026-08-07",
+  "scorer": "checks",
+  "checks_runner": "lib/harness-cli-checks.sh",
+  "client": "harness-cli",
+  "subject": "Product Consulting Harness CLI (bin/consult, lib/, docs/, tests/)",
+  "surface": "CLI",
+  "mode": "Directive",
+  "target": 9.0,
+  "convergence": "every dimension >= 9.0 on the same scored iteration",
+  "max_iterations": 6,
+  "iteration_model": "iter-0 baseline + up to 5 improvement iterations",
+  "source": "BENCHMARK-CONTRACT.md",
+  "check_catalog": "checks/CHECK-CATALOG.md",
+  "check_count": 49,
+  "dimensions": [
+    "visual-cli-clarity",
+    "splash-animation",
+    "onboarding-ease",
+    "agent-detection",
+    "feature-reachability",
+    "skills-llm-reality",
+    "documentation",
+    "developer-experience",
+    "product-clarity"
+  ],
+  "checks": {
+    "visual-cli-clarity": {
+      "ids": [
+        "cli-theme-single-source",
+        "cli-monochrome-chrome",
+        "cli-accent-budget",
+        "cli-no-color-clean",
+        "cli-plain-pipe-safe"
+      ],
+      "gates": ["cli-no-color-clean", "cli-plain-pipe-safe"]
+    },
+    "splash-animation": {
+      "ids": [
+        "splash-command-exists",
+        "splash-graph-nodes-edges",
+        "splash-frames-animate",
+        "splash-bounded-noninteractive",
+        "splash-first-run-hook"
+      ],
+      "gates": ["splash-command-exists", "splash-bounded-noninteractive"]
+    },
+    "onboarding-ease": {
+      "ids": [
+        "onboarding-command-exists",
+        "onboarding-cold-start",
+        "onboarding-steps-explicit",
+        "onboarding-idempotent",
+        "onboarding-next-action"
+      ],
+      "gates": ["onboarding-command-exists", "onboarding-cold-start"]
+    },
+    "agent-detection": {
+      "ids": [
+        "detect-command-exists",
+        "detect-covers-known-agents",
+        "detect-beyond-path",
+        "detect-no-false-positive",
+        "detect-machine-readable",
+        "detect-versions"
+      ],
+      "gates": ["detect-command-exists", "detect-no-false-positive"]
+    },
+    "feature-reachability": {
+      "ids": [
+        "help-lists-every-command",
+        "every-command-exits-zero",
+        "core-features-reachable",
+        "unknown-command-honest",
+        "no-hidden-env-requirements"
+      ],
+      "gates": ["help-lists-every-command", "every-command-exits-zero"]
+    },
+    "skills-llm-reality": {
+      "ids": [
+        "provider-live-answer",
+        "tmp-projects-two-varying",
+        "skill-uses-provider-seam",
+        "skill-critique-live-project-a",
+        "skill-benchmark-live-project-b",
+        "skill-design-sprint-live",
+        "skills-outputs-project-specific",
+        "no-mock-provider"
+      ],
+      "gates": [
+        "provider-live-answer",
+        "skill-uses-provider-seam",
+        "no-mock-provider"
+      ]
+    },
+    "documentation": {
+      "ids": [
+        "readme-matches-cli",
+        "readme-onboarding-section",
+        "docs-cli-not-tui",
+        "docs-no-stale-paths",
+        "docs-skills-live"
+      ],
+      "gates": ["readme-matches-cli", "docs-no-stale-paths"]
+    },
+    "developer-experience": {
+      "ids": [
+        "smoke-green",
+        "harness-cli-checks-runner",
+        "checks-dispatch-routes-engagement",
+        "no-new-runtime-deps",
+        "errors-name-the-fix",
+        "scripts-parse-clean"
+      ],
+      "gates": ["smoke-green", "harness-cli-checks-runner"]
+    },
+    "product-clarity": {
+      "ids": [
+        "status-states-identity",
+        "non-goals-visible",
+        "engagement-scope-explicit",
+        "no-overclaim"
+      ],
+      "gates": ["no-overclaim"]
+    }
+  },
+  "live_checks": [
+    "provider-live-answer",
+    "skill-critique-live-project-a",
+    "skill-benchmark-live-project-b",
+    "skill-design-sprint-live",
+    "skills-outputs-project-specific"
+  ],
+  "band_table": [
+    { "when": "all checks pass", "score": 9.5 },
+    { "when": "all gates pass and exactly one non-gate check fails", "score": 8.0 },
+    { "when": "all gates pass and >=60% of checks pass", "score": 7.0 },
+    { "when": "all gates pass and <60% of checks pass", "score": 5.5 },
+    { "when": "any gate fails and >=2 checks pass", "score": 4.0 },
+    { "when": "any gate fails and <2 checks pass", "score": 2.0 }
+  ],
+  "scoring_protocol": {
+    "independent_scorer": "Analyst or Independent Verifier; never the iteration's Builder.",
+    "deterministic": "Dimension scores computed from check results via band_table; no hand adjustment.",
+    "void_rule": "Score without a cited path, command output, or check id is void.",
+    "live_rule": "A run with any live check skipped is kind=partial and cannot converge.",
+    "critic_reaudit": "Mandatory before the run is accepted.",
+    "overall": "Mean of nine dimensions, one decimal; informational only."
+  },
+  "baseline_rules": {
+    "iter_0": "Scored before any CLI behavior change; measurement-only scaffold allowed.",
+    "immutable": "Never re-scored retroactively."
+  },
+  "dependency_allowlist": [
+    "bash", "awk", "sed", "grep", "find", "sort", "jq", "python3", "git", "gh"
+  ],
+  "invariants": [
+    "Local-first harness: no daemon, server, database, or network service.",
+    "No LLM mocks: real agent runtime or declared CONSULT_PROVIDER only.",
+    "Client product repos stay siblings; no nested clients/ tree.",
+    "Provider seam stays lib/provider.sh; no second runtime module.",
+    "Client vision is a constraint, never edited to ease a score.",
+    "Contract, contract.json, and CHECK-CATALOG.md frozen during a run."
+  ],
+  "out_of_scope": [
+    "JobOS / Job App / any sibling product",
+    "Amending BENCHMARKS.md v1, ofc-v1, or harness-apc-v1"
+  ],
+  "critical_failures": [
+    "Mocked LLM/agent evidence or skill artifact naming no runtime binary",
+    "Benchmark moved mid-run",
+    "Self-scoring by the iteration's Builder",
+    "Missing Critic verdict",
+    "Fabricated check output",
+    "Scope breach (sibling product touched, nested clients/, second runtime module)",
+    "Invariant breach (daemon/server/database, provider seam moved)",
+    "Secrets in engagement artifacts"
+  ],
+  "stop_conditions": {
+    "converged": "All nine dimensions >= 9.0 with live checks executed and Critic accept.",
+    "exhausted": "6 iterations consumed -> write convergence-report.md"
+  }
+}

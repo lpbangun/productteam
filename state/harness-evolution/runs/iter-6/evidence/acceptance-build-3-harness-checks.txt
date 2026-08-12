@@ -1,0 +1,47 @@
+
+  Harness checks (harness-apc-v1 objective subset)
+
+  ✓ workspace-default-isolated           real-git-worktree
+  ✓ workspace-lifecycle-cli              real-git-worktree
+  ✓ workspace-dirty-refusal              real-git-worktree
+  ✓ workspace-dirty-escape-evidence      real-git-worktree
+  ✓ workspace-safe-remove                real-git-worktree
+  ✓ gate-guided-refuse                   real-cli-engagement
+  ✓ gate-guided-pass                     real-cli-engagement
+  ✓ gate-directive-refuse                real-cli-engagement
+  ✓ gate-directive-pass                  real-cli-engagement
+  ✓ gate-challenge-refuse                real-cli-engagement
+  ✓ gate-challenge-alternative           real-cli-engagement
+  ✓ gate-override-refuse                 real-cli-engagement
+  ✓ gate-override-pass                   real-cli-engagement
+  ✓ escalation-block-state               real-cli-continuation
+  ✓ escalation-pauses-progress           real-cli-continuation
+  ✓ escalation-resume-refuse             real-cli-continuation
+  ✓ escalation-resume-authorized         real-cli-continuation
+  ✓ escalation-memory-continuation       real-cli-continuation
+  ✓ inspect-pack-regenerable             real-cli-continuation
+  ✓ inspect-pack-missing-honest          real-cli-continuation
+  ✓ help-lists-runtime                   ok
+  ✓ smoke-green                          Preparing worktree (detached HEAD 9242270)
+  ✓ status-runs                          ok
+  ✓ runtime-detect                       ok
+  ✓ runtime-honest-fail                  ok
+  ✓ lock-files-present                   ok
+  ✓ lock-hashes-stable                   unchanged
+  ✓ learning-schema                      ok
+  ✓ judgment-examples                    ok
+  ✓ harness-engagement-mode              ok
+  ✓ memory-harness-lesson                ok
+  ✓ github-seam                          ok
+  ✓ merge-refuses-without-auth           refused_ok
+  ✓ skills-present                       ok
+  ✓ skill-critique-runs                  ok
+  ✓ skill-benchmark-runs                 ok
+  ✓ skill-design-sprint-runs             ok
+  ✓ lessons-closed-iters                 ok
+  ✓ phases-artifact                      loop-sequence-only
+  ✓ org-self-review-recent               ok
+  ✓ secrets-scan                         clean
+  ✓ provider-seam                        ok
+
+  42 passed · 0 failed  → state/harness-evolution/runs/iter-6/checks.json

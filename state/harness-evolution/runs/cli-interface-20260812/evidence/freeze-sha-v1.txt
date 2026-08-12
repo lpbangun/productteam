@@ -1,0 +1,1 @@
+7804c3dd8872e4d2635988510b7344e0f52e1a9a79def6142c3b9f93e08e254c  state/harness-evolution/runs/cli-interface-20260812/CLI-BENCHMARK-CONTRACT.md

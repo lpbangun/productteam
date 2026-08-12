@@ -1,0 +1,31 @@
+
+> opentui-spike@0.1.0 snapshot
+> node src/index.js --snapshot --width 80
+
+╭ productteam · agcode-learning ───────────────────────────────────────────────╮
+│iter iter-3 · overall 8.3 · areas≥9 3 · trend +0.1 · 6 engagements · provider…│
+│Local-first agentic-coding learning system — tutor skill plus plain-text      │
+│learning files; research artifacts justify the design                         │
+├ transcript · evidence · missing ─────────────────────────────────────────────┤
+│evidence missing                                                              │
+│evidence unavailable: no inspect-pack.json for agcode-learning                │
+├ workers · activity ──────────────────────────────────────────────────────────┤
+│✗ session-3116676 Analyst failed · hello · /nonexistent · 0s                  │
+│✓ session-3115140 Analyst completed · Reply with exactly LIVE-CYCLE-OK · agen…│
+│✗ session-3112312 Analyst failed · hello · /nonexistent · 1s                  │
+├ palette ─────────────────────────────────────────────────────────────────────┤
+│>                                                                             │
+│agents  productteam agents [--json]                                           │
+│baseline  productteam baseline <client> [--allow-dirty <reason>]              │
+│bench  productteam bench <client> [run --iter <n>]                            │
+│card  productteam card list|show|seed-specialist …                            │
+│chat  productteam chat                                                        │
+│checks  productteam checks <client> [--allow-dirty <reason>]                  │
+│direction  productteam direction <client> propose|list|clear|rebut …          │
+│escalation  productteam escalation <client> block <id> <summary> <option> [op…│
+│+30 more matches                                                              │
+│detail: cli command · productteam agents [--json] — chat: supported           │
+│(read/delegated ops only; palette never runs it)                              │
+│type to filter the registry · Enter shows detail — nothing is executed        │
+│prototype · reads live CLI JSON + state files · never writes · Ctrl+C quits ·…│
+╰──────────────────────────────────────────────────────────────────────────────╯

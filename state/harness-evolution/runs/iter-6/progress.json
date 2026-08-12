@@ -1,0 +1,62 @@
+{
+  "mission": "unattended-consulting-operability",
+  "mission_iteration": 1,
+  "iteration_cap": 3,
+  "updated": "2026-08-10",
+  "build_order": [1, 2, 3, 4],
+  "builds": {
+    "1": {
+      "name": "workspace-isolation",
+      "status": "done",
+      "benchmark": "mission-benchmark.md",
+      "advisor_verdict": "evidence/advisor-verdict.json",
+      "critic_verdict": "critic-verdict.md",
+      "verification": {
+        "smoke_exit": 0,
+        "harness_checks_exit": 0,
+        "harness_checks": "27/27"
+      }
+    },
+    "2": {
+      "name": "judgment-gates",
+      "status": "done",
+      "benchmark": "mission-benchmark.md#build-2",
+      "advisor_verdict": "evidence/build-2-advisor-verdict.json",
+      "critic_verdict": "build-2-critic-verdict.md",
+      "verification": {
+        "gate_smoke_exit": 0,
+        "smoke_exit": 0,
+        "harness_checks_exit": 0,
+        "harness_checks": "35/35"
+      }
+    },
+    "3": {
+      "name": "inspect-pack-escalations",
+      "status": "done",
+      "benchmark": "mission-benchmark.md#build-3",
+      "advisor_verdict": "evidence/build-3-advisor-verdict.json",
+      "critic_verdict": "build-3-critic-verdict.md",
+      "verification": {
+        "escalation_smoke_exit": 0,
+        "smoke_exit": 0,
+        "harness_checks_exit": 0,
+        "harness_checks": "42/42"
+      }
+    },
+    "4": {
+      "name": "role-envelope-inspection",
+      "status": "done",
+      "benchmark": "mission-benchmark.md#build-4",
+      "advisor_verdict": "evidence/build-4-advisor-verdict.json",
+      "critic_verdict": "build-4-critic-verdict.md",
+      "verification": {
+        "role_smoke_exit": 0,
+        "smoke_exit": 0,
+        "harness_checks_exit": 0,
+        "harness_checks": "50/50"
+      }
+    }
+  },
+  "converged": true,
+  "next_action": "Mission complete: all four ordered builds passed Advisor and Critic acceptance."
+}

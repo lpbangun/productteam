@@ -1,0 +1,9 @@
+[project]
+name = "nursery-irrigation"
+version = "0.1.0"
+description = "Overnight valve schedules from transpiration deficit (dummy project)"
+requires-python = ">=3.11"
+dependencies = []
+
+[tool.harness]
+purpose = "dummy target for Product Consulting Harness CLI skill verification"
