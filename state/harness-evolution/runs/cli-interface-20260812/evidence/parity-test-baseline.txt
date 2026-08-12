@@ -1,0 +1,29 @@
+
+  cli-interface parity (frozen contract cli-interface-20260812)
+
+  PASS  frozen contract hash matches FREEZE-SHA.txt
+  PASS  help exits 0
+  PASS  -h exits 0
+  PASS  --help exits 0
+  PASS  help names all 32 top-level commands
+  FAIL  checks onboarding-flight-control exits 0 (rc=2 — workspace-metadata-mismatch: onboarding-flight-control (/home/logani/.herdr/worktrees/Product Consulting Harness/upgrade-basic-funcionalities/state/engagements/onboarding-flight-control/workspace.json))
+  FAIL  README documents direction
+  FAIL  README documents pool
+  FAIL  README documents project-memory
+  FAIL  README documents run-loop
+  FAIL  README documents style
+  PASS  chat refuses non-TTY with TTY remedy
+  PASS  /help lists all 25 slash verbs
+  PASS  all 14 unsupported chat commands classified honestly
+  PASS  all machine-readable surfaces emit valid JSON
+  PASS  redirected output carries no ANSI
+  PASS  color TTY emits ANSI
+  PASS  NO_COLOR=1 suppresses ANSI on TTY
+  PASS  multi-word argv round-trips byte-identical
+  PASS  empty argv rejected
+  FAIL  style metadata has no duplicated entries (found 1 duplicate(s))
+  PASS  unknown command exits non-zero
+  PASS  usage error exits non-zero (open)
+  PASS  usage error exits non-zero (run-loop)
+
+  cli-interface parity: FAIL (frozen-baseline defects expected at iter 1)

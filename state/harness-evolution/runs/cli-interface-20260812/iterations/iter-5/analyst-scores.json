@@ -1,0 +1,164 @@
+{
+  "benchmark": "productteam-cli-interface",
+  "contract": "cli-interface-20260812-v3",
+  "contract_file": "CLI-BENCHMARK-CONTRACT.md",
+  "contract_sha256": "92f06ecd08e4e804e8c703af4a3af38519a7702ba2a72494fcdf9d596a6dc7f6",
+  "freeze_proof": "FREEZE-SHA.txt",
+  "run": "cli-interface-20260812",
+  "iteration": 5,
+  "kind": "analyst-rebenchmark",
+  "iteration_type": "no-change",
+  "frozen": "2026-08-12 (v3 re-freeze)",
+  "evaluator": "Analyst (independent; AnalystIter5 worker; Principal did not score and did not author this artifact)",
+  "subject": "Unchanged iteration-2 deliverable: bin/productteam + lib/commands.sh + lib/repl.sh + lib/workspace.sh + lib/onboarding.sh + README.md + tests/cli-interface-parity.sh on HEAD 1ebb52f (uncommitted repair worktree; contract file and FREEZE-SHA.txt untouched)",
+  "no_code_delta": {
+    "accepted_work": "none",
+    "code_delta": "none",
+    "note": "Iteration 5 is a no-change re-benchmark per max-iteration-plan.md: no safe work item has positive benchmark lift, and rewriting immutable historical evidence is rejected. Current implementation and archived evidence are unchanged since iteration 2 — re-verified read-only this iteration (32 cmd_reg_add rows + CMD_CHAT_ONLY in lib/commands.sh; workspace-metadata-recreate/repoint in lib/workspace.sh:76-80; repl_tokenize + scoped INT trap rc=130 in lib/repl.sh:312,351; onboarding --iter syntax at lib/onboarding.sh:51; cmd_status_json at bin/productteam:287 and cmd_reg_index dispatch at 1422-1425; tracked machine-pinned workspace.json still present). Nothing was re-run; iteration-2 final artifacts are reused as evidence per max-iteration-plan.md.",
+    "evidence_reused": [
+      "evidence/parity-final.txt (31/31 PASS)",
+      "evidence/smoke-final.txt (exit 0, no FAIL)",
+      "evidence/visual-final.json (14/14, converged: true, live_provider_proof pass)",
+      "evidence/live-chat-cycle.typescript (real agent runtime, LIVE-CYCLE-OK)",
+      "evidence/harness-checks-final/checks.json (57/57, validation: real-commands)",
+      "evidence/usage-parity-probes.txt (10 rows, exit 1 + usage matching help)"
+    ]
+  },
+  "scores": {
+    "reachability": {
+      "score": 9,
+      "rationale": "Parity probe 2 PASS (help/-h/--help exit 0 and name all 32 top-level commands) and probe 3 PASS (checks onboarding-flight-control exits 0 on a cold checkout; a pre-existing marker directory at the would-be workspace path survives byte-identical — non-destructive guard). D1 holds: lib/workspace.sh workspace_ensure recreates metadata only when the recorded path is absent (workspace-metadata-recreate) and leaves an existing recorded path byte-identical while using the canonical workspace (workspace-metadata-repoint) — never deleting/resetting a worktree. Dispatch is registry-driven (bin/productteam:1422-1425 cmd_reg_index; unknown command dies non-zero, probe 16). smoke-final.txt exit 0; harness-checks-final/checks.json 57/57; usage-parity-probes.txt exercises 9 misuse probes all exit 1 with help-matching usage. Conservative 9, not 10 (unchanged from iteration 2): report and inspect are named/routed by the registry but their happy paths are not directly executed in the archived final evidence, and the repoint branch proceeds exit 0 (the frozen probe's expectation) rather than hard-refusing non-zero on an existing foreign recorded path.",
+      "evidence": [
+        "evidence/parity-final.txt (probes 2, 3, 16 PASS)",
+        "evidence/smoke-final.txt (exit 0, no FAIL lines)",
+        "evidence/harness-checks-final/checks.json (57/57, validation: real-commands)",
+        "evidence/usage-parity-probes.txt (9 misuse probes + unknown command, exit 1)",
+        "lib/workspace.sh:66-101 (workspace_ensure recreate/repoint, never destructive)",
+        "bin/productteam:1422-1425 (cmd_reg_index registry dispatch)"
+      ]
+    },
+    "chat-reachability-classification": {
+      "score": 10,
+      "rationale": "All classification and forwarding probes PASS: probe 5 (chat refuses non-TTY with a TTY remedy), probe 6 (help --json registry membership 32/18/14/6 cross-checked set-for-set against the frozen table), probe 7 (PTY /help lists the full 24-verb registry-derived palette; all 14 unsupported commands yield `unknown /X — /help` with a non-empty registry chat_reason), probe 8 (/score <client> --iter 0 and /bench <client> run --iter 7 forward --iter and reach the honest Analyst-stamp refusal `scores invalid: missing Analyst stamp …` — never a missing-iter/usage error), probe 9 (quoted /provider \"codex\" selects codex without eval; embedded $(…)/; text inert). Real runtime proof: evidence/live-chat-cycle.typescript shows an authenticated real `agent` cycle returning LIVE-CYCLE-OK (exit 0) — no mocks (scoring protocol rule 6). Source: lib/commands.sh registry (18 supported / 14 unsupported with safety-usefulness reasons / 6 chat-only CMD_CHAT_ONLY) drives /help, hints, routing, and classification via lib/repl.sh repl_palette_build + repl_run_slash.",
+      "evidence": [
+        "evidence/parity-final.txt (probes 5, 6, 7, 8, 9 PASS)",
+        "evidence/live-chat-cycle.typescript (real agent runtime, LIVE-CYCLE-OK)",
+        "lib/commands.sh (registry + non-empty chat_reason for all 14 unsupported)",
+        "lib/repl.sh:27-46, 391-471 (registry-driven palette, slash routing, forwarding)",
+        "CLI-BENCHMARK-CONTRACT.md dimension 2 (frozen classification table)"
+      ]
+    },
+    "argument-usage-parity": {
+      "score": 10,
+      "rationale": "Slash forwarding is argument-identical to the CLI path: probe 8 PASS — /score and /bench with --iter reach the same honest downstream stamp refusal as the CLI controls (bin/productteam score/bench with --iter), never a missing-iter error. Probe 16 PASS — unknown command and usage errors (open, run-loop) exit non-zero. evidence/usage-parity-probes.txt: 9 misuse probes (open, workspace <client>, score, run-loop, gh, skill, splash --bogus, onboarding --bogus, agents --bogus) all exit 1 naming the same usage the help table promises, plus unknown command exit 1. Baseline cosmetic notes (pool list --bogus error prefix; bin/consult forms in README body) are outside the rubric anchors (usage-line enforcement and slash-forwarding identity) and appear in no failing probe.",
+      "evidence": [
+        "evidence/parity-final.txt (probes 8, 16 PASS)",
+        "evidence/usage-parity-probes.txt (10 rows, exit 1 + usage matching help)",
+        "lib/repl.sh:391-471 (slash argv forwarded verbatim to REG_HANDLER)",
+        "bin/productteam:1169-1260, 1299-1316 (cmd_bench/cmd_run_detail/parse_score_args)"
+      ]
+    },
+    "help-readme-onboarding-parity": {
+      "score": 10,
+      "rationale": "Probe 4 PASS — README.md documents every help-listed command (32/32: quickstart plus the 32-row CLI-surface table under README.md:65 `CLI surface (frozen contract cli-interface-20260812-v3)`). Probe 12 PASS — onboarding --yes next-step text uses the current syntax `productteam score <client> --iter <n>`; lib/onboarding.sh:51 prints the --iter form (baseline D4 stale `productteam score <client>` fixed), and onboarding succeeds on an isolated state root (parity runs with a fresh CONSULT_STATE_ROOT). README also documents machine-readable boundaries (README.md:116) and the bin/consult compatibility shim.",
+      "evidence": [
+        "evidence/parity-final.txt (probes 4, 12 PASS)",
+        "lib/onboarding.sh:51 (step 4 prints `productteam score <client> --iter <n>`)",
+        "README.md:65-68 (32-command CLI-surface table under the frozen contract)",
+        "CLI-BENCHMARK-CONTRACT.md dimension 4"
+      ]
+    },
+    "argv-safety": {
+      "score": 10,
+      "rationale": "Probe 9 PASS — quoted slash argv parses as one value (/provider \"codex\" selects codex, quotes stripped) and embedded `;$(…)` text is inert (nothing executed). Probe 14 PASS — CLI multi-word argv round-trips byte-identical (style append taste \"alpha beta gamma\") and empty argv is rejected non-zero. Code: lib/repl.sh:349-389 repl_tokenize is a safe shell-like tokenizer honoring single/double quotes and backslash with no eval and no re-parse; metacharacters stay literal.",
+      "evidence": [
+        "evidence/parity-final.txt (probes 9, 14 PASS)",
+        "lib/repl.sh:349-389 (repl_tokenize: quotes honored, no eval, metachars inert)",
+        "CLI-BENCHMARK-CONTRACT.md dimension 5"
+      ]
+    },
+    "frontend-machine-boundary": {
+      "score": 10,
+      "rationale": "Probe 6 PASS — help --json emits the frozen registry shape (32 commands with usage/chat_supported/chat_reason, 6 chat_only verbs) and membership matches the frozen classification 32/18/14/6 set-for-set. Probe 11 PASS — status --json lists engagements including onboarding-flight-control and harness-evolution. Probe 10 PASS — all existing machine-readable surfaces (agents --json, card list --json, style show --json, pool list --json, project-memory show <client> --json, escalation status, gate/workspace/role status) parse as valid JSON. README documents every surface in the `Machine-readable boundaries` table (README.md:116-131). Code: cmd_help_json (lib/commands.sh:108-122), cmd_status_json (bin/productteam:287-331).",
+      "evidence": [
+        "evidence/parity-final.txt (probes 6, 10, 11 PASS)",
+        "lib/commands.sh:108-122 (cmd_help_json frozen shape)",
+        "bin/productteam:287-331 (cmd_status_json engagements array)",
+        "README.md:116-131 (Machine-readable boundaries table)",
+        "CLI-BENCHMARK-CONTRACT.md dimension 6 + registry shape"
+      ]
+    },
+    "non-tty-redirect-nocolor-exit": {
+      "score": 10,
+      "rationale": "Probe 13 PASS — `bench harness-evolution` and `run harness-evolution 7` handle summary-shaped runs/iter-7/scores.json (`\"scores\": null`) honestly with rc=1, no `jq: error` traceback, never exit 5 (D7 fixed: cmd_bench skips non-contract-shaped history rows; cmd_run_detail shape-checks and dies with the shape plus a re-score remedy). Probe 15 PASS — redirected output and TTY+NO_COLOR=1 carry zero ESC bytes while a color TTY emits ANSI. Probe 16 PASS — unknown command and usage errors exit non-zero. All four 9-10 criteria evidenced.",
+      "evidence": [
+        "evidence/parity-final.txt (probes 13, 15, 16 PASS)",
+        "bin/productteam:1185-1187, 1248-1256 (cmd_bench filter + cmd_run_detail honest shape die)",
+        "evidence/bench-harness-evolution.txt, evidence/run-harness-evolution-7.txt (baseline D7 raw jq exit 5, now fixed)",
+        "CLI-BENCHMARK-CONTRACT.md dimension 7"
+      ]
+    },
+    "ctrl-c-child-cleanup-partial-artifacts": {
+      "score": 9,
+      "rationale": "Code contract holds: lib/repl.sh repl_ask installs a scoped `trap INT` (lib/repl.sh:312) running repl_interrupt_cleanup (lib/repl.sh:225-232) — kill of the provider process group (-pid) with pid fallback, reap, rc=130, worker marked failed, partial artifact bytes preserved with the honest `Ctrl+C leaves partial on disk` message; the REPL survives. lib/run-loop.sh traps TERM/INT to loop_pause_for_signal (status=paused, --resume continues). Runtime proof: evidence/visual-final.json 14/14 including honest-partial-output (SIGINT keeps REPL alive; artifact bytes/path preserved; worker marked failed; clean exit) with the required live provider proof (evidence/live-chat-cycle.typescript); smoke-final.txt run-loop smoke PASS. Conservative 9, not 10 (unchanged from iteration 2): the artifact/worker/REPL-alive behavior is evidenced in the recorded transcript, but the literal 130 exit recording is code-verifiable (rc=130) and not shown in an archived output transcript.",
+      "evidence": [
+        "lib/repl.sh:225-232, 311-317 (repl_interrupt_cleanup killpg + scoped trap, rc=130)",
+        "lib/run-loop.sh (loop_pause_for_signal on TERM/INT)",
+        "evidence/visual-final.json (14/14, honest-partial-output pass) + live_provider_proof",
+        "evidence/smoke-final.txt (overnight run-loop smoke PASS)",
+        "CLI-BENCHMARK-CONTRACT.md dimension 8"
+      ]
+    },
+    "visual-smoke-contracts": {
+      "score": 10,
+      "rationale": "evidence/smoke-final.txt: `productteam smoke` exits 0 with no FAIL lines (`all smoke checks passed`; the archived file holds 55 PASS rows as of this audit — the dimension's 9-10 anchor is exit 0 + no FAIL, which holds; the iteration-2 narrative's 41/41 count is superseded by the file's actual row count, no score impact). The baseline single FAIL (`checks`, D1 root cause) is gone. Parity probe 15 PASS — splash and help render statically in a pipe with zero ESC bytes. evidence/visual-final.json: visual-cli-v2 contract 14/14 (converged: true) with live provider proof (real authenticated agent cycle). Rubric 9-10 fully met.",
+      "evidence": [
+        "evidence/smoke-final.txt (exit 0, `all smoke checks passed`, no FAIL lines)",
+        "evidence/visual-final.json (14/14, converged: true, live_provider_proof pass)",
+        "evidence/parity-final.txt (probe 15: splash/help ANSI-free in pipe)",
+        "CLI-BENCHMARK-CONTRACT.md dimension 9"
+      ]
+    },
+    "dependencies-cold-start": {
+      "score": 8,
+      "rationale": "D1 cold-start defect repaired: parity probe 3 PASS — `checks onboarding-flight-control` exits 0 on a cold checkout and recovery is automatic and non-destructive (recorded worktrees left byte-identical; metadata recreated only when the recorded path is absent, repointed otherwise — lib/workspace.sh:66-101). Runtime honesty holds (smoke: runtime --check refuses a missing provider). Band 6-8 (`state pins absolute paths but commands self-heal`) applies, not 9-10: the rubric's 9-10 anchor requires `No machine-pinned absolute paths in tracked state`, and tracked engagement metadata still pins this machine's absolute paths — state/engagements/onboarding-flight-control/workspace.json (committed, unmodified vs HEAD) records source_repo `/home/logani/projects/onboarding-flight-control` and path `/home/logani/.herdr/worktrees/Product Consulting Harness/test-rapid-basics/tmp/workspaces/onboarding-flight-control` with exists:true; sibling tracked metadata (overnight-rehearsal, harness-cli) carries /home/logani pins (critic-final-verdict.md). The repair removed the command impact (commands self-heal fully automatically and non-destructively), so the dimension sits at the top of band 6-8, not 9-10.",
+      "evidence": [
+        "evidence/parity-final.txt (probe 3 PASS: checks rc=0 + non-destructive guard)",
+        "state/engagements/onboarding-flight-control/workspace.json (tracked, machine-pinned /home/logani paths, unmodified)",
+        "lib/workspace.sh:66-101 (automatic recreate/repoint recovery, never destructive)",
+        "evidence/smoke-final.txt (runtime --check honesty PASS)",
+        "CLI-BENCHMARK-CONTRACT.md dimension 10 (9-10 anchor: no machine-pinned absolute paths in tracked state)"
+      ]
+    },
+    "metadata-simplicity-deletion": {
+      "score": 9,
+      "rationale": "CLI's own state remains minimal: state/.cli gitignored (.gitignore:3) holding the 5-byte first-run marker plus one config line (atomic tmp+rename writes); the only repair-introduced artifact is lib/commands.sh — a source file, not durable state — and no daemon/duplicate state authority was added. v3 scope note honored: the state/style/ duplicate is durable org memory, out of scope and untouched (critical failure #6 avoided; evidence/style-dup-baseline.txt retained for the record). Deletion paths exist (workspace remove clean-worktree-only; direction clear --i-am-owner); run-loop smoke scaffolding cleans up after itself (tests/run-loop-smoke.sh trap cleanup; smoke-final.txt overnight run-loop smoke PASS; parity harnesses remove their fresh state roots and tmp workspaces on exit). Conservative 9, not 10 (unchanged from iteration 2): the standalone tests/run-loop-smoke.sh is trap-cleanup code-verified and its loop covered by smoke-final, but it is not itself archived as a standalone run in the final evidence.",
+      "evidence": [
+        ".gitignore:3 (state/.cli/)",
+        "lib/commands.sh (thin registry as source, not state)",
+        "evidence/smoke-final.txt (run-loop smoke PASS; scaffolding cleaned)",
+        "tests/run-loop-smoke.sh (trap cleanup EXIT)",
+        "lib/workspace.sh (workspace remove), bin/productteam (direction clear --i-am-owner)",
+        "CLI-BENCHMARK-CONTRACT.md dimension 11 + v3 scope note",
+        "evidence/style-dup-baseline.txt (out of scope, retained for the record)"
+      ]
+    }
+  },
+  "overall": 9.5,
+  "overall_note": "Mean of the 11 integer scores, one decimal: 105/11 = 9.545 → 9.5. Unchanged from iteration 2 (FinalAnalyst 9.5); no code delta exists to move any score. Per-dimension: 9, 10, 10, 10, 10, 10, 10, 9, 10, 8, 9 (sum 105). Baseline iter-1 mean 5.5 (61/11); improvement +4.0.",
+  "converged": false,
+  "convergence_note": "Per this assignment's overlay rule, converged is true only if every dimension >=9; dimension 10 (dependencies-cold-start) = 8 because tracked state still pins machine-specific absolute paths, so converged = false. The frozen contract's own convergence checklist (every dimension >=8.0 with the parity test green, iter-1 baseline never rewritten, freeze SHA unchanged, Analyst-authored scores, Critic re-audit, real verification, thin registry) is met on every item the recorded evidence can verify. Both thresholds are stated explicitly so the >=9 overlay is not read as a silent contract amendment (critic-final-verdict.md nit).",
+  "blocker": {
+    "dimension": "dependencies-cold-start",
+    "score": 8,
+    "frozen_9_10_anchor": "No machine-pinned absolute paths in tracked state; cold-start commands run; recovery non-destructive (CLI-BENCHMARK-CONTRACT.md dimension 10)",
+    "current_state": "Tracked engagement metadata pins this machine's absolute paths: state/engagements/onboarding-flight-control/workspace.json (committed, unmodified) records source_repo /home/logani/projects/onboarding-flight-control and path /home/logani/.herdr/worktrees/Product Consulting Harness/test-rapid-basics/tmp/workspaces/onboarding-flight-control (exists:true); sibling tracked metadata carries /home/logani pins (critic-final-verdict.md: overnight-rehearsal, harness-cli).",
+    "why_not_fixable": "The frozen 9-10 anchor can only be met by deleting or rewriting those tracked records. They are immutable historical evidence of prior machine-bound worktrees and of external client repo identity; rewriting would corrupt evidence and deleting would break plain-file authority (max-iteration-plan.md). The permanent Critic explicitly rejected that repair path: 'Do not scrub state/engagements/*/workspace.json (or sibling historical metadata) to chase the 9-10 anchor' (critic-final-verdict.md).",
+    "documented_in": [
+      "final-scores.json (iteration-2 convergence_note + dimension-10 score 8)",
+      "critic-final-verdict.md (convergence/evidence-corruption ruling: remain non-converged)",
+      "max-iteration-plan.md (iterations 3-6 no-change plan; refusal to corrupt evidence)"
+    ]
+  },
+  "baseline_guard": "iter-1 baseline-scores.json and evidence/*-baseline-* artifacts are untouched; freeze files CLI-BENCHMARK-CONTRACT.md and FREEZE-SHA.txt unmodified (FREEZE-SHA.txt re-read this iteration; parity probe 1 PASS). This Analyst made no run-root or production edits and ran no commands/tests; writes are limited to iterations/iter-5/analyst-scores.json and analyst-evidence.md."
+}

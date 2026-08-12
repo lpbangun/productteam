@@ -1,0 +1,33 @@
+# usage-parity-probes — argument/usage parity evidence (frozen iter 1, 2026-08-12)
+# Misuse probes vs help usage lines: every misuse exits 1 and names the same usage the help table promises.
+
+$ bin/productteam open
+  exit=1
+  error: usage: productteam open <client> --repo <absolute-path> [--mode Guided|Directive|Challenge|Override] [--scorer checks|provider] [--contract <id>] [--mission <text>] [--public <url>]
+$ bin/productteam workspace onboarding-flight-control
+  exit=1
+  error: usage: productteam workspace <client> ensure|status|remove
+$ bin/productteam score
+  exit=1
+  error: usage: productteam score <client> --iter <n>
+$ bin/productteam run-loop
+  exit=1
+  error: usage: productteam run-loop <client> --max-hours <n> --max-iters <m> [--dry-run] [--resume] [--no-provider]
+$ bin/productteam gh
+  exit=1
+  error: usage: productteam gh preflight|pr-create|status|checks|merge|validate …
+$ bin/productteam skill
+  exit=1
+  error: usage: productteam skill <critique|benchmark|design-sprint> <target> [out-dir]
+$ bin/productteam splash --bogus
+  exit=1
+  error: usage: productteam splash [--frames|--no-splash]
+$ bin/productteam onboarding --bogus
+  exit=1
+  error: unknown option '--bogus' — usage: productteam onboarding [--yes]
+$ bin/productteam agents --bogus
+  exit=1
+  error: unknown option '--bogus' — usage: productteam agents [--json] [--check]
+$ bin/productteam not-a-command
+  exit=1
+  error: unknown command 'not-a-command' — cause: not in the command table. Remedy: productteam help

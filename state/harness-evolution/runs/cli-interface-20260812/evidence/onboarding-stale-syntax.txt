@@ -1,0 +1,6 @@
+# onboarding-stale-syntax — D4 evidence (frozen iter 1 v2, 2026-08-12)
+# command: CONSULT_NO_SPLASH=1 CONSULT_STATE_ROOT=$(mktemp -d) bin/productteam onboarding --yes
+# step 4 prints stale 'productteam score <client>' — help/CLI require '--iter <n>'
+
+11:  4. Score that client                  productteam score <client>
+12-       ○ pending the scorer is declared by the engagement contract.json

@@ -62,18 +62,38 @@ workspace_ensure() {
     local recorded_source recorded_path
     recorded_source=$(jq -r '.source_repo // empty' "$metadata" 2>/dev/null)
     recorded_path=$(jq -r '.path // empty' "$metadata" 2>/dev/null)
-    if [[ "$recorded_source" != "$source" || "$recorded_path" != "$path" ]]; then
+    if [[ "$recorded_source" != "$source" ]]; then
       printf 'workspace-metadata-mismatch: %s (%s)\n' "$client" "$metadata" >&2
       return 2
+    fi
+    if [[ "$recorded_path" != "$path" ]]; then
+      # D1 policy: a recorded path that no longer exists is recreated at the
+      # canonical current workspace; a recorded path that still exists (e.g.
+      # a foreign worktree from another harness instance) is refused for use
+      # and left byte-identical — never deleted, relocated, reset, or
+      # overwritten — while the canonical workspace is ensured below and the
+      # metadata is recreated to point at it.
+      if [[ -d "$recorded_path" ]]; then
+        printf 'workspace-metadata-repoint: %s (recorded %s left unchanged; using canonical %s)\n' "$client" "$recorded_path" "$path" >&2
+      else
+        printf 'workspace-metadata-recreate: %s (%s -> %s)\n' "$client" "$recorded_path" "$path" >&2
+      fi
     fi
   fi
 
   if [[ ! -d "$path" ]]; then
     mkdir -p "$(dirname "$path")"
-    git -C "$source" worktree add --detach "$path" HEAD >&2 || {
-      printf 'workspace-create-failed: %s (%s)\n' "$client" "$path" >&2
-      return 2
-    }
+    if ! git -C "$source" worktree add --detach "$path" HEAD >&2; then
+      # The workspace directory was removed outside the CLI while the
+      # worktree stayed registered in the source repo: prune stale admin
+      # entries (git only drops registrations whose working tree no longer
+      # exists — existing paths are never touched) and retry once.
+      git -C "$source" worktree prune >&2
+      git -C "$source" worktree add --detach "$path" HEAD >&2 || {
+        printf 'workspace-create-failed: %s (%s)\n' "$client" "$path" >&2
+        return 2
+      }
+    fi
   elif ! git -C "$path" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
     printf 'workspace-invalid: %s (%s)\n' "$client" "$path" >&2
     return 2

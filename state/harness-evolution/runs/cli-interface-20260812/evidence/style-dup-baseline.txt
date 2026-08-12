@@ -1,0 +1,5 @@
+# style-dup-baseline — D5 evidence (frozen iter 1, 2026-08-12)
+# command: bin/productteam style show --json (committed org style state)
+# duplicate entry: 'rehearsal prefers file evidence' appears twice in taste
+
+{"taste":["rehearsal prefers file evidence","rehearsal prefers file evidence","prefer smallest diffs; evidence over prose"]}

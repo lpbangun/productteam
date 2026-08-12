@@ -1,0 +1,82 @@
+# smoke-baseline — visual/smoke contract evidence (frozen iter 1, 2026-08-12)
+# command: CONSULT_NO_SPLASH=1 CONSULT_STATE_ROOT=$(mktemp -d) timeout 120 bin/productteam smoke
+# exit code: 1 (single FAIL: 'checks' — same root cause as D1)
+
+
+  productteam smoke
+
+  PASS  help
+  PASS  status
+  PASS  org
+  PASS  memory
+  PASS  judge show
+  PASS  bench
+  PASS  bench contract id
+  PASS  help lists score
+  PASS  help lists runtime
+  PASS  help lists harness-checks
+  PASS  help lists gh
+  PASS  help lists skill
+  PASS  help lists chat
+  PASS  repl.sh present
+  PASS  chat refuses non-TTY
+  PASS  skill critique present
+  PASS  skill benchmark present
+  PASS  skill design-sprint present
+  PASS  runtime
+  PASS  judge harness-evolution
+  ✓ auth: lpbangun
+  PASS  gh preflight
+  PASS  gh merge refuses without auth
+  PASS  runtime --check refuses missing provider
+workspace-metadata-mismatch: onboarding-flight-control (/home/logani/.herdr/worktrees/Product Consulting Harness/upgrade-basic-funcionalities/state/engagements/onboarding-flight-control/workspace.json)
+  FAIL  checks
+  PASS  ofc refuses provider run
+  PASS  agcode refuses checks
+  PASS  unknown rejects
+  PASS  help lists judge
+  PASS  help lists gate
+  PASS  help lists escalation
+  PASS  help lists resume
+  PASS  help lists inspect
+  PASS  escalation status
+  PASS  escalation status missing honesty
+  PASS  escalation real lifecycle (block/refuse/resume/inspect)
+  PASS  help lists role
+  PASS  role status file-derived
+  PASS  role status closed-iter honesty
+  PASS  learning schema
+  PASS  challenge example
+  PASS  override example
+Preparing worktree (detached HEAD d07117a)
+HEAD is now at d07117a initial
+  PASS  workspace isolation real-worktree refuse/pass
+Preparing worktree (detached HEAD 70795dc)
+HEAD is now at 70795dc initial
+Preparing worktree (detached HEAD 70795dc)
+HEAD is now at 70795dc initial
+  PASS  open→baseline cold bootstrap refuse/pass
+  PASS  agent cards list/show/seed + envelope display_name
+  PASS  help lists card
+  PASS  style/project memory inspect + role envelope fields
+  PASS  help lists style
+  PASS  help lists project-memory
+
+  Experience sealed: 20260812-pool-smoke-worked-2901792-1
+
+
+  Experience sealed: 20260812-pool-smoke-failed-2901792-1
+
+
+  Experience sealed from iter: 20260812-lessons-excerpt-2901792-1
+
+  PASS  experience pool list/add/search + inspect/role wiring
+  PASS  help lists pool
+  PASS  help lists direction
+  PASS  direction propose→select→rebut→seal refuse/pass
+  PASS  judgment gate smoke (regression)
+  PASS  help lists run-loop
+  PASS  overnight run-loop smoke (limits/resume/hard-stops)
+
+  1 smoke check(s) failed
+

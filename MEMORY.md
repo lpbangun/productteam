@@ -233,3 +233,22 @@ and evidence-linked.
   or spinner output can starve the intended signal window. Keep `/help` and
   slash-prefix hints on one verb list; keep exported sessions as markdown
   under `state/.cli/sessions/`.
+
+- **2026-08-12 · CLI metadata and frontend boundary.** Keep canonical
+  command name/aliases, usage, handler, chat classification/reason, and
+  machine-output capability in one descriptive table. Human help, JSON help,
+  top-level dispatch, slash hints, and slash routing must consume it. Parse
+  slash input into an argv array without `eval`; PTY-test required options,
+  quoting, metacharacter inertness, and paths containing spaces.
+- **2026-08-12 · Framework evidence gate.** A working TUI spike is not adoption
+  evidence. Ink and OpenTUI both consumed the plain-file/JSON boundary and
+  passed focused tests, but added more than 1,100 source lines, large runtime
+  trees, higher runtime floors, no provider streaming, no screen-reader proof,
+  and zero Bash deletion. Delete candidates that miss the 25–30% net-deletion
+  gate; reconsider only after measured multiline, scrolling, focus, streaming,
+  Unicode, or repaint defects.
+- **2026-08-12 · Benchmark integrity over cosmetic convergence.** Do not rewrite
+  immutable historical evidence merely to satisfy a portability rubric that
+  rejects machine-local paths. Record the blind spot and finish honestly
+  non-converged at the iteration cap rather than inflate a score or erase
+  provenance.

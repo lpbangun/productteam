@@ -1,0 +1,340 @@
+{
+  "client": "harness-evolution",
+  "mode": {
+    "value": "Directive",
+    "source": "/home/logani/.herdr/worktrees/Product Consulting Harness/upgrade-basic-funcionalities/state/harness-evolution/engagement.md",
+    "missing": false
+  },
+  "gate": {
+    "status": {
+      "client": "harness-evolution",
+      "mode": "Directive",
+      "allowed": true,
+      "decision": "allowed",
+      "reason": "implement allowed",
+      "bound_direction": "Make unattended multi-iteration consulting operable under the Constitution",
+      "artifact": "/home/logani/.herdr/worktrees/Product Consulting Harness/upgrade-basic-funcionalities/state/harness-evolution/judgment/directive.json",
+      "artifact_ts": "2026-08-10T06:59:04Z",
+      "required": {
+        "directive.json": "direction + decision (+ risks array, may be empty)"
+      },
+      "present": {
+        "directive_present": true,
+        "direction_present": true,
+        "decision_present": true,
+        "risks_recorded": true
+      }
+    },
+    "judgment_dir_missing": false
+  },
+  "scores": {
+    "missing": false,
+    "history": [
+      {
+        "run": "/home/logani/.herdr/worktrees/Product Consulting Harness/upgrade-basic-funcionalities/state/harness-evolution/runs/iter-0",
+        "ts": "",
+        "kind": "",
+        "overall": "4.4",
+        "weakest": ""
+      },
+      {
+        "run": "/home/logani/.herdr/worktrees/Product Consulting Harness/upgrade-basic-funcionalities/state/harness-evolution/runs/iter-1",
+        "ts": "",
+        "kind": "",
+        "overall": "5.8",
+        "weakest": ""
+      },
+      {
+        "run": "/home/logani/.herdr/worktrees/Product Consulting Harness/upgrade-basic-funcionalities/state/harness-evolution/runs/iter-2",
+        "ts": "",
+        "kind": "",
+        "overall": "6.9",
+        "weakest": ""
+      },
+      {
+        "run": "/home/logani/.herdr/worktrees/Product Consulting Harness/upgrade-basic-funcionalities/state/harness-evolution/runs/iter-3",
+        "ts": "",
+        "kind": "",
+        "overall": "7.8",
+        "weakest": ""
+      },
+      {
+        "run": "/home/logani/.herdr/worktrees/Product Consulting Harness/upgrade-basic-funcionalities/state/harness-evolution/runs/iter-4",
+        "ts": "",
+        "kind": "",
+        "overall": "8.2",
+        "weakest": ""
+      },
+      {
+        "run": "/home/logani/.herdr/worktrees/Product Consulting Harness/upgrade-basic-funcionalities/state/harness-evolution/runs/iter-5",
+        "ts": "",
+        "kind": "",
+        "overall": "8.4",
+        "weakest": ""
+      },
+      {
+        "run": "/home/logani/.herdr/worktrees/Product Consulting Harness/upgrade-basic-funcionalities/state/harness-evolution/runs/iter-7",
+        "ts": "2026-08-10",
+        "kind": "full",
+        "overall": "",
+        "weakest": ""
+      }
+    ],
+    "latest": {
+      "ts": "2026-08-10",
+      "iter": 7,
+      "kind": "full",
+      "visual": {
+        "contract": "visual-cli-v2",
+        "passed": 14,
+        "total": 14,
+        "failed": 0,
+        "skipped": 0,
+        "live_provider_proof": "pass",
+        "converged": true,
+        "evidence": "visual-checks-final.json"
+      },
+      "harness": {
+        "contract": "harness-cli-v1",
+        "passed": 49,
+        "total": 49,
+        "failed": 0,
+        "skipped": 0,
+        "overall": 9.5,
+        "kind": "full",
+        "evidence": "harness-cli-final/checks.json"
+      },
+      "converged": true
+    },
+    "latest_run": "/home/logani/.herdr/worktrees/Product Consulting Harness/upgrade-basic-funcionalities/state/harness-evolution/runs/iter-7"
+  },
+  "history": {
+    "file": "/home/logani/.herdr/worktrees/Product Consulting Harness/upgrade-basic-funcionalities/state/harness-evolution/history.jsonl",
+    "missing": false,
+    "entries": [
+      {
+        "ts": "2026-08-06T06:12:00Z",
+        "iter": 0,
+        "kind": "baseline",
+        "contract": "harness-apc-v1",
+        "evaluator": "independent-analyst",
+        "overall": 4.4,
+        "void": false,
+        "scores": {
+          "architecture-simplicity": 7.0,
+          "cli-onboarding": 7.0,
+          "runtime-routing": 3.0,
+          "github-integration": 2.0,
+          "memory-learning": 3.0,
+          "product-judgment": 5.0,
+          "product-skills": 1.0,
+          "testing-evidence": 6.5,
+          "autonomy-loop": 3.0,
+          "safety-discipline": 6.5
+        },
+        "run": "runs/iter-0"
+      },
+      {
+        "ts": "2026-08-06T06:23:32Z",
+        "iter": 1,
+        "kind": "iteration",
+        "contract": "harness-apc-v1",
+        "evaluator": "independent-analyst",
+        "overall": 5.8,
+        "void": false,
+        "scores": {
+          "architecture-simplicity": 7.5,
+          "cli-onboarding": 7.5,
+          "runtime-routing": 8.5,
+          "github-integration": 2.0,
+          "memory-learning": 5.0,
+          "product-judgment": 6.5,
+          "product-skills": 1.0,
+          "testing-evidence": 7.5,
+          "autonomy-loop": 4.5,
+          "safety-discipline": 7.5
+        },
+        "run": "runs/iter-1"
+      },
+      {
+        "ts": "2026-08-06T06:28:17Z",
+        "iter": 2,
+        "kind": "iteration",
+        "contract": "harness-apc-v1",
+        "evaluator": "independent-analyst",
+        "overall": 6.9,
+        "void": false,
+        "scores": {
+          "architecture-simplicity": 8.0,
+          "cli-onboarding": 8.0,
+          "runtime-routing": 8.5,
+          "github-integration": 7.0,
+          "memory-learning": 7.0,
+          "product-judgment": 7.5,
+          "product-skills": 1.0,
+          "testing-evidence": 8.0,
+          "autonomy-loop": 6.0,
+          "safety-discipline": 8.0
+        },
+        "run": "runs/iter-2"
+      },
+      {
+        "ts": "2026-08-06T06:34:01Z",
+        "iter": 3,
+        "kind": "iteration",
+        "contract": "harness-apc-v1",
+        "evaluator": "independent-analyst",
+        "overall": 7.8,
+        "void": false,
+        "scores": {
+          "architecture-simplicity": 8.0,
+          "cli-onboarding": 8.5,
+          "runtime-routing": 8.5,
+          "github-integration": 7.0,
+          "memory-learning": 7.0,
+          "product-judgment": 7.5,
+          "product-skills": 9.0,
+          "testing-evidence": 8.5,
+          "autonomy-loop": 6.0,
+          "safety-discipline": 8.0
+        },
+        "run": "runs/iter-3"
+      },
+      {
+        "ts": "2026-08-06T06:37:59Z",
+        "iter": 4,
+        "kind": "iteration",
+        "contract": "harness-apc-v1",
+        "evaluator": "independent-analyst",
+        "overall": 8.2,
+        "void": false,
+        "scores": {
+          "architecture-simplicity": 8.0,
+          "cli-onboarding": 8.5,
+          "runtime-routing": 8.5,
+          "github-integration": 9.0,
+          "memory-learning": 7.5,
+          "product-judgment": 8.0,
+          "product-skills": 9.0,
+          "testing-evidence": 8.5,
+          "autonomy-loop": 7.0,
+          "safety-discipline": 8.5
+        },
+        "run": "runs/iter-4"
+      },
+      {
+        "ts": "2026-08-06T06:41:43Z",
+        "iter": 5,
+        "kind": "iteration",
+        "contract": "harness-apc-v1",
+        "evaluator": "independent-analyst",
+        "overall": 8.4,
+        "void": false,
+        "converged": false,
+        "scores": {
+          "architecture-simplicity": 8.0,
+          "cli-onboarding": 8.5,
+          "runtime-routing": 8.5,
+          "github-integration": 9.0,
+          "memory-learning": 8.5,
+          "product-judgment": 8.0,
+          "product-skills": 9.0,
+          "testing-evidence": 8.5,
+          "autonomy-loop": 8.0,
+          "safety-discipline": 8.5
+        },
+        "run": "runs/iter-5",
+        "blockers": [
+          "critic-scores-reaudit-pending"
+        ],
+        "notes": "dims all>=8.0; checklist fails until Critic re-audits iter-5 scores.json"
+      }
+    ]
+  },
+  "escalations": {
+    "file": "/home/logani/.herdr/worktrees/Product Consulting Harness/upgrade-basic-funcionalities/state/harness-evolution/escalations.json",
+    "missing": true
+  },
+  "pause": {
+    "file": "/home/logani/.herdr/worktrees/Product Consulting Harness/upgrade-basic-funcionalities/state/harness-evolution/pause.json",
+    "missing": true
+  },
+  "lessons": {
+    "pointer": "/home/logani/.herdr/worktrees/Product Consulting Harness/upgrade-basic-funcionalities/state/harness-evolution/runs/iter-7/lessons.md",
+    "missing": false,
+    "excerpt": "# Lessons — iter 7\n\n- A continuously repainting PTY can starve a naive `select()` drain loop. Bound drains by wall-clock time before using them as interaction probes.\n- Interrupt honesty needs process-tree evidence, not only a message. Record both provider and child PIDs, assert both dead, preserve artifact bytes, and keep the prompt alive.\n- Bash job control (`set -m` around the background turn) supplies an isolated process group without adding `setsid` as a runtime dependency.\n- A command palette needs one verb source shared by `/help`, matching, and dispatch tests; prose containing slash paths can pollute naive command extraction.\n- Exported transcripts should contain the same timestamped turn separators users see, not a reconstructed approximation.\n- Run the full dependency-policy suite after targeted visual convergence; visual checks alone cannot detect a new executable dependency."
+  },
+  "continuation": {
+    "file": "/home/logani/.herdr/worktrees/Product Consulting Harness/upgrade-basic-funcionalities/state/harness-evolution/continuation.json",
+    "missing": true
+  },
+  "style": {
+    "missing": false,
+    "pointer": "/home/logani/.herdr/worktrees/Product Consulting Harness/upgrade-basic-funcionalities/state/style/style.md",
+    "taste": [
+      "rehearsal prefers file evidence",
+      "rehearsal prefers file evidence",
+      "prefer smallest diffs; evidence over prose"
+    ],
+    "risk": [
+      "escalate auth/architecture; no force-push"
+    ],
+    "stack": [
+      "bash CLI + plain state files; no DB/daemon"
+    ],
+    "never": [
+      "auto-Implement past judgment gates; invent permanent workers"
+    ]
+  },
+  "project_memory": {
+    "missing": true,
+    "pointer": null,
+    "excerpt": null
+  },
+  "experience_pool": {
+    "missing": false,
+    "pointer": "/home/logani/.herdr/worktrees/Product Consulting Harness/upgrade-basic-funcionalities/state/experience-pool",
+    "retrieved": [
+      {
+        "id": "20260811-osint-stop-resume-1",
+        "ts": "2026-08-11T08:00:00Z",
+        "kind": "failed",
+        "domain": "client",
+        "client": "osint-loop-research",
+        "iter": 1,
+        "title": "OSINT stop/resume: one engine, exit 2 at max",
+        "path": "entries/20260811-osint-stop-resume-1.md",
+        "tags": [
+          "osint",
+          "resume",
+          "termination"
+        ],
+        "cite_line": "state/missions/osint-lift/report.md · Mission 2 closed iter-1"
+      },
+      {
+        "id": "20260811-workspace-checks-restore-1",
+        "ts": "2026-08-11T07:30:00Z",
+        "kind": "worked",
+        "domain": "implement",
+        "client": "harness-cli",
+        "iter": null,
+        "title": "Workspace checks must restore dirt after measurement",
+        "path": "entries/20260811-workspace-checks-restore-1.md",
+        "tags": [
+          "workspace",
+          "checks",
+          "restore"
+        ],
+        "cite_line": "MEMORY.md Lessons 2026-08-11 · three-mission loop · workspace restore after checks"
+      }
+    ],
+    "index_count": 2
+  },
+  "next_suggested_action": "continue the loop: consult bench harness-evolution run",
+  "missing": [
+    "escalations.json",
+    "pause.json",
+    "continuation.json",
+    "memory/project.md"
+  ]
+}

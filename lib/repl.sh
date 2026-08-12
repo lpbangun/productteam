@@ -22,11 +22,29 @@ SESSION_TRANSCRIPT=''       # $SESSION_DIR/transcript.md once repl_session_init 
 REPL_HINT_BOUND=''          # non-empty while slash-hint readline bindings are live
 HINT_BUFFER='' HINT_DEDUP='' # readline hint state (slash prefix + last rendered set)
 
-# ── slash verb palette (canonical; /help and live hints render from this) ──
-repl_slash_verbs=(
-  help status agents runtime onboarding splash judge score checks bench report run
-  memory org gh skill smoke harness-checks workers provider clear export exit quit
-)
+# ── slash verb palette: derived from the command registry (chat_supported)
+# plus the chat-only verbs; /help and live hints render from this list ──
+repl_slash_verbs=()
+repl_palette_build() {
+  local i v
+  repl_slash_verbs=()
+  if declare -p CMD_REGISTRY >/dev/null 2>&1 && (( ${#CMD_REGISTRY[@]} > 0 )); then
+    for i in "${!CMD_REGISTRY[@]}"; do
+      cmd_reg_get "$i"
+      [[ "$REG_CHAT" == 1 ]] && repl_slash_verbs+=("$REG_NAME")
+    done
+  else
+    # Frozen fallback while the registry is not sourced (standalone repl
+    # sourcing); membership identical to the registry-driven palette.
+    repl_slash_verbs=(help status agents runtime onboarding splash judge score
+      checks bench report run memory org gh skill smoke harness-checks
+      workers provider clear export exit quit)
+  fi
+  for v in "${CMD_CHAT_ONLY[@]:-}"; do
+    repl_slash_verbs+=("$v")
+  done
+}
+repl_palette_build
 
 repl_header() {
   local tip tip_w=22 i
@@ -328,40 +346,79 @@ repl_ask() { # $1=prompt — real background provider invocation + activity + ca
   fi
 }
 
-repl_run_slash() { # $1=line without leading /
-  local line="$1" cmd args
-  IFS=' ' builtin read -r cmd args <<<"$line"
-  case "$cmd" in
-    ''|help)
-      local v out=''
-      for v in "${repl_slash_verbs[@]}"; do
-        out+="/$v "
-      done
-      printf '  %s\n' "${out% }"
-      printf '  bare text → provider · /export writes markdown under the CLI sessions directory\n'
-      ;;
-    clear) printf '%s' "${CLR:-}"; repl_header ;;
-    exit|quit) return 99 ;;
-    export) repl_export_session ;;
-    status) cmd_status ;;
-    agents|runtime) cmd_agents $args ;;
-    workers)
-      if declare -F activity_strip >/dev/null 2>&1; then
-        activity_strip 2>/dev/null || true
-      else
-        printf '  %sno worker activity yet%s\n' "${D:-}" "${R:-}"
-      fi
-      ;;
-    provider)
-      if [[ -n "$args" ]]; then
-        if runtime_have "$args"; then
-          CONSULT_PROVIDER="$args"
-          printf '  %sprovider → %s%s\n' "$G" "$args" "$R"
+# ── safe shell-like tokenizer: single/double quotes + backslash honored;
+# $(), ;, and metacharacters stay inert — argv is never re-parsed, no eval ──
+repl_tokenize() { # $1=line → REPLY_ARGS array
+  local line="$1" w='' quote='' c nxt i
+  REPLY_ARGS=()
+  for (( i = 0; i < ${#line}; i++ )); do
+    c="${line:i:1}"
+    if [[ -n "$quote" ]]; then
+      if [[ "$c" == "$quote" ]]; then
+        quote=''
+      elif [[ "$c" == '\' && "$quote" == '"' ]]; then
+        if (( i + 1 < ${#line} )); then
+          nxt="${line:i+1:1}"
+          case "$nxt" in
+            '$'|'`'|'"'|'\') w+="$nxt"; i=$((i+1)) ;;
+            *) w+='\' ;;
+          esac
         else
-          printf '  %sprovider %s is not a usable installed agent%s\n' "$RD" "$args" "$R"
+          w+='\'
+        fi
+      else
+        w+="$c"
+      fi
+    else
+      case "$c" in
+        \') quote="'" ;;
+        \") quote='"' ;;
+        '\')
+          if (( i + 1 < ${#line} )); then
+            i=$((i+1)); w+="${line:i:1}"
+          else
+            w+='\'
+          fi
+          ;;
+        ' '|$'\t') [[ -n "$w" ]] && { REPLY_ARGS+=("$w"); w=''; } ;;
+        *) w+="$c" ;;
+      esac
+    fi
+  done
+  [[ -n "$w" ]] && REPLY_ARGS+=("$w")
+}
+
+repl_run_slash() { # $1=line without leading / → 0 keeps the session, 99 exits
+  local line="$1" verb idx
+  repl_tokenize "$line"
+  verb="${REPLY_ARGS[0]:-}"
+  if [[ -z "$verb" || "$verb" == 'help' ]]; then
+    local v out=''
+    for v in "${repl_slash_verbs[@]}"; do
+      out+="/$v "
+    done
+    printf '  %s\n' "${out% }"
+    printf '  bare text → provider · /export writes markdown under the CLI sessions directory\n'
+    return 0
+  fi
+  case "$verb" in
+    clear)
+      printf '%s' "${CLR:-}"
+      repl_header
+      return 0
+      ;;
+    exit|quit) return 99 ;;
+    export) repl_export_session; return 0 ;;
+    provider)
+      local want="${REPLY_ARGS[1]:-}" next
+      if [[ -n "$want" ]]; then
+        if runtime_have "$want"; then
+          CONSULT_PROVIDER="$want"
+          printf '  %sprovider → %s%s\n' "$G" "$want" "$R"
+        else
+          printf '  %sprovider %s is not a usable installed agent%s\n' "$RD" "$want" "$R"
         fi
       elif declare -F runtime_cycle >/dev/null 2>&1; then
-        local next
         next=$(runtime_cycle 2>/dev/null || true)
         if [[ -n "$next" ]]; then
           CONSULT_PROVIDER="$next"
@@ -372,55 +429,43 @@ repl_run_slash() { # $1=line without leading /
       else
         printf '  %sprovider cycle unavailable%s\n' "$RD" "$R"
       fi
+      return 0
       ;;
-    onboarding) cmd_onboarding $args ;;
-    splash) cmd_splash $args ;;
-    judge)
-      [[ -n "$args" ]] || { printf '  usage: /judge <client> [set <mode>]\n'; return 0; }
-      # shellcheck disable=SC2086
-      set -- $args
-      if [[ "${2:-}" == set ]]; then cmd_judge_set "$1" "${3:-}"; else cmd_judge "$1"; fi
-      repl_foot_select "$1"
+    workers)
+      if declare -F activity_strip >/dev/null 2>&1; then
+        activity_strip 2>/dev/null || true
+      else
+        printf '  %sno worker activity yet%s\n' "${D:-}" "${R:-}"
+      fi
+      return 0
       ;;
-    score)
-      [[ -n "$args" ]] || { printf '  usage: /score <client>\n'; return 0; }
-      set -- $args
-      cmd_score "$1"
-      repl_foot_select "$1"
+  esac
+  idx=$(cmd_reg_index "$verb")
+  if [[ -z "$idx" ]]; then
+    printf '  unknown /%s — /help\n' "$verb"
+    return 0
+  fi
+  cmd_reg_get "$idx"
+  if [[ "$REG_CHAT" != 1 ]]; then
+    printf '  unknown /%s — /help\n' "$verb"
+    printf '  %s%s%s\n' "${D:-}" "$REG_REASON" "${R:-}"
+    return 0
+  fi
+  if (( ${#REPLY_ARGS[@]} - 1 < REG_MIN )); then
+    printf '  usage: %s\n' "$REG_USAGE"
+    return 0
+  fi
+  local -a argv=("${REPLY_ARGS[@]:1}")
+  # Subshell isolates handler errors/dies so the session always survives.
+  (
+    "$REG_HANDLER" "${argv[@]}"
+  ) || true
+  case "$verb" in
+    judge|score|bench|report|run)
+      if (( ${#argv[@]} >= 1 )); then
+        repl_foot_select "${argv[0]}"
+      fi
       ;;
-    checks)
-      [[ -n "$args" ]] || { printf '  usage: /checks <client>\n'; return 0; }
-      cmd_checks $args ;;
-    bench)
-      [[ -n "$args" ]] || { printf '  usage: /bench <client> [run]\n'; return 0; }
-      set -- $args
-      if [[ "${2:-}" == run ]]; then cmd_bench_run "$1"; else cmd_bench "$1"; fi
-      repl_foot_select "$1"
-      ;;
-    report)
-      [[ -n "$args" ]] || { printf '  usage: /report <client>\n'; return 0; }
-      set -- $args
-      cmd_report "$1"
-      repl_foot_select "$1"
-      ;;
-    run)
-      set -- $args
-      [[ $# -ge 2 ]] || { printf '  usage: /run <client> <iter>\n'; return 0; }
-      cmd_run_detail "$1" "$2"
-      repl_foot_select "$1"
-      ;;
-    memory) cmd_memory ;;
-    org) cmd_org ;;
-    gh)
-      [[ -n "$args" ]] || { printf '  usage: /gh <sub> …\n'; return 0; }
-      cmd_gh $args ;;
-    skill)
-      set -- $args
-      [[ $# -ge 2 ]] || { printf '  usage: /skill <name> <target> [out]\n'; return 0; }
-      cmd_skill "$@" ;;
-    smoke) cmd_smoke ;;
-    harness-checks) cmd_harness_checks $args ;;
-    *) printf '  unknown /%s — /help\n' "$cmd" ;;
   esac
   return 0
 }

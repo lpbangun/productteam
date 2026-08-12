@@ -34,17 +34,22 @@ bin/productteam splash [--frames]
 bin/productteam agents [--json] [--check]
 bin/productteam runtime          # alias of agents
 bin/productteam judge <client>   # mode + mission (also: harness-evolution)
-bin/productteam gate <client> status|implement|select|direct|challenge|override
+bin/productteam gate <client> status|implement|select|direct|challenge|override|rebut
+bin/productteam direction <client> propose|list|clear|rebut   # Guided directions (state/engagements/<client>/direction/)
 bin/productteam workspace <client> ensure|status|remove
 bin/productteam escalation <client> block|status|resume
 bin/productteam inspect <client>
 bin/productteam role <client> seal|invoke|status|close
 bin/productteam card list|show|seed-specialist   # named agent cards (state/agents/)
+bin/productteam style show|init|append|accept-lesson|rewrite   # org style memory (state/style/)
+bin/productteam project-memory show|append <client>   # per-engagement notes
+bin/productteam pool list|show|search|add   # experience excerpts (state/experience-pool/)
 bin/productteam score <client> --iter <n>   # Analyst-stamped score
 bin/productteam checks <client>  # deterministic contract checks
 bin/productteam bench <client>   # scores + history
 bin/productteam bench <client> run --iter <n>
 bin/productteam run <client> <n> # scores for iteration n
+bin/productteam run-loop <client> --max-hours <n> --max-iters <m>   # overnight loop driver
 bin/productteam report <client>  # latest iteration reasoning
 bin/productteam harness-checks   # harness-apc objective checks + secrets scan
 bin/productteam gh preflight     # GitHub auth + permissions (redacted)
@@ -56,6 +61,75 @@ bin/productteam skill critique|benchmark|design-sprint <target>
 
 # `bin/consult` remains a compatibility shim to `bin/productteam`.
 ```
+
+## CLI surface (frozen contract `cli-interface-20260812-v3`)
+
+Every top-level command below is named by `productteam help`; `help` is the
+canonical command surface. The frozen command table has **32** commands:
+**18** chat-supported, **14** intentionally unsupported in chat (each with a
+non-empty safety/usefulness reason), plus **6** chat-only verbs (`provider
+workers clear export exit quit`).
+
+| Command | Purpose |
+|---------|---------|
+| `productteam` | Org status overview (same as `status`) |
+| `productteam help [--json]` | Command table; `--json` emits the command registry |
+| `productteam status [--json]` | Org overview; `--json` emits the engagement list |
+| `productteam chat` | Role-aware interactive session (TTY only) |
+| `productteam onboarding [--yes]` | First-run: agents → provider → engagement → score |
+| `productteam splash [--frames]` | Knowledge-graph banner (`CONSULT_NO_SPLASH=1` skips) |
+| `productteam agents [--json] [--check]` | Coding agents on this device; provider availability |
+| `productteam runtime [--check]` | Alias of `agents`; `--check` fails if none usable |
+| `productteam judge <client> [set <mode>]` | Judgment mode + mission |
+| `productteam open <client> --repo <abs-path>` | Cold engagement stub + freeze stamp + workspace |
+| `productteam baseline <client>` | iter-0 bootstrap via workspace + checks/score |
+| `productteam gate <client> status\|implement\|select\|direct\|challenge\|override\|rebut` | Durable judgment decisions + machine status |
+| `productteam direction <client> propose\|list\|clear\|rebut` | Guided direction proposals + Critic rebuttal |
+| `productteam workspace <client> ensure\|status\|remove` | Isolated client worktree lifecycle |
+| `productteam escalation <client> block\|status\|resume` | Durable owner block and authorized continuation |
+| `productteam inspect <client> [out]` | Regenerate the file-derived inspect pack |
+| `productteam role <client> seal\|invoke\|status\|close` | Single-turn roles, sealed input, authorship gates |
+| `productteam card list\|show\|seed-specialist` | Named agent cards (`state/agents/`) |
+| `productteam style show\|init\|append\|accept-lesson\|rewrite` | Org style memory (`state/style/`) |
+| `productteam project-memory show\|append <client>` | Per-engagement notes |
+| `productteam pool list\|show\|search\|add` | Cross-engagement experience excerpts |
+| `productteam score <client> --iter <n>` | Score via the declared scorer + Analyst stamp |
+| `productteam checks <client>` | Deterministic checks in the isolated workspace |
+| `productteam bench <client> [run --iter <n>]` | Benchmark contract + history + latest scores |
+| `productteam run <client> <n>` | Show scores for iteration n |
+| `productteam run-loop <client> --max-hours <n> --max-iters <m>` | Overnight loop driver |
+| `productteam report <client>` | Latest iteration report |
+| `productteam harness-checks [iter-dir]` | Objective harness-apc checks + secrets scan |
+| `productteam gh preflight\|pr-create\|status\|checks\|merge\|validate` | Gated GitHub (no `--admin`) |
+| `productteam skill <name> <target>` | Run a skill (`/critique|/benchmark|/design-sprint`) |
+| `productteam memory` | Organizational memory |
+| `productteam org` | Roles, loop, autonomy |
+| `productteam smoke` | CLI smoke tests |
+
+`score <client> --iter <n>` and `bench <client> run --iter <n>` are the only
+score entrypoints; a missing `--iter` is a usage error. `bench`/`run` render
+only **contract-shaped** score records (a `.scores` object plus a numeric
+`.overall`); a null or summary-shaped `runs/iter-N/scores.json` is skipped
+with a note when a newer contract-shaped run exists, and otherwise fails
+honestly (never a raw jq traceback, never a silently substituted iteration).
+
+### Machine-readable boundaries
+
+All machine surfaces below are **derived, read-mostly views over plain files
+under `state/` — the files remain authoritative**; every surface emits valid
+JSON unless noted, parseable with `jq -e .`.
+
+| Surface | Command / path | Shape and authority |
+|---------|----------------|---------------------|
+| Command registry | `productteam help --json` | `{commands:[{name,usage,chat_supported,chat_reason?}], chat_only:[…]}` — 32 commands, 6 chat-only verbs; drives help text, dispatch validation, slash palette, unsupported reasons |
+| Engagement list | `productteam status --json` | `{engagements:[{client,…}], …}` — engagement list / current selection, derived from `state/engagements/` |
+| Agent detection | `productteam agents --json` | array of `{name,status,path,version,note}` from `lib/provider.sh` catalog (PATH then `CONSULT_AGENT_DIRS`) |
+| Provider availability | `productteam agents` / `productteam runtime --check` | honest absence: `runtime --check` exits non-zero with a remedy when no agent is usable |
+| Inspect pack | `productteam inspect <client>` | regenerates `state/engagements/<client>/inspect-pack.json` from engagement files: mode/gate, scores + `history.jsonl`, escalation/pause, lessons, continuation, `next_suggested_action`; missing sources are explicit `missing:true` |
+| Worker activity | `state/.cli/runs/session-<pid>/workers.tsv` | TSV `id role state mission provider start elapsed artifact`; file-backed telemetry (`lib/activity.sh`), atomic temp+rename, never a supervisor |
+| Judgment gate | `productteam gate <client> status` | JSON `{client,mode,allowed,decision,reason,bound_direction,artifact,artifact_ts,…}` derived from `judgment/` files; always exits 0 |
+| Workspace | `productteam workspace <client> status` | JSON `{client,source_repo,path,sha,exists,dirty,allow_dirty_reason}` derived from engagement `workspace.json` + live worktree |
+| Role envelope | `productteam role <client> status [iter]` | JSON `{client,iter,root,asked,ran,produced,missing}` derived from `roles/iter-N/<Role>/attempt-N/` files; byte-stable |
 
 Provider: authenticated Cursor `agent` CLI by default (`CONSULT_PROVIDER` to swap).
 Detected agents: `bin/productteam agents`. No API keys. No mocks — skills call the
@@ -108,9 +182,14 @@ fallback. `CONSULT_WORKSPACE_ROOT` may relocate worktrees without changing the
 plain-file metadata seam.
 
 `ensure` reuses the existing detached checkout; it does not reset it to a newer
-source `HEAD`. To refresh, remove the clean workspace and ensure it again. If a
-workspace directory was deleted outside the CLI, run `git -C <Repo> worktree
-prune`, then `workspace <client> ensure` to repair the registration.
+source `HEAD`. To refresh, remove the clean workspace and ensure it again.
+Recovery is automatic and non-destructive: if the recorded `workspace.json`
+path no longer exists, `ensure` recreates it at the canonical current
+workspace (pruning only stale git registrations whose working tree is gone);
+a recorded path that still exists — e.g. a foreign worktree from another
+harness instance — is left byte-identical and the metadata is repointed to
+the canonical workspace. Existing, dirty, or foreign worktrees are never
+deleted, relocated, reset, or overwritten.
 
 ## Product Judgment modes
 
@@ -127,15 +206,15 @@ Full text: `JUDGMENT.md`.
 
 The four modes bind implementation through **durable files** under the
 engagement: `state/engagements/<client>/judgment/` (selection, directive,
-challenge, override). `consult gate <client> …` is the read-mostly gate:
+challenge, override). `productteam gate <client> …` is the read-mostly gate:
 
 ```sh
-bin/consult gate <client> status                                   # machine JSON
-bin/consult gate <client> implement [<direction>]                  # allow/refuse
-bin/consult gate <client> select <direction> [selected-by]         # Guided or Challenge safer alternative
-bin/consult gate <client> direct <direction> [risk...]             # Directive only
-bin/consult gate <client> challenge <harmful> <safer> <evidence>   # Challenge only
-bin/consult gate <client> override <direction> <risk> <critic-record> <evidence-record>
+productteam gate <client> status                                   # machine JSON
+productteam gate <client> implement [<direction>]                  # allow/refuse
+productteam gate <client> select <direction> [selected-by]         # Guided or Challenge safer alternative
+productteam gate <client> direct <direction> [risk...]             # Directive only
+productteam gate <client> challenge <harmful> <safer> <evidence>   # Challenge only
+productteam gate <client> override <direction> <risk> <critic-record> <evidence-record>
 ```
 
 The current `Mode:` line in `engagement.md` is the sole authority: each verb
@@ -162,10 +241,10 @@ same read-only `implement` predicate after pause and seal checks.
 ## Escalations and file-state continuation
 
 ```sh
-bin/consult escalation <client> block <id> <summary> <option> [option...]
-bin/consult escalation <client> status
-bin/consult escalation <client> resume <id> <resume-token>
-bin/consult inspect <client>
+productteam escalation <client> block <id> <summary> <option> [option...]
+productteam escalation <client> status
+productteam escalation <client> resume <id> <resume-token>
+productteam inspect <client>
 ```
 
 `block` writes one entry in engagement `escalations.json` and an active
@@ -194,13 +273,13 @@ chat.
 ## Role envelopes and authorship gates
 
 ```sh
-bin/consult role <client> seal <iter> <builder-input-file>
-bin/consult role <client> invoke Analyst <iter> '<single-turn task>'
-bin/consult role <client> invoke Builder <iter>
-bin/consult role <client> invoke Critic <iter> '<single-turn task>'
-bin/consult role <client> status [iter]
-bin/consult role <client> close <iter>
-bin/consult score <client> --iter <iter>
+productteam role <client> seal <iter> <builder-input-file>
+productteam role <client> invoke Analyst <iter> '<single-turn task>'
+productteam role <client> invoke Builder <iter>
+productteam role <client> invoke Critic <iter> '<single-turn task>'
+productteam role <client> status [iter]
+productteam role <client> close <iter>
+productteam score <client> --iter <n>
 ```
 
 Each invoke is one `provider_ask` call in the isolated client worktree. It

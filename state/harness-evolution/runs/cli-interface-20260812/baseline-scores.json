@@ -1,0 +1,213 @@
+{
+  "benchmark": "productteam-cli-interface",
+  "contract": "cli-interface-20260812-v3",
+  "contract_file": "CLI-BENCHMARK-CONTRACT.md",
+  "contract_sha256": "92f06ecd08e4e804e8c703af4a3af38519a7702ba2a72494fcdf9d596a6dc7f6",
+  "freeze_proof": "FREEZE-SHA.txt",
+  "revision_history": [
+    {
+      "version": "v1",
+      "contract_id": "cli-interface-20260812",
+      "sha256": "7804c3dd8872e4d2635988510b7344e0f52e1a9a79def6142c3b9f93e08e254c",
+      "evidence": "evidence/contract-v1-rejected.md, evidence/freeze-sha-v1.txt",
+      "note": "rejected pre-build by Critic"
+    },
+    {
+      "version": "v2",
+      "contract_id": "cli-interface-20260812-v2",
+      "sha256": "036ae8e8c57bdbb3f88beafcba1c9ff3cb0e4c03298f9d03a390cdb463a7adca",
+      "evidence": "evidence/contract-v2-rejected.md, evidence/freeze-sha-v2.txt",
+      "note": "rejected by CriticV2; reconstruction not byte-exact per header"
+    },
+    {
+      "version": "v3",
+      "contract_id": "cli-interface-20260812-v3",
+      "sha256": "92f06ecd08e4e804e8c703af4a3af38519a7702ba2a72494fcdf9d596a6dc7f6",
+      "evidence": "FREEZE-SHA.txt",
+      "note": "owner-approved re-freeze; fixes CriticV2 blockers (set-for-set registry membership, PTY 24-verb palette + per-unsupported behavior, probe numbering 1-16). No production edit has begun; iter-1 baseline still from the unmodified repository."
+    }
+  ],
+  "run": "cli-interface-20260812",
+  "iteration": 1,
+  "kind": "baseline",
+  "frozen": "2026-08-12 (v3 re-freeze)",
+  "evaluator": "Analyst",
+  "subject": "bin/productteam + bin/consult + lib/*.sh + tests/*.sh + README.md + tests/cli-interface-parity.sh (pre-implementation state, HEAD 1ebb52f)",
+  "pre_implementation": true,
+  "scoring_note": "Scores are integers 0-10 per the frozen v3 contract. Where tests/cli-interface-parity.sh covers a dimension, the probe outcome is primary evidence; a failing probe caps the dimension at 5 unless an environment-only cause is documented with proof (contract Scoring protocol rule 3). v3 parity baseline: 14 FAIL probes (= frozen defects D1-D7), all other probes PASS (evidence/parity-test-baseline-v3.txt). Registry membership contract: 32 commands = 18 chat-supported + 14 unsupported; chat_only 6; palette 24.",
+  "scores": {
+    "reachability": {
+      "score": 5,
+      "rationale": "CONFIRMED (parity FAIL, frozen D1): `productteam checks onboarding-flight-control` exits 2 (workspace-metadata-mismatch) on the shipped checkout — tracked workspace.json pins a workspace path from a different worktree; workspace_ensure hard-fails with no remedy and no non-destructive recovery (v2 D1 policy: recover only when the recorded path is absent; existing/dirty/foreign worktrees must never be touched). Non-destructive workspace guard PASSes (existing path untouched) but the command itself is unreachable on a cold checkout. Rubric band <=5: 'a documented command cannot be reached on a cold checkout (exit != 0 for a non-environmental reason)'. Analyst finding folded here: `bench harness-evolution` / `run harness-evolution 7` also exit 5 (see D7, scored under dimension 7).",
+      "evidence": [
+        "evidence/parity-test-baseline-v3.txt (FAIL checks rc=2; PASS non-destructive guard)",
+        "evidence/checks-baseline.txt",
+        "state/engagements/onboarding-flight-control/workspace.json (machine-pinned path)",
+        "lib/workspace.sh:66-68 (workspace-metadata-mismatch, no remedy)",
+        "CLI-BENCHMARK-CONTRACT.md dimension 1 + D1 policy"
+      ]
+    },
+    "chat-reachability-classification": {
+      "score": 5,
+      "rationale": "CONFIRMED (parity FAIL, frozen D2): slash forwarding drops required flags — `/score <client> --iter <n>` and `/bench <client> run --iter <n>` reach cmd_score/cmd_bench_run without --iter and the session dies with 'scoring requires --iter <n> to bind the Analyst stamp'. CLI controls prove the honest downstream outcome is a stamp refusal ('scores invalid: missing Analyst stamp ...'), so the slash path mis-forwards. Rubric band <=5: 'slash argument forwarding drops required flags'. Passing guards (24 PASS) confirm: chat refuses non-TTY with remedy; /help lists all 25 verbs; all 14 unsupported commands classify honestly; slash lines never execute embedded text.",
+      "evidence": [
+        "evidence/parity-test-baseline-v3.txt (2 FAIL /score + /bench rows; chat PASS rows)",
+        "lib/repl.sh:331-426 (repl_run_slash score/bench cases vs bin/productteam CLI dispatch)",
+        "CLI-BENCHMARK-CONTRACT.md dimension 2 verification (stamp-refusal controls)"
+      ]
+    },
+    "argument-usage-parity": {
+      "score": 5,
+      "rationale": "CONFIRMED via shared D2 failing probe (parity sections 6-8 are this dimension's verification too): slash forwarding is not argument-identical to the CLI path — /score and /bench drop --iter, contradicting what the CLI commands promise. Rubric band <=5: 'slash forwarding drops required flags'. All CLI-side usage probes PASS (open, workspace <client>, score, run-loop, gh, skill, splash --bogus, onboarding --bogus, agents --bogus exit 1 with usage/unknown-option matching help; evidence/usage-parity-probes.txt + Analyst exit-table). Cosmetic gaps remain: `pool list --bogus` lacks the 'error:' prefix; README body uses bin/consult forms 18x.",
+      "evidence": [
+        "evidence/parity-test-baseline-v3.txt (usage-error PASS rows; D2 FAIL rows)",
+        "evidence/usage-parity-probes.txt",
+        "evidence/exit-table.txt (20+ misuse rows)",
+        "CLI-BENCHMARK-CONTRACT.md dimension 3 (slash-forwarding verification)"
+      ]
+    },
+    "help-readme-onboarding-parity": {
+      "score": 5,
+      "rationale": "CONFIRMED (parity FAIL, frozen D3 + D4): (a) README omits 5 help-listed commands — direction, pool, project-memory, run-loop, style (help 32 vs README 27); (b) `onboarding --yes` step 4 prints the stale signature `productteam score <client>` instead of current `score <client> --iter <n>` (lib/onboarding.sh:51; evidence/onboarding-stale-syntax.txt). Rubric band <=5: 'README omits >= 3 help-listed commands, or onboarding prints a stale command signature'. Onboarding itself succeeds on an isolated state root (--yes rc=0).",
+      "evidence": [
+        "evidence/parity-test-baseline-v3.txt (5 README FAIL rows + onboarding FAIL row)",
+        "evidence/readme-parity-diff.txt",
+        "evidence/onboarding-stale-syntax.txt",
+        "lib/onboarding.sh:51 (stale step-4 text)",
+        "evidence/exit-table.txt (onboarding --yes rc=0)"
+      ]
+    },
+    "argv-safety": {
+      "score": 5,
+      "rationale": "CONFIRMED (parity FAIL, frozen D5): quoted slash argv is mangled — `/provider \"codex\"` treats the quotes literally and fails with 'provider \"codex\" is not a usable installed agent' instead of selecting codex. Rubric band <=5: 'quotes mangled' (a slash parser must strip quotes without eval). Passing guards: CLI-side multi-word argv round-trips byte-identical (style append taste 'alpha beta gamma'), empty argv rejected non-zero, embedded `$(...)`/`;` in slash lines is inert (injection-inert PASS).",
+      "evidence": [
+        "evidence/parity-test-baseline-v3.txt (FAIL quoted slash argv; PASS round-trip/empty/injection-inert rows)",
+        "lib/repl.sh:331-426 (slash parsing)",
+        "CLI-BENCHMARK-CONTRACT.md dimension 5"
+      ]
+    },
+    "frontend-machine-boundary": {
+      "score": 5,
+      "rationale": "CONFIRMED (parity FAIL, frozen D6): the two required frontend surfaces do not exist — `help --json` and `status --json` emit prose (exit 0) instead of the frozen registry shape (32 commands + chat_supported/chat_reason + 6 chat-only verbs) and engagement-list JSON. Rubric band <=5: 'help --json / status --json absent'. All existing JSON seams remain authoritative and parse: agents --json, card list --json, style show --json, pool list --json, project-memory show --json, escalation/gate/workspace/role status, direction list --json, inspect pack (parity PASS + Analyst jq/byte checks; zero ANSI).",
+      "evidence": [
+        "evidence/parity-test-baseline-v3.txt (2 FAIL help --json + status --json; PASS existing-JSON row)",
+        "evidence/exit-table.txt (existing JSON surfaces rc=0)",
+        "evidence/inspect-probe.json",
+        "CLI-BENCHMARK-CONTRACT.md dimension 6 + registry shape"
+      ]
+    },
+    "non-tty-redirect-nocolor-exit": {
+      "score": 5,
+      "rationale": "CONFIRMED (parity FAIL, frozen D7): `bench harness-evolution` and `run harness-evolution 7` exit 5 with a raw `jq: error` traceback on summary-shaped runs/iter-7/scores.json (\"scores\": null) — a raw interpreter traceback with jq's exit code 5 reaches the user. Rubric band <=5: 'a raw jq: error traceback with exit 5 reaches the user' (rule 3 cap). All ANSI criteria PASS: redirected output zero ESC bytes, TTY+NO_COLOR=1 zero ESC bytes, color TTY emits ANSI, unknown command and usage errors exit non-zero.",
+      "evidence": [
+        "evidence/parity-test-baseline-v3.txt (2 FAIL bench/run rows; ANSI PASS rows)",
+        "evidence/bench-harness-evolution.txt",
+        "evidence/run-harness-evolution-7.txt",
+        "state/harness-evolution/runs/iter-7/scores.json (scores: null)",
+        "bin/productteam:1214-1290 (cmd_bench/cmd_run_detail jq pipeline)",
+        "CLI-BENCHMARK-CONTRACT.md dimension 7"
+      ]
+    },
+    "ctrl-c-child-cleanup-partial-artifacts": {
+      "score": 7,
+      "rationale": "No failing parity probe. Code-verified: repl_interrupt_cleanup kills the provider process group (-pid), reaps it, marks the worker failed, and preserves partial artifact bytes with an honest message (lib/repl.sh:207-226); run-loop traps TERM/INT to loop_pause_for_signal (progress.json status=paused, stop_reason=killed-resume-pending; --resume continues — tests/run-loop-smoke.sh PASS in smoke-baseline.txt). Archived runtime proof (pre-implementation): tests/visual-cli.sh honest-partial-output, visual-checks-final.json 14/14. Not re-executed in this baseline; exit-130 recording not independently verified -> conservative 7.",
+      "evidence": [
+        "lib/repl.sh:207-226 (repl_interrupt_cleanup)",
+        "lib/run-loop.sh (loop_pause_for_signal)",
+        "tests/visual-cli.sh:245-362 (honest-partial-output probe)",
+        "state/harness-evolution/runs/iter-7/visual-checks-final.json (14/14)",
+        "evidence/smoke-baseline.txt (run-loop smoke PASS)"
+      ]
+    },
+    "visual-smoke-contracts": {
+      "score": 6,
+      "rationale": "CONFIRMED: `productteam smoke` exits 1 with exactly one FAIL ('checks', D1 root cause); all other 41 smoke checks PASS (evidence/smoke-baseline.txt, full transcript). Rubric band 6-8: 'one FAIL from state drift'. Contracts archived pre-implementation: visual-contract.json 14/14 pass (iter-7/visual-checks-final.json), harness-cli-v1 49/49 overall 9.5 (iter-6/harness-cli-final/checks.json + state/engagements/harness-cli/runs/iter-1/checks.json); splash renders statically in a pipe (ANSI-free).",
+      "evidence": [
+        "evidence/smoke-baseline.txt (exit 1, single FAIL 'checks')",
+        "state/harness-evolution/runs/iter-7/visual-checks-final.json (14/14)",
+        "state/harness-evolution/runs/iter-6/harness-cli-final/checks.json (49/49, 9.5)",
+        "state/harness-evolution/visual-contract.json",
+        "state/engagements/harness-cli/checks/CHECK-CATALOG.md"
+      ]
+    },
+    "dependencies-cold-start": {
+      "score": 5,
+      "rationale": "CONFIRMED (frozen D1 root cause): tracked state pins machine-specific absolute paths (state/engagements/onboarding-flight-control/workspace.json pins /home/logani/...; also overnight-rehearsal workspace.json/roles/memory/inspect-pack and harness-cli checks evidence). `checks onboarding-flight-control` fails on a cold checkout (exit 2) with no recovery and no remedy in the message (lib/workspace.sh:66-68). Rubric band <=5: 'a tracked command fails on a fresh checkout because state pins this machine's absolute paths, with no recovery'. Positive controls hold: onboarding --yes rc=0 on fresh CONSULT_STATE_ROOT; runtime --check with bad provider rc=1 honest; CLI surface deps within allowlist (bash/coreutils/jq/python3/git/gh/timeout; node/bun only in client-check runners/comments).",
+      "evidence": [
+        "evidence/checks-baseline.txt",
+        "state/engagements/onboarding-flight-control/workspace.json",
+        "lib/workspace.sh:66-68",
+        "grep -R '/home/logani' state/engagements/ (overnight-rehearsal, harness-cli)",
+        "evidence/exit-table.txt (onboarding --yes, runtime --check rows)"
+      ]
+    },
+    "metadata-simplicity-deletion": {
+      "score": 8,
+      "rationale": "No failing parity probe in v2. Scope note (v3): the committed state/style/ duplicate is durable org memory, OUT of scope (D5 removed; state/style/* must not be edited to satisfy any probe — critical failure #6). CLI's own metadata is minimal and verified: state/.cli gitignored holding only the 5-byte first-run marker plus one config line written by onboarding --yes; atomic tmp+rename writes; deletion paths exist (workspace remove clean-worktree-only, direction clear --i-am-owner); run-loop smoke scaffolding cleans up after itself (trap cleanup, PASS in smoke-baseline). Conservative 8: run-loop-smoke not re-run standalone in this baseline.",
+      "evidence": [
+        ".gitignore (state/.cli/), state/.cli/first-run (5 bytes)",
+        "evidence/exit-table.txt (onboarding --yes writes config under isolated state root)",
+        "bin/productteam:603-650 (style/project-memory), lib/workspace.sh",
+        "evidence/smoke-baseline.txt (run-loop smoke PASS)",
+        "CLI-BENCHMARK-CONTRACT.md dimension 11 + v2 scope note",
+        "evidence/style-dup-baseline.txt (retained for the record; out of scope)"
+      ]
+    }
+  },
+  "overall": 5.5,
+  "overall_note": "Mean of the 11 integer scores, one decimal (61/11). Convergence for repair iterations: every dimension >= 8.0 with the parity test green. The v3 re-freeze retains the v2-added frozen defects (D2 slash --iter forwarding, D4 stale onboarding syntax, D5 quoted slash argv, D6 missing help/status --json, D7 bench/run raw jq) with set-for-set registry membership + PTY 24-verb palette; scores are unchanged from the v2 reconciliation (baseline mean 5.5).",
+  "frozen_defects": [
+    "D1: `productteam checks onboarding-flight-control` exits 2 (workspace-metadata-mismatch) — tracked workspace.json pins a stale worktree path; workspace_ensure hard-fails, no remedy, no non-destructive recovery (parity 3 FAIL; evidence/checks-baseline.txt).",
+    "D2: slash forwarding drops required flags — /score <client> --iter <n> and /bench <client> run --iter <n> die with 'scoring requires --iter' instead of reaching the Analyst-stamp refusal (parity 7 FAIL; CLI controls PASS).",
+    "D3: README omits 5 help-listed commands: direction, pool, project-memory, run-loop, style (help 32 vs README 27) (parity 4 FAIL; evidence/readme-parity-diff.txt).",
+    "D4: `onboarding --yes` step 4 prints stale 'productteam score <client>' — current syntax requires --iter <n> (parity 11 FAIL; lib/onboarding.sh:51; evidence/onboarding-stale-syntax.txt).",
+    "D5: quoted slash argv mangled — /provider \"codex\" treated literally instead of selecting codex (parity 8 FAIL).",
+    "D6: frontend boundary — help --json and status --json do not exist (emit prose, exit 0); no command-registry metadata, no engagement-list JSON (parity 6+10 FAIL).",
+    "D7: bench harness-evolution and run harness-evolution 7 exit 5 with a raw jq: error traceback on summary-shaped runs/iter-7/scores.json (scores: null) — no honest message, no fallback (parity 12 FAIL; evidence/bench-harness-evolution.txt, run-harness-evolution-7.txt)."
+  ],
+  "out_of_scope": [
+    "state/style/ duplicate entry (v1 D5): durable org memory per Principal decision; must not be edited to satisfy any probe (critical failure #6). Evidence retained at evidence/style-dup-baseline.txt."
+  ],
+  "analyst_additional_findings": [
+    "`pool list --bogus` error lacks the standard 'error:' prefix used by die() elsewhere (bin/productteam:690-700).",
+    "README body uses bin/consult forms 18x vs productteam in help/quickstart (documented shim mitigates; cosmetic).",
+    "workspace-metadata-mismatch message names the metadata file but offers no remedy (lib/workspace.sh:66-68) — folded into D1/D10."
+  ],
+  "rejected_assumptions": [
+    "chat non-TTY refusal is a defect: REJECTED — intended TTY-gated design, parity-asserted with remedy (PASS).",
+    "Unsupported slash commands misroute: REJECTED — all 14 frozen-unsupported commands classify honestly as `unknown /X — /help` (parity PASS).",
+    "Slash lines execute embedded text: REJECTED — `$(...)`/`;` inert (parity PASS).",
+    "Existing JSON surfaces leak ANSI or non-JSON: REJECTED — parity PASS + Analyst jq/byte checks on 9 surfaces.",
+    "NO_COLOR/redirect handling broken: REJECTED — parity PASS on all four ANSI criteria.",
+    "CLI-side multi-word argv truncation: REJECTED — round-trips byte-identical; empty argv rejected (parity PASS).",
+    "Hidden runtime dependencies (node/bun): REJECTED — only in client-check runners/comments; CLI surface within allowlist.",
+    "help omits dispatch commands: REJECTED — help names all 32 frozen top-level commands (parity PASS).",
+    "Probes dirtied protected untracked paths: REJECTED — the three pre-existing untracked paths are byte-identical before/after; the single probe side-effect (tracked state/harness-evolution/runs/checks.json) was restored byte-exact via git checkout and verified clean."
+  ],
+  "dirty_worktree_preservation": {
+    "pre_existing_untracked_paths": [
+      "state/engagements/onboarding-flight-control/runs/check-20260810T061017889894029/",
+      "state/engagements/onboarding-flight-control/runs/check-20260810T061159572636558/",
+      "state/harness-evolution/inspect-pack.json"
+    ],
+    "note": "git status --short before and after all probes shows exactly these three untracked paths plus the new run directory state/harness-evolution/runs/cli-interface-20260812/ and Advisor-owned tests/cli-interface-parity.sh. The untracked inspect-pack.json was never written (inspect probe redirected to run-dir inspect-probe.json).",
+    "probe_side_effect_restored": "A `productteam harness-checks` reachability probe (no iter arg) rewrote tracked state/harness-evolution/runs/checks.json; restored byte-exact via git checkout -- and verified (git diff --stat empty)."
+  },
+  "observed_suite_entrypoints": [
+    "tests/cli-interface-parity.sh — frozen-contract parity probe v2; observed 14 FAIL (D1-D7), all other probes PASS (D1-D7) — evidence/parity-test-baseline-v3.txt.",
+    "tests/consult-smoke.sh — `productteam smoke`; observed exit 1 with a single FAIL ('checks', D1 root cause) — evidence/smoke-baseline.txt (full transcript).",
+    "tests/visual-cli.sh — 14-id visual contract suite; archived pass 14/14 in state/harness-evolution/runs/iter-7/visual-checks-final.json (pre-implementation; not re-run in this baseline).",
+    "lib/harness-cli-checks.sh — 49-check harness-cli-v1 suite; archived 49/49 overall 9.5 (iter-6/harness-cli-final/checks.json, state/engagements/harness-cli/runs/iter-1/checks.json); self-routes via productteam checks harness-cli.",
+    "lib/harness-checks.sh — harness-apc suite via `productteam harness-checks`; observed rc=0 in baseline (evidence/exit-table.txt; default output artifact restored after probe).",
+    "lib/run-checks.sh — ofc-v1 client suite (not run in baseline: would build/modify sibling repos; smoke sets CONSULT_SMOKE_SKIP_CLIENT=1 for the same reason).",
+    "10 sub-smokes invoked by consult-smoke.sh: workspace, judgment-gate, escalation, role-envelope (real provider), agent-cards, style-memory, experience-pool, direction-path, open-baseline, run-loop — all PASS in smoke-baseline.txt."
+  ],
+  "probe_environment": {
+    "head": "1ebb52f fix(harness): pool cite leak, specialist sed corruption, iter validation",
+    "date": "2026-08-12",
+    "tty": "false (non-interactive probes)",
+    "no_color": "true for probe runs",
+    "provider": "agent (detected), never invoked for scoring during baseline",
+    "scope_note": "No production edits; no formatters/linters; no project-wide test-suite runs beyond the observed entrypoints archived by the Advisor; targeted read-only probes only. Freeze file and FREEZE-SHA.txt untouched; iter-1 baseline not rewritten retroactively."
+  }
+}

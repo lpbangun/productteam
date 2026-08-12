@@ -1,0 +1,2 @@
+# v2 freeze hash (rejected contract cli-interface-20260812-v2, overwritten by v3)
+036ae8e8c57bdbb3f88beafcba1c9ff3cb0e4c03298f9d03a390cdb463a7adca

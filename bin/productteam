@@ -27,6 +27,7 @@ source "$ROOT/lib/github.sh"
 source "$ROOT/lib/splash.sh"
 source "$ROOT/lib/onboarding.sh"
 source "$ROOT/lib/activity.sh"
+source "$ROOT/lib/commands.sh"
 source "$ROOT/lib/repl.sh"
 source "$ROOT/lib/render.sh"
 source "$ROOT/lib/workspace.sh"
@@ -87,8 +88,20 @@ engagement_repo() { # engagement dir → absolute Repo: path or empty
 latest_run() { # client dir → highest iter-N name or empty
   { ls "$1/runs" 2>/dev/null || true; } | { grep -E '^iter-[0-9]+$' || true; } | sort -t- -k2 -n | tail -1
 }
+latest_contract_run() { # client dir → newest iter-N with contract-shaped scores.json, or empty
+  local d="$1" it
+  while IFS= read -r it; do
+    if [[ -f "$d/runs/$it/scores.json" ]] &&
+       jq -e 'type == "object" and (.scores|type) == "object" and (.overall|type) == "number"' \
+         "$d/runs/$it/scores.json" >/dev/null 2>&1; then
+      printf '%s' "$it"
+      return 0
+    fi
+  done < <({ ls "$d/runs" 2>/dev/null || true; } | { grep -E '^iter-[0-9]+$' || true; } | sort -t- -k2 -nr)
+  return 0
+}
 score_val() { # $1=score entry (number or {score,...}) → numeric score
-  jq -r 'if type == "number" then . else .score end' <<<"$1"
+  jq -r 'if type == "number" then . elif type == "object" then (.score // empty) else empty end' <<<"$1"
 }
 score_ev() { # $1=score entry → evidence text (string or array joined) or empty
   jq -r 'if type == "number" then "" elif (.evidence|type) == "array" then (.evidence|join("; ")) else (.evidence // "") end' <<<"$1"
@@ -164,91 +177,28 @@ cmd_workspace() {
 }
 
 cmd_help() {
-  local prov
+  local json=0 a
+  for a in "$@"; do
+    case "$a" in
+      --json) json=1 ;;
+      *) die "unknown option '$a' — usage: productteam help [--json]" ;;
+    esac
+  done
+  if (( json )); then
+    cmd_help_json
+    return 0
+  fi
+  local prov i out
   prov="$(runtime_default 2>/dev/null || echo '(none)')"
-  cat <<EOF
-
-  ${B}productteam${R} — Product Consulting Harness
-
-  ${B}Commands${R}
-    productteam                     Org status and engagements overview
-    productteam status              The same overview, named explicitly
-    productteam chat                Interactive session (TTY; V1 robots mark)
-    productteam onboarding [--yes]  First run: agents, provider, first score
-    productteam splash [--frames]   Knowledge-graph banner (CONSULT_NO_SPLASH=1 skips)
-    productteam agents [--json]     Coding agents on this device
-    productteam runtime [--check]   Alias of agents; --check fails if none
-    productteam judge <client>      Product Judgment mode + mission
-    productteam judge <client> set <mode>
-                                Set Guided|Directive|Challenge|Override
-    productteam open <client> --repo <abs-path> [--mode …] [--scorer …]
-                                Cold engagement stub + freeze stamp + workspace
-    productteam baseline <client> [--allow-dirty <reason>]
-                                iter-0 via workspace + checks/score entrypoints
-    productteam gate <client> status|implement|select|direct|challenge|override|rebut
-                                Durable judgment decisions + machine status
-    productteam direction <client> propose|list|clear|rebut
-                                Guided direction proposals + Critic rebuttal (see gate rebut alias)
-    productteam workspace <client> ensure|status|remove
-                                Isolated client worktree lifecycle
-    productteam escalation <client> block <id> <summary> <option> [option...]
-    productteam escalation <client> status|resume <id> <token>
-                                Durable owner block and authorized continuation
-    productteam inspect <client> [out]
-                                Regenerate the file-derived inspect pack
-    productteam role <client> invoke <Analyst|Builder|Critic> <iter> [task]
-    productteam role <client> seal <iter> <input-file>
-    productteam role <client> status [iter] | close <iter>
-                                Single-turn roles, sealed input, authorship gates
-    productteam card list [--json] | show <name|id|role> [client] [--json]
-    productteam card seed-specialist <client> [display_name]
-                                Named agent cards (state/agents/)
-    productteam style show [--json] | init | append <taste|risk|stack|never> <text…>
-    productteam style accept-lesson <path> | rewrite [--i-am-owner]
-                                Org taste/risk/stack/never (state/style/)
-    productteam project-memory show <client> [--json]
-    productteam project-memory append <client> <text…>
-                                Per-engagement notes (state/engagements/<client>/memory/)
-    productteam pool list [--domain …] [--kind worked|failed] [--json]
-    productteam pool show <id> | search <query> | add … | add-from-iter …
-                                Cross-engagement experience excerpts (state/experience-pool/)
-    productteam score <client> --iter <n>
-                                Score via the declared scorer + Analyst stamp
-    productteam run-loop <client> --max-hours <n> --max-iters <m>
-                                Overnight loop driver (inspect→gate→roles→score→close)
-                                [--dry-run] [--resume] [--no-provider]
-    productteam bench <client>      Benchmark contract + history + latest scores
-    productteam bench <client> run --iter <n>
-                                Provider scoring with authorship gate
-    productteam checks <client> [--allow-dirty <reason>]
-                                Deterministic checks in isolated workspace
-    productteam harness-checks [iter-dir]
-                                Objective harness-apc checks + secrets scan
-    productteam gh preflight [dir]  GitHub auth + permissions (tokens redacted)
-    productteam gh pr-create [dir]  Push branch + open PR (CONSULT_PR_*)
-    productteam gh status [dir] [n] PR view JSON
-    productteam gh checks [dir] [n] PR checks
-    productteam gh merge [dir] [n]  Merge only if authorize-merge present (no --admin)
-    productteam gh validate [dir] [ref] [out]
-                                Post-merge/PR validation artifact
-    productteam skill <name> <target> [out-dir]
-                                Run /critique|/benchmark|/design-sprint
-    productteam run <client> <n>    Show scores for iteration n
-    productteam report <client>     Latest iteration report
-    productteam memory              Organizational memory
-    productteam org                 Roles, loop, autonomy
-    productteam smoke               CLI smoke tests
-    productteam help                This text
-
-  ${B}Non-goals${R}
-    ${D}Not an IDE, not a client redesign. There is no daemon, no server and
-    no database — state is plain files you can read.${R}
-
-  ${D}State: state/engagements/<client>/ · harness-evolution: state/harness-evolution/
-  Client repos: siblings (Repo: path) · Judgment: JUDGMENT.md
-  Provider: ${CONSULT_PROVIDER:-$prov} · Learning: docs/learning-schema.md${R}
-
-EOF
+  printf -v out '\n  %sproductteam%s — Product Consulting Harness\n\n  %sCommands%s\n    productteam                     Org status and engagements overview\n' \
+    "$B" "$R" "$B" "$R"
+  for i in "${!CMD_REGISTRY[@]}"; do
+    cmd_reg_get "$i"
+    printf -v out '%s    %s\n%32s%s\n' "$out" "$REG_USAGE" '' "$REG_SUMMARY"
+  done
+  printf -v out '%s\n  %sNon-goals%s\n    %sNot an IDE, not a client redesign. There is no daemon, no server and\n    no database — state is plain files you can read.%s\n\n  %sState: state/engagements/<client>/ · harness-evolution: state/harness-evolution/\n  Client repos: siblings (Repo: path) · Judgment: JUDGMENT.md\n  Provider: %s · Learning: docs/learning-schema.md%s\n\n' \
+    "$out" "$B" "$R" "$D" "$R" "$D" "${CONSULT_PROVIDER:-$prov}" "$R"
+  printf '%s' "$out"
 }
 
 cmd_agents() {
@@ -334,7 +284,63 @@ cmd_harness_checks() {
   fi
 }
 
+cmd_status_json() { # file-derived engagement summaries; no first-run writes
+  local tsv='' d name last ov prev ov_prev trend desc at line
+  local -a dirs
+  for d in "$STATE"/*/; do
+    [[ -d "$d" ]] || continue
+    dirs+=("$d")
+  done
+  [[ -d "$ROOT/state/harness-evolution" ]] && dirs+=("$ROOT/state/harness-evolution")
+  for d in "${dirs[@]}"; do
+    name=$(basename "$d")
+    last=$(latest_run "$d" 2>/dev/null || true)
+    desc=''
+    [[ -f "$d/engagement.md" ]] && desc=$(awk -F': ' '/^Vision:/{print $2; exit}' "$d/engagement.md")
+    if [[ -n "$last" && -f "$d/runs/$last/scores.json" ]]; then
+      ov=$(jq -r '.overall' "$d/runs/$last/scores.json")
+      prev=$(ls "$d/runs" 2>/dev/null | grep -E '^iter-[0-9]+$' | sort -t- -k2 -n | awk -v l="$last" '$0!=l' | tail -1)
+      if [[ -n "$prev" && -f "$d/runs/$prev/scores.json" ]]; then
+        ov_prev=$(jq -r '.overall' "$d/runs/$prev/scores.json")
+        trend=$(awk -v a="$ov" -v b="$ov_prev" 'BEGIN{d=a-b; printf "%s%.1f", (d>=0?"+":""), d}')
+      else
+        trend='baseline'
+      fi
+      at=$(jq -r '[((.scores // {}) | to_entries[]) | select((.value|if type=="number" then . else .score end)>=9)] | length' "$d/runs/$last/scores.json")
+      printf -v line '%s\t1\t%s\t%s\t%s\t%s\t%s\n' "$name" "$last" "$ov" "$at" "$trend" "$desc"
+      tsv+="$line"
+    else
+      printf -v line '%s\t0\t\t\t\t\t%s\n' "$name" "$desc"
+      tsv+="$line"
+    fi
+  done
+  printf '%s' "$tsv" | jq -Rs '
+    split("\n") | map(select(length > 0)) | map(split("\t")) |
+    { selected: null,
+      engagements: map({
+        client: .[0],
+        scored: (.[1] == "1"),
+        last_iter: (if .[2] == "" then null else .[2] end),
+        overall: (if .[3] == "" or .[3] == "null" then null else (.[3] | tonumber) end),
+        areas_ge_9: (if .[4] == "" then null else (.[4] | tonumber) end),
+        trend: (if .[5] == "" then null else .[5] end),
+        desc: .[6]
+      })
+    }'
+}
+
 cmd_status() {
+  local json=0 a
+  for a in "$@"; do
+    case "$a" in
+      --json) json=1 ;;
+      *) die "unknown option '$a' — usage: productteam status [--json]" ;;
+    esac
+  done
+  if (( json )); then
+    cmd_status_json
+    return 0
+  fi
   first_run_notice
   local prov
   prov="$(runtime_default 2>/dev/null || echo none)"
@@ -1177,6 +1183,7 @@ cmd_bench() {
     printf '   %siter  date        kind        overall   areas≥9   weakest%s\n' "$D" "$R"
     local sparkvals=''
     while IFS= read -r line; do
+      jq -e 'type == "object" and (.scores|type) == "object" and (.overall|type) == "number"' <<<"$line" >/dev/null 2>&1 || continue
       local iter kind ts ov at weak ws
       iter=$(jq -r '.iter' <<<"$line")
       kind=$(jq -r '.kind' <<<"$line")
@@ -1193,9 +1200,18 @@ cmd_bench() {
     printf '  %sNo scored runs yet. First: productteam bench %s run%s\n\n' "$D" "$c" "$R"
   fi
 
-  # latest detail
+  # latest detail — show the newest contract-shaped score record; a
+  # null/summary-shaped latest run is skipped, never rendered raw.
   local last; last=$(latest_run "$d")
-  [[ -n "$last" && -f "$d/runs/$last/scores.json" ]] || return 0
+  [[ -n "$last" ]] || return 0
+  local lastc; lastc=$(latest_contract_run "$d")
+  if [[ -z "$lastc" ]]; then
+    die "no contract-shaped scores for $c (runs exist but none carry a .scores object + numeric .overall; latest recorded: $d/runs/$last/scores.json). Re-score with: productteam score $c --iter <n>"
+  fi
+  if [[ "$lastc" != "$last" ]]; then
+    printf '  %snote:%s %s scores.json is not contract-shaped; showing latest contract-shaped %s%s\n' "$D" "$R" "$last" "$lastc" "$R" >&2
+  fi
+  last=$lastc
   printf '  %sLATEST — %s%s\n' "$B" "$last" "$R"
   local prev=''
   if [[ -f "$d/history.jsonl" && -s "$d/history.jsonl" ]]; then
@@ -1203,9 +1219,10 @@ cmd_bench() {
   fi
   local prev_scores='{}'
   if [[ -n "$prev" && -f "$d/runs/iter-$prev/scores.json" ]]; then
-    prev_scores=$(jq -c '.scores' "$d/runs/iter-$prev/scores.json")
+    prev_scores=$(jq -c 'select((.scores|type) == "object") | .scores' "$d/runs/iter-$prev/scores.json" 2>/dev/null)
+    [[ -n "$prev_scores" ]] || prev_scores='{}'
   fi
-  jq -r '.scores | to_entries[] | "\(.key)\t\(.value|if type=="number" then . else .score end)\t\(.value|if type=="number" then "" elif (.evidence|type)=="array" then (.evidence|join("; ")) else (.evidence // "") end)"' \
+  jq -r '.scores | to_entries[] | "\(.key)\t\(.value|if type=="number" then . elif type=="object" then (.score // "") else "" end)\t\(.value|if type=="number" then "" elif (.evidence|type)=="array" then (.evidence|join("; ")) else (.evidence // "") end)"' \
     "$d/runs/$last/scores.json" | \
   while IFS=$'\t' read -r area sc ev; do
     local delta='' ev_path='' ev_text="$ev"
@@ -1232,6 +1249,11 @@ cmd_run_detail() {
   local c="$1" n="$2" d; d=$(client_dir "$c")
   local rd="$d/runs/iter-$n"
   [[ -f "$rd/scores.json" ]] || die "no scores for $c iter-$n"
+  if ! jq -e 'type == "object" and (.scores|type) == "object" and (.overall|type) == "number"' "$rd/scores.json" >/dev/null 2>&1; then
+    local shape
+    shape=$(jq -r 'if type == "null" then "null" elif type != "object" then type elif (.overall|type) == "number" then "summary-shaped (.scores is " + (.scores|type) + ")" elif (.scores|type) == "object" then "summary-shaped (missing numeric .overall)" else "summary-shaped (no .scores object, no .overall number)" end' "$rd/scores.json" 2>/dev/null || echo unreadable)
+    die "iter-$n scores.json for $c is $shape, not a contract-shaped score record: $rd/scores.json (expected .scores object + numeric .overall; re-score with: productteam score $c --iter $n)"
+  fi
   printf '\n  %s%s — %s%s\n' "$B" "$c" "iter-$n" "$R"
   local prev=''
   if [[ -f "$d/history.jsonl" && -s "$d/history.jsonl" ]]; then
@@ -1239,9 +1261,10 @@ cmd_run_detail() {
   fi
   local prev_scores='{}'
   if [[ -n "$prev" && -f "$d/runs/iter-$prev/scores.json" ]]; then
-    prev_scores=$(jq -c '.scores' "$d/runs/iter-$prev/scores.json")
+    prev_scores=$(jq -c 'select((.scores|type) == "object") | .scores' "$d/runs/iter-$prev/scores.json" 2>/dev/null)
+    [[ -n "$prev_scores" ]] || prev_scores='{}'
   fi
-  jq -r '.scores | to_entries[] | "\(.key)\t\(.value|if type=="number" then . else .score end)\t\(.value|if type=="number" then "" elif (.evidence|type)=="array" then (.evidence|join("; ")) else (.evidence // "") end)"' "$rd/scores.json" | \
+  jq -r '.scores | to_entries[] | "\(.key)\t\(.value|if type=="number" then . elif type=="object" then (.score // "") else "" end)\t\(.value|if type=="number" then "" elif (.evidence|type)=="array" then (.evidence|join("; ")) else (.evidence // "") end)"' "$rd/scores.json" | \
   while IFS=$'\t' read -r area sc ev; do
     local delta='' ev_path='' ev_text="$ev"
     if [[ "$ev" == *': '* && "${ev%%:*}" =~ [./] ]]; then
@@ -1376,89 +1399,35 @@ cmd_run_loop() {
 }
 
 # ── dispatch ─────────────────────────────────────────────────────────
+dispatch_judge() { # <client> [set <mode>] — special-case routing stays a wrapper
+  if [[ "${2:-}" == 'set' ]]; then
+    [[ $# -ge 3 ]] || die 'usage: productteam judge <client> set <mode>'
+    cmd_judge_set "$1" "$3"
+  else
+    cmd_judge "$1"
+  fi
+}
+
+dispatch_bench() { # <client> [run --iter <n>] — special-case routing stays a wrapper
+  if [[ "${2:-}" == 'run' ]]; then
+    cmd_bench_run "$1" "${@:3}"
+  else
+    cmd_bench "$1"
+  fi
+}
+
 main() {
-  local cmd="${1:-status}"; shift || true
+  local cmd="${1:-status}" idx
+  shift || true
   [[ "$cmd" == "-h" || "$cmd" == "--help" ]] && { cmd_help; return; }
-  case "$cmd" in
-    help)           cmd_help ;;
-    status)         cmd_status ;;
-    chat)           cmd_chat ;;
-    org)            cmd_org ;;
-    memory)         cmd_memory ;;
-    smoke)          cmd_smoke ;;
-    agents)         cmd_agents "$@" ;;
-    runtime)        cmd_agents "$@" ;;
-    splash)         cmd_splash "$@" ;;
-    onboarding)     cmd_onboarding "$@" ;;
-    harness-checks)
-      cmd_harness_checks "${1:-}" ;;
-    gh)
-      [[ $# -ge 1 ]] || die 'usage: productteam gh preflight|pr-create|status|checks|merge|validate …'
-      cmd_gh "$@" ;;
-    skill)
-      [[ $# -ge 2 ]] || die 'usage: productteam skill <critique|benchmark|design-sprint> <target> [out-dir]'
-      cmd_skill "$@" ;;
-    judge)
-      [[ $# -ge 1 ]] || die 'usage: productteam judge <client> [set <mode>]'
-      if [[ "${2:-}" == 'set' ]]; then
-        [[ $# -ge 3 ]] || die 'usage: productteam judge <client> set <mode>'
-        cmd_judge_set "$1" "$3"
-      else
-        cmd_judge "$1"
-      fi ;;
-    open)
-      cmd_open "$@" ;;
-    baseline)
-      [[ $# -ge 1 ]] || die 'usage: productteam baseline <client> [--allow-dirty <reason>]'
-      cmd_baseline "$@" ;;
-    workspace|worktree)
-      [[ $# -ge 2 ]] || die 'usage: productteam workspace <client> ensure|status|remove'
-      cmd_workspace "$@" ;;
-    gate)
-      [[ $# -ge 2 ]] || die 'usage: productteam gate <client> status|implement|select|direct|challenge|override|rebut …'
-      cmd_gate "$@" ;;
-    direction)
-      [[ $# -ge 2 ]] || die 'usage: productteam direction <client> propose|list|clear|rebut …'
-      cmd_direction "$@" ;;
-    escalation)
-      [[ $# -ge 2 ]] || die 'usage: productteam escalation <client> block|status|resume …'
-      cmd_escalation "$@" ;;
-    inspect)
-      [[ $# -ge 1 ]] || die 'usage: productteam inspect <client> [out]'
-      cmd_inspect "$@" ;;
-    role)
-      [[ $# -ge 2 ]] || die 'usage: productteam role <client> seal|invoke|status|close …'
-      cmd_role "$@" ;;
-    card)
-      [[ $# -ge 1 ]] || die 'usage: productteam card list|show|seed-specialist …'
-      cmd_card "$@" ;;
-    style)
-      [[ $# -ge 1 ]] || die 'usage: productteam style show|init|append|accept-lesson|rewrite …'
-      cmd_style "$@" ;;
-    project-memory)
-      [[ $# -ge 1 ]] || die 'usage: productteam project-memory show|append <client> …'
-      cmd_project_memory "$@" ;;
-    pool)
-      [[ $# -ge 1 ]] || die 'usage: productteam pool list|show|search|add|add-from-iter …'
-      cmd_pool "$@" ;;
-    score)
-      [[ $# -ge 1 ]] || die 'usage: productteam score <client> --iter <n>'
-      cmd_score "$@" ;;
-    run-loop)
-      cmd_run_loop "$@" ;;
-    checks)
-      [[ $# -ge 1 ]] || die 'usage: productteam checks <client> [--allow-dirty <reason>]'
-      cmd_checks "$@" ;;
-    bench)
-      [[ $# -ge 1 ]] || die 'usage: productteam bench <client> [run --iter <n>]'
-      if [[ "${2:-}" == 'run' ]]; then cmd_bench_run "$1" "${@:3}"; else cmd_bench "$1"; fi ;;
-    run)
-      [[ $# -ge 2 ]] || die 'usage: productteam run <client> <iter>'
-      cmd_run_detail "$1" "$2" ;;
-    report)
-      [[ $# -ge 1 ]] || die 'usage: productteam report <client>'
-      cmd_report "$1" ;;
-    *) die "unknown command '$cmd' — cause: not in the command table. Remedy: productteam help" ;;
-  esac
+  idx=$(cmd_reg_index "$cmd")
+  if [[ -z "$idx" ]]; then
+    die "unknown command '$cmd' — cause: not in the command table. Remedy: productteam help"
+  fi
+  cmd_reg_get "$idx"
+  if (( $# < REG_MIN )); then
+    die "usage: $REG_USAGE"
+  fi
+  "$REG_HANDLER" "$@"
 }
 main "$@"

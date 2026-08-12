@@ -1,0 +1,33 @@
+
+> productteam-ink-prototype@0.0.0 snapshot
+> node src/cli.js --snapshot --columns 80
+
+productteam · 6 engagement(s) · 14 provider(s) (6 found) · cli-interface-202608…
+selected: agcode-learning · scored · last iter-3 · overall 8.3 · +0.1
+╭──────────────────────────────────────────────────────────────────────────────╮
+│ evidence                                                                     │
+│ inspect: inspect-pack.json — explicit missing state                          │
+│ read side is the file itself; `productteam inspect` (CLI write op) regenera… │
+│ session session-3118871 — 0 worker(s)                                        │
+│ ── 10:53:59 · command ──                                                     │
+│                                                                              │
+│ ## Command                                                                   │
+│ lines 1–6 of 16                                                              │
+╰──────────────────────────────────────────────────────────────────────────────╯
+╭──────────────────────────────────────────────────────────────────────────────╮
+│ activity                                                                     │
+│ newest session session-3118871 · 0 worker(s) · states: none                  │
+│ (no worker rows recorded)                                                    │
+│ interrupted: never recorded by the CLI (Ctrl+C writes state=failed, exit 13… │
+│                                                                              │
+│                                                                              │
+╰──────────────────────────────────────────────────────────────────────────────╯
+╭──────────────────────────────────────────────────────────────────────────────╮
+│ > /  4 match(es)                                                             │
+│ ▸ /agents — productteam agents [--json]                                      │
+│   /baseline — productteam baseline <client> [--allow-dirty <reason>] (unsup… │
+│   /bench — productteam bench <client> [run --iter <n>]                       │
+│   /card — productteam card list|show|seed-specialist … (unsupported)         │
+│ type to filter · Enter preview (never executes) · Tab focus · Esc clear · q… │
+╰──────────────────────────────────────────────────────────────────────────────╯
+snapshot render — deterministic, ANSI-free; adapter data loaded from the real r…

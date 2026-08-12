@@ -48,7 +48,7 @@ onboarding_run() { # $1=1 to write, anything else to preview
   else
     printf '       %s %spresent: %s%s\n' "$(status_badge pending)" "${D:-}" "${engagements:-none yet}" "${R:-}"
   fi
-  printf '  4. Score that client                  %sproductteam score <client>%s\n' "${B:-}" "${R:-}"
+  printf '  4. Score that client                  %sproductteam score <client> --iter <n>%s\n' "${B:-}" "${R:-}"
   printf '       %s %sthe scorer is declared by the engagement contract.json%s\n' "$(status_badge pending)" "${D:-}" "${R:-}"
   printf '  5. Read scores, history, reasoning    %sproductteam bench <client>%s\n\n' "${B:-}" "${R:-}"
 

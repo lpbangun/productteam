@@ -1,0 +1,38 @@
+
+  cli-interface parity v2 (frozen contract cli-interface-20260812-v2)
+
+  PASS  frozen contract hash matches FREEZE-SHA.txt
+  PASS  help exits 0
+  PASS  -h exits 0
+  PASS  --help exits 0
+  PASS  help names all 32 top-level commands
+  FAIL  checks onboarding-flight-control exits 0 (rc=2 — workspace-metadata-mismatch: onboarding-flight-control (/home/logani/.herdr/worktrees/Product Consulting Harness/upgrade-basic-funcionalities/state/engagements/onboarding-flight-control/workspace.json))
+  PASS  workspace recovery is non-destructive (existing path untouched)
+  FAIL  README documents direction
+  FAIL  README documents pool
+  FAIL  README documents project-memory
+  FAIL  README documents run-loop
+  FAIL  README documents style
+  PASS  chat refuses non-TTY with TTY remedy
+  FAIL  help --json emits a parseable command registry (got prose or exit != 0)
+  PASS  CLI control: score --iter 0 reaches stamp refusal (not missing-iter)
+  PASS  CLI control: bench run --iter 7 reaches stamp refusal (not missing-iter)
+  FAIL  /score <client> --iter <n> forwards --iter (stamp=0 requires_iter=1 — session dies on missing --iter)
+  FAIL  /bench <client> run --iter <n> forwards --iter (stamp=0 requires_iter=1 — session dies on missing --iter)
+  FAIL  quoted slash argv parsed as one value (/provider "codex" mangles quotes)
+  PASS  slash line with embedded ;$(...) is inert (nothing executed)
+  PASS  existing machine-readable surfaces emit valid JSON
+  FAIL  status --json emits a parseable engagement list (got prose or exit != 0)
+  FAIL  onboarding next-step uses current score syntax (prints stale "score <client>")
+  FAIL  bench harness-evolution handles summary-shaped scores honestly (rc=5, raw jq traceback)
+  FAIL  run harness-evolution 7 handles summary-shaped scores honestly (rc=5, raw jq traceback)
+  PASS  multi-word argv round-trips byte-identical
+  PASS  empty argv rejected
+  PASS  redirected output carries no ANSI
+  PASS  color TTY emits ANSI
+  PASS  NO_COLOR=1 suppresses ANSI on TTY
+  PASS  unknown command exits non-zero
+  PASS  usage error exits non-zero (open)
+  PASS  usage error exits non-zero (run-loop)
+
+  cli-interface parity v2: FAIL (frozen-baseline defects expected at iter 1)

@@ -1,0 +1,7 @@
+# checks-baseline — D1 evidence (frozen iter 1, 2026-08-12)
+# command: CONSULT_NO_SPLASH=1 CONSULT_STATE_ROOT=$(mktemp -d) bin/productteam checks onboarding-flight-control
+# exit code: 2
+
+
+  Deterministic checks — onboarding-flight-control
+workspace-metadata-mismatch: onboarding-flight-control (/home/logani/.herdr/worktrees/Product Consulting Harness/upgrade-basic-funcionalities/state/engagements/onboarding-flight-control/workspace.json)
