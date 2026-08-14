@@ -1,0 +1,27 @@
+{
+  "status": "non-convergent",
+  "date": "2026-08-13",
+  "scoring_basis": "Independent Analyst report in agent://TuiFinalAnalyst; frozen common PTY benchmark blocked before comparable interaction evidence.",
+  "opentui": {
+    "mandatory_mean": 5.46,
+    "overall_mean": 5.06,
+    "mandatory_pass": false,
+    "dimensions": [
+      {"id":1,"score":5},{"id":2,"score":5},{"id":3,"score":5},{"id":4,"score":5},{"id":5,"score":5},{"id":6,"score":5},{"id":7,"score":5},{"id":8,"score":5},{"id":9,"score":5},{"id":10,"score":5},{"id":11,"score":8},{"id":12,"score":5},{"id":13,"score":0},{"id":14,"score":5},{"id":15,"score":5},{"id":16,"score":5},{"id":17,"score":5},{"id":18,"score":8}
+    ]
+  },
+  "textual": {
+    "mandatory_mean": 5.69,
+    "overall_mean": 5.83,
+    "mandatory_pass": false,
+    "dimensions": [
+      {"id":1,"score":5},{"id":2,"score":5},{"id":3,"score":5},{"id":4,"score":5},{"id":5,"score":5},{"id":6,"score":5},{"id":7,"score":5},{"id":8,"score":5},{"id":9,"score":5},{"id":10,"score":5},{"id":11,"score":8},{"id":12,"score":8},{"id":13,"score":0},{"id":14,"score":8},{"id":15,"score":8},{"id":16,"score":7},{"id":17,"score":8},{"id":18,"score":8}
+    ]
+  },
+  "decision": {
+    "outcome": "delete-both",
+    "reason": "Neither candidate has evidence sufficient to score every mandatory dimension at least 9. The shared frozen runner makes the ProductTeam proxy non-executable and independently rejects the required agents --json trace, so the missing evidence is a benchmark contradiction, not measured framework inferiority.",
+    "comparative_ranking_authorized": false
+  },
+  "full_report": "agent://TuiFinalAnalyst"
+}

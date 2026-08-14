@@ -1,3 +1,13 @@
 tmp/
 *.tmp
 state/.cli/
+spikes/opentui/node_modules/
+spikes/opentui/dist/
+spikes/textual/.venv/
+spikes/textual/dist/
+spikes/**/__pycache__/
+spikes/**/.pytest_cache/
+spikes/**/.mypy_cache/
+lib/tui/.venv/
+lib/tui/**/__pycache__/
+lib/tui/**/.pytest_cache/

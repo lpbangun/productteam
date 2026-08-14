@@ -1,0 +1,33 @@
+{
+  "commands": [
+    {
+      "argv": [
+        "/home/logani/.bun/bin/bun",
+        "run",
+        "typecheck"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": "$ tsc --noEmit\n"
+    },
+    {
+      "argv": [
+        "/home/logani/.bun/bin/bun",
+        "test"
+      ],
+      "exit_code": 0,
+      "stdout": "bun test v1.3.14 (0d9b296a)\n",
+      "stderr": "\n 61 pass\n 0 fail\n 916 expect() calls\nRan 61 tests across 4 files. [4.66s]\n"
+    },
+    {
+      "argv": [
+        "/home/logani/.bun/bin/bun",
+        "run",
+        "package"
+      ],
+      "exit_code": 0,
+      "stdout": "Bundled 7 modules in 12ms\n\n  main.js  25.47 KB  (entry point)\n\n",
+      "stderr": "$ bun build ./src/main.tsx --outdir ./dist --target bun --minify --external \"@opentui/*\" --external \"solid-js\" && tar -czf dist/productteam-tui-opentui-source.tar.gz -C .. opentui/package.json opentui/bun.lock opentui/tsconfig.json opentui/bunfig.toml opentui/src\n"
+    }
+  ]
+}

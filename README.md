@@ -29,6 +29,7 @@ bin/productteam                  # org overview (status)
 bin/productteam status           # same overview, named explicitly
 bin/productteam help             # command table
 bin/productteam chat             # role-aware interactive session
+bin/productteam tui              # optional Textual cockpit (TTY presentation client)
 bin/productteam onboarding [--yes]
 bin/productteam splash [--frames]
 bin/productteam agents [--json] [--check]
@@ -65,10 +66,14 @@ bin/productteam skill critique|benchmark|design-sprint <target>
 ## CLI surface (frozen contract `cli-interface-20260812-v3`)
 
 Every top-level command below is named by `productteam help`; `help` is the
-canonical command surface. The frozen command table has **32** commands:
-**18** chat-supported, **14** intentionally unsupported in chat (each with a
+canonical command surface. The frozen command table has **33** commands:
+**18** chat-supported, **15** intentionally unsupported in chat (each with a
 non-empty safety/usefulness reason), plus **6** chat-only verbs (`provider
-workers clear export exit quit`).
+workers clear export exit quit`). The historical `cli-interface-20260812-v3`
+table had **32** commands; `productteam tui` is the additive, optional TTY
+frontend added on top of that freeze (it is `chat_supported=0`, so the frozen
+32-command contract in `state/harness-evolution/runs/cli-interface-20260812/`
+stays untouched).
 
 | Command | Purpose |
 |---------|---------|
@@ -76,6 +81,7 @@ workers clear export exit quit`).
 | `productteam help [--json]` | Command table; `--json` emits the command registry |
 | `productteam status [--json]` | Org overview; `--json` emits the engagement list |
 | `productteam chat` | Role-aware interactive session (TTY only) |
+| `productteam tui` | Optional Textual cockpit (TTY presentation client; `productteam chat` remains the fallback, and `chat` never launches the TUI) |
 | `productteam onboarding [--yes]` | First-run: agents → provider → engagement → score |
 | `productteam splash [--frames]` | Knowledge-graph banner (`CONSULT_NO_SPLASH=1` skips) |
 | `productteam agents [--json] [--check]` | Coding agents on this device; provider availability |
@@ -121,7 +127,7 @@ JSON unless noted, parseable with `jq -e .`.
 
 | Surface | Command / path | Shape and authority |
 |---------|----------------|---------------------|
-| Command registry | `productteam help --json` | `{commands:[{name,usage,chat_supported,chat_reason?}], chat_only:[…]}` — 32 commands, 6 chat-only verbs; drives help text, dispatch validation, slash palette, unsupported reasons |
+| Command registry | `productteam help --json` | `{commands:[{name,usage,chat_supported,chat_reason?}], chat_only:[…]}` — 33 commands, 6 chat-only verbs; drives help text, dispatch validation, slash palette, unsupported reasons |
 | Engagement list | `productteam status --json` | `{engagements:[{client,…}], …}` — engagement list / current selection, derived from `state/engagements/` |
 | Agent detection | `productteam agents --json` | array of `{name,status,path,version,note}` from `lib/provider.sh` catalog (PATH then `CONSULT_AGENT_DIRS`) |
 | Provider availability | `productteam agents` / `productteam runtime --check` | honest absence: `runtime --check` exits non-zero with a remedy when no agent is usable |
@@ -141,6 +147,15 @@ and engagement score trend visible; slash prefixes show matching commands.
 Provider turns state that execution is blocking and Ctrl+C preserves any
 partial artifact. `/export` writes the timestamped markdown transcript under
 the state/.cli/sessions/ directory.
+
+`productteam tui` is the optional Textual presentation client: it derives its
+slash palette from the live registry, runs every chat-supported verb as argv
+against `bin/productteam`, refuses unsupported verbs with the registry reason,
+and keeps the same session verbs (`/provider`, `/workers`, `/clear`, `/export`,
+`/exit`). It requires a TTY and stays read-only — `bin/productteam` remains the
+sole domain, judgment, workspace, provider, and durable-state writer.
+`productteam chat` remains the fallback interactive session, and `chat` never
+launches the TUI.
 
 GitHub: `bin/productteam gh …` wraps `gh` with gates — **never** `--admin` /
 force-merge. Merge requires `state/harness-evolution/authorize-merge` (or

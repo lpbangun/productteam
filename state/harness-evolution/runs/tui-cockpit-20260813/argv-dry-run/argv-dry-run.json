@@ -1,0 +1,378 @@
+{
+  "cli": "/home/logani/.herdr/worktrees/Product Consulting Harness/exp-tui-migration/bin/productteam",
+  "mode_oct": "0o775",
+  "executable": true,
+  "policy": "token-aware; allow agents --json; do not substring-ban 'agent'; no 0444 proxy",
+  "results": [
+    {
+      "argv": [
+        "help",
+        "--json"
+      ],
+      "token_ok": true,
+      "token_note": "ok",
+      "rc": 0,
+      "stdout_bytes": 5897,
+      "stderr_bytes": 0,
+      "stdout_head": "{\n  \"contract\": \"cli-interface-20260812-v3\",\n  \"commands\": [\n    {\n      \"name\": \"agents\",\n      \"usage\": \"productteam agents [--json]\",\n      \"chat_supported\": true\n    },\n    {\n      \"name\": \"baseline\",\n      \"usage\": \"productteam baseline <client> [--allow-dirty <reason>]\",\n      \"chat_supported\": false,\n      \"chat_reason\": \"usefulness: one-shot iter-0 bootstrap gated by --allow-dirty; owner-g",
+      "stderr_head": "",
+      "elapsed_s": 0.071
+    },
+    {
+      "argv": [
+        "status",
+        "--json"
+      ],
+      "token_ok": true,
+      "token_note": "ok",
+      "rc": 0,
+      "stdout_bytes": 1904,
+      "stderr_bytes": 0,
+      "stdout_head": "{\n  \"selected\": null,\n  \"engagements\": [\n    {\n      \"client\": \"agcode-learning\",\n      \"scored\": true,\n      \"last_iter\": \"iter-3\",\n      \"overall\": 8.3,\n      \"areas_ge_9\": 3,\n      \"trend\": \"+0.1\",\n      \"desc\": \"Local-first agentic-coding learning system \u2014 tutor skill plus plain-text learning files; research artifacts justify the design\"\n    },\n    {\n      \"client\": \"harness-cli\",\n      \"score",
+      "stderr_head": "",
+      "elapsed_s": 0.34
+    },
+    {
+      "argv": [
+        "agents",
+        "--json"
+      ],
+      "token_ok": true,
+      "token_note": "allowed required seam agents --json",
+      "rc": 0,
+      "stdout_bytes": 2043,
+      "stderr_bytes": 0,
+      "stdout_head": "[\n  {\n    \"name\": \"agent\",\n    \"status\": \"found\",\n    \"path\": \"/home/logani/.local/bin/agent\",\n    \"version\": \"2026.08.11-e8db854\",\n    \"note\": \"on PATH or a known install dir\"\n  },\n  {\n    \"name\": \"claude\",\n    \"status\": \"found\",\n    \"path\": \"/home/logani/.local/bin/claude\",\n    \"version\": \"unknown\",\n    \"note\": \"on PATH or a known install dir\"\n  },\n  {\n    \"name\": \"codex\",\n    \"status\": \"found\",",
+      "stderr_head": "",
+      "elapsed_s": 4.258
+    },
+    {
+      "argv": [
+        "status"
+      ],
+      "token_ok": true,
+      "token_note": "ok",
+      "rc": 0,
+      "stdout_bytes": 889,
+      "stderr_bytes": 0,
+      "stdout_head": "\n  Product Consulting Harness\n  Product Judgment Layer \u00b7 CLI-first \u00b7 evidence over opinion\n  Provider: agent \u00b7 agents: productteam agents\n\n  \u25cf agcode-learning 8.3 +0.1 \u00b7 3/9\u22659\n    Local-first agentic-coding learning system \u2014 tutor skill plus plain-text learning files; \u2026\n  \u25cf harness-cli 9.5 +6.1 \u00b7 9/9\u22659\n    Product Consulting Harness \u2014 CLI-first product judgment layer; evidence over opinion; del\u2026\n ",
+      "stderr_head": "",
+      "elapsed_s": 0.458
+    },
+    {
+      "argv": [
+        "help"
+      ],
+      "token_ok": true,
+      "token_note": "ok",
+      "rc": 0,
+      "stdout_bytes": 4443,
+      "stderr_bytes": 0,
+      "stdout_head": "\n  productteam \u2014 Product Consulting Harness\n\n  Commands\n    productteam                     Org status and engagements overview\n    productteam agents [--json]\n                                Coding agents on this device\n    productteam baseline <client> [--allow-dirty <reason>]\n                                iter-0 via workspace + checks/score entrypoints\n    productteam bench <client> [run --it",
+      "stderr_head": "",
+      "elapsed_s": 0.058
+    },
+    {
+      "argv": [
+        "runtime"
+      ],
+      "token_ok": true,
+      "token_note": "ok",
+      "rc": 0,
+      "stdout_bytes": 745,
+      "stderr_bytes": 0,
+      "stdout_head": "\n  Coding agents\n  \u25cf agent     unknown        /home/logani/.local/bin/agent (selected)\n  \u25cf claude    2.1.222        /home/logani/.local/bin/claude\n  \u25cf codex     0.147.0        /home/logani/.local/bin/codex\n  \u25cf opencode  unknown        /home/logani/.opencode/bin/opencode\n  \u25cb gemini    missing \u00b7 \n  \u25cf cursor    unknown        /home/logani/.local/bin/cursor\n  \u25cf droid     unknown        /home/logani/.l",
+      "stderr_head": "",
+      "elapsed_s": 3.723
+    },
+    {
+      "argv": [
+        "org"
+      ],
+      "token_ok": true,
+      "token_note": "ok",
+      "rc": 0,
+      "stdout_bytes": 1189,
+      "stderr_bytes": 0,
+      "stdout_head": "\n  The organization (AGENTS.md \u00b7 CONSTITUTION.md \u00b7 JUDGMENT.md)\n\n    \u25c6 Principal   orchestrates the loop; decides, escalates; never self-scores\n    \u25c7 Analyst     inspects and scores against the frozen contract, with evidence\n    \u25b8 Builder     implements accepted items; smallest diff; verification attached\n    \u25c9 Critic      rebuts priorities, audits diffs and scores, reviews the org\n\n  Product Judg",
+      "stderr_head": "",
+      "elapsed_s": 0.061
+    },
+    {
+      "argv": [
+        "memory"
+      ],
+      "token_ok": true,
+      "token_note": "ok",
+      "rc": 0,
+      "stdout_bytes": 16041,
+      "stderr_bytes": 0,
+      "stdout_head": "\n  # MEMORY.md \u2014 Organizational Memory\n  \n  Append-mostly. Newest entry per section on top. This file exists so a\n  future run continues instead of restarting. Keep entries short, dated,\n  and evidence-linked.\n  \n  ## Engagements\n  \n  - **osint-loop-research** (opened + closed 2026-08-11) \u2014 operable loop engine lift.\n    Repo: `/home/logani/projects/osint-loop-research` \u00b7 Mode: Directive \u00b7 Contrac",
+      "stderr_head": "",
+      "elapsed_s": 0.049
+    },
+    {
+      "argv": [
+        "gate",
+        "harness-cli",
+        "status"
+      ],
+      "token_ok": true,
+      "token_note": "ok",
+      "rc": 0,
+      "stdout_bytes": 664,
+      "stderr_bytes": 0,
+      "stdout_head": "{\n  \"client\": \"harness-cli\",\n  \"mode\": \"Directive\",\n  \"allowed\": false,\n  \"decision\": \"refused\",\n  \"reason\": \"Directive: no directive recorded for harness-cli \u2014 run: consult gate harness-cli direct <direction> (expected /home/logani/.herdr/worktrees/Product Consulting Harness/exp-tui-migration/state/engagements/harness-cli/judgment/directive.json)\",\n  \"bound_direction\": null,\n  \"artifact\": null,\n ",
+      "stderr_head": "",
+      "elapsed_s": 0.094
+    },
+    {
+      "argv": [
+        "workspace",
+        "harness-cli",
+        "status"
+      ],
+      "token_ok": true,
+      "token_note": "ok",
+      "rc": 0,
+      "stdout_bytes": 319,
+      "stderr_bytes": 0,
+      "stdout_head": "{\n  \"client\": \"harness-cli\",\n  \"source_repo\": \"/home/logani/.herdr/worktrees/Product Consulting Harness/fix-new-user-tui\",\n  \"path\": \"/home/logani/.herdr/worktrees/Product Consulting Harness/exp-tui-migration/tmp/workspaces/harness-cli\",\n  \"sha\": \"\",\n  \"exists\": false,\n  \"dirty\": false,\n  \"allow_dirty_reason\": null\n}\n",
+      "stderr_head": "",
+      "elapsed_s": 0.076
+    },
+    {
+      "argv": [
+        "role",
+        "harness-cli",
+        "status"
+      ],
+      "token_ok": true,
+      "token_note": "ok",
+      "rc": 0,
+      "stdout_bytes": 718,
+      "stderr_bytes": 0,
+      "stdout_head": "{\n  \"client\": \"harness-cli\",\n  \"iter\": 0,\n  \"artifact_root\": \"/home/logani/.herdr/worktrees/Product Consulting Harness/exp-tui-migration/state/engagements/harness-cli/roles/iter-0\",\n  \"asked\": [],\n  \"ran\": [],\n  \"produced\": [],\n  \"missing\": [\n    \"/home/logani/.herdr/worktrees/Product Consulting Harness/exp-tui-migration/state/engagements/harness-cli/roles/iter-0/Analyst/attempt-*/manifest.json\",\n",
+      "stderr_head": "",
+      "elapsed_s": 0.11
+    },
+    {
+      "argv": [
+        "bench",
+        "harness-cli"
+      ],
+      "token_ok": true,
+      "token_note": "ok",
+      "rc": 0,
+      "stdout_bytes": 1566,
+      "stderr_bytes": 0,
+      "stdout_head": "\n  Benchmark \u2014 harness-cli\n  Contract harness-cli-v1 \u00b7 frozen 2026-08-07 \u00b7 target \u2265 9.0 in every dimension\n\n  HISTORY\n   iter  date        kind        overall   areas\u22659   weakest\n   0     2026-08-07  baseline    3.4      0         splash-animation 2.0\n   1     2026-08-07  iteration   9.5      9         visual-cli-clarity 9.5\n   trend: \u2583\u2588\n\n  LATEST \u2014 iter-1\n   visual-cli-clarity    9.5 \u25b0\u25b0\u25b0\u25b0\u25b0\u25b0\u25b0\u25b0\u25b0\u25b0  ",
+      "stderr_head": "",
+      "elapsed_s": 0.713
+    },
+    {
+      "argv": [
+        "report",
+        "harness-cli"
+      ],
+      "token_ok": true,
+      "token_note": "ok",
+      "rc": 0,
+      "stdout_bytes": 1949,
+      "stderr_bytes": 0,
+      "stdout_head": "\n  # harness-cli iter-1 \u2014 report\n  \n  **Contract:** harness-cli-v1 \u00b7 **Kind:** iteration \u00b7 **Overall:** 9.5\n  **Baseline:** 3.4 \u2192 **9.5** \u00b7 **Converged:** yes (every dimension \u2265 9.0)\n  **Live:** full (provider + three skills against tmp-projects)\n  \n  ## Diff summary\n  \n  - `bin/consult` \u2014 B&W theme (2 accents), `agents`/`splash`/`onboarding`, checks_runner routing, first-run splash hook, help/dis",
+      "stderr_head": "",
+      "elapsed_s": 0.073
+    },
+    {
+      "argv": [
+        "judge",
+        "harness-cli"
+      ],
+      "token_ok": true,
+      "token_note": "ok",
+      "rc": 0,
+      "stdout_bytes": 903,
+      "stderr_bytes": 0,
+      "stdout_head": "\n  Product Judgment \u2014 harness-cli\n  Mode: Directive   (Guided|Directive|Challenge|Override)\n\n  ## Mission\n  \n  Turn `bin/productteam` into a **fully clean chatbot-style CLI** in the spirit of\n  Grok Build / Droid / OpenCode: black-and-white terminal chrome with sparse\n  accent colors, OpenCode/Droid-style first-run onboarding, a short login/splash\n  animation that draws a knowledge-graph of comput",
+      "stderr_head": "",
+      "elapsed_s": 0.058
+    },
+    {
+      "argv": [
+        "run",
+        "harness-cli",
+        "1"
+      ],
+      "token_ok": true,
+      "token_note": "ok",
+      "rc": 0,
+      "stdout_bytes": 1261,
+      "stderr_bytes": 0,
+      "stdout_head": "\n  harness-cli \u2014 iter-1\n   visual-cli-clarity    9.5 \u25b0\u25b0\u25b0\u25b0\u25b0\u25b0\u25b0\u25b0\u25b0\u25b0\n     +5.5 checks.json: 5/5 pass; gates_ok=True; failed=none\n   splash-animation      9.5 \u25b0\u25b0\u25b0\u25b0\u25b0\u25b0\u25b0\u25b0\u25b0\u25b0\n     +7.5 checks.json: 5/5 pass; gates_ok=True; failed=none\n   onboarding-ease       9.5 \u25b0\u25b0\u25b0\u25b0\u25b0\u25b0\u25b0\u25b0\u25b0\u25b0\n     +7.5 checks.json: 5/5 pass; gates_ok=True; failed=none\n   agent-detection       9.5 \u25b0\u25b0\u25b0\u25b0\u25b0\u25b0\u25b0\u25b0\u25b0\u25b0\n     +7.5 checks.json: 6/6 pass; gat",
+      "stderr_head": "",
+      "elapsed_s": 0.479
+    },
+    {
+      "argv": [
+        "splash"
+      ],
+      "token_ok": true,
+      "token_note": "ok",
+      "rc": 0,
+      "stdout_bytes": 0,
+      "stderr_bytes": 0,
+      "stdout_head": "",
+      "stderr_head": "",
+      "elapsed_s": 0.06
+    },
+    {
+      "argv": [
+        "report"
+      ],
+      "token_ok": true,
+      "token_note": "ok",
+      "rc": 1,
+      "stdout_bytes": 0,
+      "stderr_bytes": 46,
+      "stdout_head": "",
+      "stderr_head": "\n  error: usage: productteam report <client>\n\n",
+      "elapsed_s": 0.055
+    },
+    {
+      "argv": [
+        "score"
+      ],
+      "token_ok": true,
+      "token_note": "ok",
+      "rc": 1,
+      "stdout_bytes": 0,
+      "stderr_bytes": 56,
+      "stdout_head": "",
+      "stderr_head": "\n  error: usage: productteam score <client> --iter <n>\n\n",
+      "elapsed_s": 0.048
+    },
+    {
+      "argv": [
+        "run"
+      ],
+      "token_ok": true,
+      "token_note": "ok",
+      "rc": 1,
+      "stdout_bytes": 0,
+      "stderr_bytes": 50,
+      "stdout_head": "",
+      "stderr_head": "\n  error: usage: productteam run <client> <iter>\n\n",
+      "elapsed_s": 0.049
+    },
+    {
+      "argv": [
+        "skill"
+      ],
+      "token_ok": true,
+      "token_note": "ok",
+      "rc": 1,
+      "stdout_bytes": 0,
+      "stderr_bytes": 90,
+      "stdout_head": "",
+      "stderr_head": "\n  error: usage: productteam skill <critique|benchmark|design-sprint> <target> [out-dir]\n\n",
+      "elapsed_s": 0.043
+    },
+    {
+      "argv": [
+        "bench"
+      ],
+      "token_ok": true,
+      "token_note": "ok",
+      "rc": 1,
+      "stdout_bytes": 0,
+      "stderr_bytes": 62,
+      "stdout_head": "",
+      "stderr_head": "\n  error: usage: productteam bench <client> [run --iter <n>]\n\n",
+      "elapsed_s": 0.055
+    },
+    {
+      "argv": [
+        "judge"
+      ],
+      "token_ok": true,
+      "token_note": "ok",
+      "rc": 1,
+      "stdout_bytes": 0,
+      "stderr_bytes": 58,
+      "stdout_head": "",
+      "stderr_head": "\n  error: usage: productteam judge <client> [set <mode>]\n\n",
+      "elapsed_s": 0.05
+    },
+    {
+      "argv": [
+        "checks"
+      ],
+      "token_ok": true,
+      "token_note": "ok",
+      "rc": 1,
+      "stdout_bytes": 0,
+      "stderr_bytes": 71,
+      "stdout_head": "",
+      "stderr_head": "\n  error: usage: productteam checks <client> [--allow-dirty <reason>]\n\n",
+      "elapsed_s": 0.054
+    },
+    {
+      "argv": [
+        "tui"
+      ],
+      "token_ok": true,
+      "token_note": "ok",
+      "rc": 1,
+      "stdout_bytes": 0,
+      "stderr_bytes": 95,
+      "stdout_head": "",
+      "stderr_head": "\n  error: unknown command 'tui' \u2014 cause: not in the command table. Remedy: productteam help\n\n",
+      "elapsed_s": 0.05
+    },
+    {
+      "parse": "help_json",
+      "argv": [
+        "help",
+        "--json"
+      ],
+      "json_ok": true,
+      "type": "dict",
+      "contract": "cli-interface-20260812-v3",
+      "n_commands": 32,
+      "n_supported": 18,
+      "n_unsupported": 14,
+      "chat_only": [
+        "provider",
+        "workers",
+        "clear",
+        "export",
+        "exit",
+        "quit"
+      ]
+    },
+    {
+      "parse": "status_json",
+      "argv": [
+        "status",
+        "--json"
+      ],
+      "json_ok": true,
+      "type": "dict",
+      "keys": [
+        "selected",
+        "engagements"
+      ]
+    },
+    {
+      "parse": "agents_json",
+      "argv": [
+        "agents",
+        "--json"
+      ],
+      "json_ok": true,
+      "type": "list",
+      "n": 14
+    }
+  ]
+}

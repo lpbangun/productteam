@@ -1398,6 +1398,16 @@ cmd_run_loop() {
   run_loop "$c" "$d" "$max_hours" "$max_iters" "$dry" "$no_prov" "$resume"
 }
 
+cmd_tui() {
+  if [[ ! -t 0 || ! -t 1 ]]; then
+    printf 'productteam tui requires an interactive TTY\n' >&2
+    exit 2
+  fi
+  local py="$ROOT/lib/tui/.venv/bin/python"
+  [[ -x "$py" ]] || die 'tui venv missing. Remedy: python3 -m venv lib/tui/.venv && lib/tui/.venv/bin/pip install -r lib/tui/requirements.txt'
+  exec "$py" "$ROOT/lib/tui/__main__.py" "$@"
+}
+
 # ── dispatch ─────────────────────────────────────────────────────────
 dispatch_judge() { # <client> [set <mode>] — special-case routing stays a wrapper
   if [[ "${2:-}" == 'set' ]]; then

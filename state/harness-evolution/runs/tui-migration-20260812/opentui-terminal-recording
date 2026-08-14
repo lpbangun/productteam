@@ -1,0 +1,6 @@
+Direct PTY smoke, 2026-08-13
+command: /home/logani/.bun/bin/bun run <absolute spikes/opentui/src/main.tsx>
+--terminal-case success: exit=0 restored=true rendered_PRODUCTTEAM=true replacement_character=false
+--terminal-case failure: exit=17 restored=true rendered_PRODUCTTEAM=true replacement_character=false
+base-frame tmux captures: frame-captures/opentui-solid/{120x36,80x24,60x24,40x20}-base.txt
+common frozen interactive recording: incomplete/void because generated ProductTeam proxy was mode 0444.

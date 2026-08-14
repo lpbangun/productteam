@@ -1,0 +1,9 @@
+............................                                             [100%]
+=============================== warnings summary ===============================
+lib/tui/tests/test_pty.py::test_pty_status_and_gate_refuse
+lib/tui/tests/test_pty.py::test_pty_provider_interrupt
+  /usr/lib/python3.12/pty.py:95: DeprecationWarning: This process (pid=2572257) is multi-threaded, use of forkpty() may lead to deadlocks in the child.
+    pid, fd = os.forkpty()
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+28 passed, 2 warnings in 35.75s

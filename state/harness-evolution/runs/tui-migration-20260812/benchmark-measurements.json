@@ -1,0 +1,35 @@
+{
+  "status": "partial-non-comparative",
+  "method": "Static portions of frozen measure.py plus direct PTY terminal cases; startup/RSS/p95 channel blocked by frozen proxy permissions.",
+  "opentui-solid": {
+    "terminal_success": {"exit_code": 0, "restored": true},
+    "terminal_failure": {"exit_code": 17, "restored": true},
+    "source_allocated_bytes": 212992,
+    "dependencies_allocated_bytes": 124379136,
+    "packaged_allocated_bytes": 65536,
+    "runtime_direct_dependencies": 4,
+    "installed_unique_dependencies": 111,
+    "loc": {"source": 1371, "tests": 646},
+    "cold_start_ms": null,
+    "warm_start_ms": null,
+    "idle_rss_kib": null,
+    "streaming_rss_kib": null,
+    "latency": null
+  },
+  "textual-rich": {
+    "terminal_success": {"exit_code": 0, "restored": true},
+    "terminal_failure": {"exit_code": 17, "restored": true},
+    "source_allocated_bytes": 516096,
+    "dependencies_allocated_bytes": 38866944,
+    "packaged_allocated_bytes": 28672,
+    "runtime_direct_dependencies": 2,
+    "installed_unique_dependencies": 19,
+    "loc": {"source": 812, "tests": 530},
+    "cold_start_ms": null,
+    "warm_start_ms": null,
+    "idle_rss_kib": null,
+    "streaming_rss_kib": null,
+    "latency": null
+  },
+  "blocker": "spikes/shared/pty_driver.py create_proxy sets bin/productteam to 0555 then recursively changes all files to 0444; frozen measurement launches through that proxy and cannot proceed. No comparative latency/resource claim is authorized."
+}
