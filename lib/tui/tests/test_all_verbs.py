@@ -2,9 +2,12 @@
 
 import asyncio
 import os
+import re
 
 import adapter
 from app import ProductTeamApp
+
+HOME_ROW_RE = re.compile(r"^\s*(\d+\.\d)\s+(\S+)(.*)$", re.M)
 
 VALID_ARGS = {
     "bench": "harness-cli",
@@ -49,6 +52,21 @@ async def _wait(app, pred, timeout=90.0):
     return False
 
 
+async def _boot_home(pilot, app):
+    """Wait for the locked home projection (header + home rows or the honest
+    empty copy) — the removed prose-status seed is never a boot needle."""
+    for _ in range(600):
+        if "▣─▣─▣ ProductTeam" in str(app.query_one("#header").render()):
+            break
+        await pilot.pause()
+    for _ in range(600):
+        text = app.transcript_text()
+        if HOME_ROW_RE.search(text) or "No scored sessions yet" in text:
+            return
+        await pilot.pause()
+    raise AssertionError("home projection never seeded")
+
+
 def test_all_18_supported_verbs_in_tui_transcript():
     data = adapter.help_json()
     supported = [c["name"] for c in data["commands"] if c["chat_supported"]]
@@ -74,7 +92,7 @@ def test_all_18_supported_verbs_in_tui_transcript():
 async def _run_supported(supported):
     async with ProductTeamApp().run_test(size=(80, 24)) as pilot:
         app = pilot.app
-        assert await _wait(app, lambda: "Product Consulting" in app.transcript_text())
+        await _boot_home(pilot, app)
         missing = []
         for verb in supported:
             args = VALID_ARGS.get(verb, "")
@@ -111,7 +129,7 @@ def test_every_unsupported_verb_refuses_without_spawn():
         async def run():
             async with ProductTeamApp().run_test(size=(80, 24)) as pilot:
                 app = pilot.app
-                await _wait(app, lambda: "Product Consulting" in app.transcript_text())
+                await _boot_home(pilot, app)
                 for verb in unsupported:
                     before = app.transcript_text()
                     app._run_slash(verb, "")

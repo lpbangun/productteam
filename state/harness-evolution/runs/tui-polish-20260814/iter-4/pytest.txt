@@ -1,0 +1,106 @@
+...........................FFFF........                                  [100%]
+=================================== FAILURES ===================================
+_______________________ test_pty_status_and_gate_refuse ________________________
+
+    def test_pty_status_and_gate_refuse():
+        out, status = _run_status_gate_session()
+        txt = out.decode("utf-8", "replace")
+        assert "Product Consulting Harness" in txt, "real status output seeded the transcript"
+>       assert "harness-cli" in txt, "real engagement text visible"
+E       AssertionError: real engagement text visible
+E       assert 'harness-cli' in '\x1b[?1049h\x1b[?1000h\x1b[?1003h\x1b[?1015h\x1b[?1006h\x1b[?25l\x1b[?1004h\x1b[>25u\x1b[?2026$p\x1b[?2048$p\x1b[?200...00l\x1b[?1003l\x1b[?1015l\x1b[?1006l\x1b[<u\x1b[?1049l\x1b[?25h\x1b[?1004l\x1b[?1000l\x1b[?1003l\x1b[?1015l\x1b[?1006l'
+
+lib/tui/tests/test_pty.py:114: AssertionError
+_________________________ test_pty_provider_interrupt __________________________
+
+tmp_path = PosixPath('/tmp/pytest-of-logani/pytest-138/test_pty_provider_interrupt0')
+
+    def test_pty_provider_interrupt(tmp_path):
+        """Real provider turn: first Ctrl+C keeps partial artifact + worker failed,
+        second Ctrl+C exits 130."""
+        slow = tmp_path / "slow-provider.sh"
+        slow.write_text(
+            "#!/usr/bin/env bash\n"
+            "printf 'partial analysis begins\\n'\n"
+            "sleep 30 &\n"
+            "wait\n"
+        )
+        slow.chmod(0o755)
+        state_root = tmp_path / "state"
+        pid, fd, out = _open_session(slow, {"CONSULT_STATE_ROOT": str(state_root)})
+        try:
+            assert _wait_for(fd, out, "ProductTeam", 25), "cockpit header rendered"
+            _send(fd, "analyze the layout\r")
+>           assert _wait_for(fd, out, "partial analysis begins", 25), \
+                "provider artifact streamed into the transcript"
+E               AssertionError: provider artifact streamed into the transcript
+E               assert False
+E                +  where False = _wait_for(13, [b'\x1b[?1049h\x1b[?1000h\x1b[?1003h\x1b[?1015h\x1b[?1006h\x1b[?25l\x1b[?1004h\x1b[>25u', b'\x1b[?2026$p\x1b[?2048$p\x...x1b[0m\x1b[48;2;42;42;42m                                                                                \x1b[0m', ...], 'partial analysis begins', 25)
+
+lib/tui/tests/test_pty.py:137: AssertionError
+_____________________ test_pty_typed_role_records_builder ______________________
+
+tmp_path = PosixPath('/tmp/pytest-of-logani/pytest-138/test_pty_typed_role_records_bu0')
+
+    def test_pty_typed_role_records_builder(tmp_path):
+        """D18 Role-argv row: a typed leading @Builder turn runs the real provider
+        fixture path (no _start_provider_turn stub) and workers.tsv records the
+        Builder role — activity_start is never hardcoded Analyst."""
+        fast = tmp_path / "builder-provider.sh"
+        fast.write_text(
+            "#!/usr/bin/env bash\n"
+            "printf 'builder analysis complete\\n'\n"
+        )
+        fast.chmod(0o755)
+        state_root = tmp_path / "state"
+        pid, fd, out = _open_session(fast, {"CONSULT_STATE_ROOT": str(state_root)})
+        try:
+            assert _wait_for(fd, out, "ProductTeam", 25), "cockpit header rendered"
+            _send(fd, "@Builder verify the seam\r")
+>           assert _wait_for(fd, out, "builder analysis complete", 25), \
+                "provider artifact streamed into the transcript"
+E               AssertionError: provider artifact streamed into the transcript
+E               assert False
+E                +  where False = _wait_for(13, [b'\x1b[?1049h', b'\x1b[?1000h', b'\x1b[?1003h', b'\x1b[?1015h', b'\x1b[?1006h', b'\x1b[?25l', ...], 'builder analysis complete', 25)
+
+lib/tui/tests/test_pty.py:172: AssertionError
+__________________________ test_pty_sigwinch_compact ___________________________
+
+    def test_pty_sigwinch_compact():
+        """A real terminal resize redraws compact chrome without spawning work,
+        retains the composer, and restores the wide heads after SIGWINCH."""
+        import fcntl
+    
+        def wait_delta(fd, out, mark, needle, timeout=25):
+            deadline = time.time() + timeout
+            if isinstance(needle, str):
+                needle = needle.encode()
+            while time.time() < deadline:
+                _drain(fd, out, 0.25)
+                if needle in b"".join(out)[mark:]:
+                    return True
+            return False
+    
+    
+        pid, fd, out = _open_session()
+        cwd = Path.cwd().name.encode()
+        try:
+>           assert _wait_for(fd, out, "▣─▣─▣ ProductTeam", 25), "wide header rendered"
+E           AssertionError: wide header rendered
+E           assert False
+E            +  where False = _wait_for(13, [b'\x1b[?1049h', b'\x1b[?1000h', b'\x1b[?1003h', b'\x1b[?1015h', b'\x1b[?1006h', b'\x1b[?25l', ...], '▣─▣─▣ ProductTeam', 25)
+
+lib/tui/tests/test_pty.py:220: AssertionError
+=========================== short test summary info ============================
+FAILED lib/tui/tests/test_pty.py::test_pty_status_and_gate_refuse - AssertionError: real engagement text visible
+assert 'harness-cli' in '\x1b[?1049h\x1b[?1000h\x1b[?1003h\x1b[?1015h\x1b[?1006h\x1b[?25l\x1b[?1004h\x1b[>25u\x1b[?2026$p\x1b[?2048$p\x1b[?200...00l\x1b[?1003l\x1b[?1015l\x1b[?1006l\x1b[<u\x1b[?1049l\x1b[?25h\x1b[?1004l\x1b[?1000l\x1b[?1003l\x1b[?1015l\x1b[?1006l'
+FAILED lib/tui/tests/test_pty.py::test_pty_provider_interrupt - AssertionError: provider artifact streamed into the transcript
+assert False
+ +  where False = _wait_for(13, [b'\x1b[?1049h\x1b[?1000h\x1b[?1003h\x1b[?1015h\x1b[?1006h\x1b[?25l\x1b[?1004h\x1b[>25u', b'\x1b[?2026$p\x1b[?2048$p\x...x1b[0m\x1b[48;2;42;42;42m                                                                                \x1b[0m', ...], 'partial analysis begins', 25)
+FAILED lib/tui/tests/test_pty.py::test_pty_typed_role_records_builder - AssertionError: provider artifact streamed into the transcript
+assert False
+ +  where False = _wait_for(13, [b'\x1b[?1049h', b'\x1b[?1000h', b'\x1b[?1003h', b'\x1b[?1015h', b'\x1b[?1006h', b'\x1b[?25l', ...], 'builder analysis complete', 25)
+FAILED lib/tui/tests/test_pty.py::test_pty_sigwinch_compact - AssertionError: wide header rendered
+assert False
+ +  where False = _wait_for(13, [b'\x1b[?1049h', b'\x1b[?1000h', b'\x1b[?1003h', b'\x1b[?1015h', b'\x1b[?1006h', b'\x1b[?25l', ...], '▣─▣─▣ ProductTeam', 25)
+4 failed, 35 passed in 238.92s (0:03:58)

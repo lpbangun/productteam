@@ -1,0 +1,618 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ProductTeam — locked cockpit (goal-loop reference)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#070707;--canvas:#0a0a0a;--field:#141414;--rule:#2a2a2a;--text:#e4e4e4;--mute:#737373;--you:#8a8a8a;--principal:#c084fc;--analyst:#60a5fa;--builder:#22c55e;--critic:#f59e0b;--ok:#22c55e;--err:#ef4444;--cell:12.5px;--lh:19px}
+*{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--text);font-family:"IBM Plex Mono",ui-monospace,monospace}
+body{padding:40px 24px 96px}
+header.page,main{max-width:1180px;margin:auto}
+header.page{margin-bottom:36px}
+h1{font-size:14px;margin:0 0 8px;letter-spacing:.04em}
+.lede,.note{color:var(--mute);font-size:12px;line-height:1.55;margin:0;max-width:86ch}
+.lede{margin-bottom:10px}
+.lock{color:var(--ok);font-size:12px;margin-top:12px}
+.toc{display:flex;flex-wrap:wrap;gap:8px 18px;margin:16px 0 0;font-size:11px}
+.toc a{color:var(--mute);text-decoration:none}.toc a:hover{color:var(--text)}
+.contract{margin:18px 0 0;border:1px solid var(--rule);border-radius:4px;overflow:hidden;font-size:11px;line-height:1.5}
+.contract .row{display:grid;grid-template-columns:14ch 1fr;gap:12px;padding:7px 12px;border-top:1px solid var(--rule)}
+.contract .row:first-child{border-top:0}
+.contract .k{color:var(--ok);font-weight:600}
+.contract .v{color:var(--mute)}
+.dont{color:var(--err);margin-top:10px;font-size:11px;max-width:90ch;line-height:1.55}
+section{margin:0 0 52px}h2{font-size:11px;color:var(--mute);text-transform:uppercase;letter-spacing:.12em;margin:0 0 6px}
+.note{margin:0 0 16px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(440px,1fr));gap:28px 36px;align-items:start}
+figure{margin:0}
+figcaption{font-size:11px;color:var(--mute);margin:0 0 9px;letter-spacing:.03em}
+figcaption b{color:var(--text);font-weight:600}
+.locked{color:var(--ok);font-size:10px;font-weight:600;margin-left:7px}
+.term{--cols:80;--rows:24;width:calc(var(--cols)*.62em);max-width:100%;height:calc(var(--rows)*var(--lh));background:var(--canvas);font-size:var(--cell);line-height:var(--lh);display:grid;grid-template-rows:auto 1px 1fr auto auto auto auto;overflow:hidden;position:relative;border:1px solid var(--rule)}
+.term.short{--rows:16;height:calc(16*var(--lh))}
+.term.n40{--cols:40;--rows:20;--cell:12px;--lh:18px}
+.term.boot{grid-template-rows:1fr auto auto}
+.hdr,.chips,.composer,.ftr,.activity{padding:0 8px;white-space:nowrap;overflow:hidden}
+.hdr{font-weight:600;min-height:var(--lh)}
+.heads{color:var(--mute);margin-right:7px;font-weight:400}
+.heads .pulse{color:var(--ok);animation:pulse 1s steps(2) infinite}
+.dim{color:var(--mute);font-weight:400}
+.score{color:var(--ok)}
+.rule{height:1px;background:var(--rule)}
+.log{min-height:0;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end;gap:8px;padding:6px 8px 5px}
+.log.top{justify-content:flex-start}
+.home{display:grid;grid-template-columns:1.4ch 1fr 4ch;gap:0 8px;color:var(--mute)}
+.home .s{color:var(--ok);text-align:right}
+.turn{display:grid;grid-template-columns:2px 1fr;gap:10px}
+.rail{background:#3f3f3f}
+.turn.principal .rail{background:var(--principal)}
+.turn.analyst .rail{background:var(--analyst)}
+.turn.builder .rail{background:var(--builder)}
+.turn.critic .rail{background:var(--critic)}
+.turn.cmd .rail{background:#3f3f3f}
+.role{font-weight:600}
+.role.you{color:var(--you);font-weight:400}
+.role.cmd{color:var(--mute);font-weight:400}
+.role.principal{color:var(--principal)}
+.role.analyst{color:var(--analyst)}
+.role.builder{color:var(--builder)}
+.role.critic{color:var(--critic)}
+.body{white-space:pre-wrap;min-width:0}
+.turn.user .body{color:var(--you)}
+.md{color:var(--ok);font-weight:600}
+.plus{color:var(--ok)}
+.del{color:var(--err)}
+.path{font-weight:600}
+.card{color:var(--mute);margin-top:4px}
+.card.ok{color:var(--ok)}
+.card.err{color:var(--err)}
+.activity{background:#0e0e0e;border-top:1px solid var(--rule);padding-top:3px;padding-bottom:3px;color:var(--mute)}
+.activity .line{display:flex;gap:8px;overflow:hidden}
+.activity .line+.line{margin-top:1px}
+.agent{font-weight:600}
+.agent.principal{color:var(--principal)}
+.agent.analyst{color:var(--analyst)}
+.agent.builder{color:var(--builder)}
+.agent.critic{color:var(--critic)}
+.elapsed{margin-left:auto;color:var(--mute)}
+.chips{display:flex;gap:13px;color:var(--mute);min-height:var(--lh)}
+.chips .sel{color:var(--text)}
+.chips .done{color:var(--ok)}
+.chips .fail{color:var(--err)}
+.composer{background:var(--field);min-height:calc(var(--lh)*3);padding-top:4px;color:var(--mute)}
+.cursor{color:var(--text)}
+.ftr{color:var(--mute);display:flex;gap:14px}
+.dock{background:var(--field);border-top:1px solid var(--rule);padding:4px 0 2px}
+.opt{display:grid;grid-template-columns:1.4ch 12ch 1fr;gap:8px;color:var(--mute);padding:0 8px}
+.opt.sel{color:var(--text);font-weight:600;background:#1c1c1c}
+.opt.sel .k{color:var(--ok)}
+.opt.off{color:#555}
+.ask-head{font-weight:600;padding:0 8px}
+.count{float:right;color:var(--mute);font-weight:400}
+.ask-q{padding:0 8px 4px}
+.option{display:grid;grid-template-columns:2ch 1fr 11ch;gap:6px;color:var(--mute);padding:2px 8px}
+.option.sel{background:#1c1c1c;color:var(--text)}
+.option.sel .radio,.option em{color:var(--ok)}
+.option b,.option small{display:block}
+.option small{font-size:10px;line-height:14px;color:var(--mute)}
+.option em{font-size:9px;text-align:right;font-style:normal}
+.ev-panel{border:1px solid var(--rule);border-radius:2px;background:#0e0e0e;margin:2px 8px;overflow:hidden}
+.ev-head{display:flex;color:var(--mute);padding:1px 8px;border-bottom:1px solid var(--rule)}
+.ev-head .t{margin-left:auto}
+.ev-row{display:grid;grid-template-columns:5ch 1fr;gap:8px;padding:1px 8px;color:var(--mute);border-bottom:1px solid var(--rule)}
+.ev-row:last-child{border-bottom:0}
+.ev-row .plus{color:var(--ok)}
+.ev-row .path{font-weight:600;color:var(--text)}
+.toast{position:absolute;top:8px;right:8px;color:var(--err);background:var(--canvas)}
+.toast.mute{color:var(--mute)}
+.splash{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:0;padding:8px 8px 0}
+.splash svg{width:340px;height:auto}
+.brand{font-weight:600;margin-top:10px}
+.sub{color:var(--mute);font-size:11px;margin-top:4px}
+.sub .who{color:var(--ok)}
+.bot{color:#a3a3a3}
+.bot.on{color:var(--ok);animation:pulse 1.1s steps(2) infinite}
+.swatch{display:inline-block;width:10px;height:10px;margin-right:6px;vertical-align:-1px}
+.tokens{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px 18px;font-size:11px;color:var(--mute);margin:0 0 18px}
+@keyframes pulse{50%{opacity:.3}}
+.spin::after{content:"⠋";animation:spin .8s steps(10) infinite}
+@keyframes spin{0%{content:"⠋"}10%{content:"⠙"}20%{content:"⠹"}30%{content:"⠸"}40%{content:"⠼"}50%{content:"⠴"}60%{content:"⠦"}70%{content:"⠧"}80%{content:"⠇"}90%{content:"⠏"}}
+.n40 .project,.n40 .heads,.n40 .home .s{display:none}
+.n40 .home{grid-template-columns:1.4ch 1fr}
+.n40 .turn{gap:7px}
+.n40 .activity .line:nth-child(n+2){display:none}
+.n40 .composer{min-height:calc(var(--lh)*2)}
+.n40 .ftr span+span{display:none}
+</style>
+</head>
+<body>
+<header class="page">
+  <h1>ProductTeam · locked cockpit</h1>
+  <p class="lede">This is the visual contract for <code>lib/tui/</code>. One design, shown through its states. Presentation client of <code>bin/productteam</code> and plain files. Not a daemon, not a second state authority, not a replacement for <code>productteam chat</code>.</p>
+  <p class="lock">All product questions are locked. No alternatives on this page. Goal-loop workers match these frames.</p>
+  <nav class="toc">
+    <a href="#tokens">tokens</a>
+    <a href="#boot">boot</a>
+    <a href="#open">open</a>
+    <a href="#think">thinking</a>
+    <a href="#speak">speaking</a>
+    <a href="#ask">ask</a>
+    <a href="#slash">slash</a>
+    <a href="#evidence">evidence</a>
+    <a href="#confirm">confirm</a>
+    <a href="#toast">toasts</a>
+    <a href="#compact">40-col</a>
+    <a href="#empty">empty</a>
+  </nav>
+  <div class="contract">
+    <div class="row"><span class="k">layout</span><span class="v">header / transcript 1fr / activity / chips / dock-above-composer / composer / footer. Overlays never cover the composer.</span></div>
+    <div class="row"><span class="k">Q1 home</span><span class="v">at most three recent scored sessions for this directory (or three distinct global scored projects). Exclude *smoke* *run-loop* *gate-smoke* *overnight-rehears*. Never seed full productteam status. Display only.</span></div>
+    <div class="row"><span class="k">Q2 identity</span><span class="v">You: gray 2px rail + mute label. Principal/Analyst/Builder/Critic: role-colored label + 2px rail + chip. Body text stays neutral.</span></div>
+    <div class="row"><span class="k">Q3 header</span><span class="v">▣─▣─▣ ProductTeam · {cwd project} · {score}. Middle head pulses while work is active. ≤40 cols: ProductTeam {score}. Never harness-cli or Directive in the bar.</span></div>
+    <div class="row"><span class="k">Q4 work</span><span class="v">braille spinner on the live chip + elapsed m:ss. No determinate progress bar.</span></div>
+    <div class="row"><span class="k">Q5 compact</span><span class="v">explicit 40-col mode. Prove 120×36 / 80×24 / 60×24 / 40×20 and SIGWINCH 80→40→80.</span></div>
+    <div class="row"><span class="k">Q6 ask</span><span class="v">OMP-style dock: exact question, labels, descriptions, recommended, single/multi, 1 of N, ↑↓ Space Enter Esc. Question is a real colored agent turn. Composer stays below.</span></div>
+    <div class="row"><span class="k">thinking</span><span class="v">silent work lives in the activity strip from workers.tsv. A colored transcript turn begins only when that role emits text. Never render “Thinking…” as a message.</span></div>
+    <div class="row"><span class="k">R1 markdown</span><span class="v">markdown-lite inside speaking turns: heading ok+bold, fences mute, +/− ok/err, evidence path bold. Body otherwise neutral.</span></div>
+    <div class="row"><span class="k">R2 slash</span><span class="v">palette docks above composer. Run/refuse/usage are mute Command rails, never a role color. Unsupported verbs refuse with chat_reason + usage.</span></div>
+    <div class="row"><span class="k">R3 evidence</span><span class="v">bordered labelled evidence panel, distinct from chat. Summary stays a Command turn.</span></div>
+    <div class="row"><span class="k">R4 confirm</span><span class="v">confirm dock before chat-supported writes (/gh merge, /checks --allow-dirty, /onboarding --yes).</span></div>
+    <div class="row"><span class="k">R5 toasts</span><span class="v">done = card on the turn. fail/interrupt = toast + error card. session verbs = mute toast.</span></div>
+    <div class="row"><span class="k">R6 footer</span><span class="v">idle = hints. busy = facts (interrupt, elapsed, provider). Ask/slash replace hints while those docks are open.</span></div>
+    <div class="row"><span class="k">R7 splash</span><span class="v">futuristic angular line-art heads, once, then cockpit. Idle all-neutral. Live-boot glow cycles Principal → Analyst → Builder → Principal. Ships as ASCII. Not the six-node graph. Not ROBOTS_MARK half-blocks.</span></div>
+    <div class="row"><span class="k">R8 home</span><span class="v">home rows are display only. Header follows cwd. No project picker.</span></div>
+    <div class="row"><span class="k">target</span><span class="v">chips focusable. Composer shows @Role. Session-local. Pass role as argv to provider_turn.sh. Idle home defaults to @Principal. Stop hardcoding Analyst.</span></div>
+    <div class="row"><span class="k">defaults</span><span class="v">dim timestamps on turns. Copy is a session verb, not chrome. High-contrast is these tokens.</span></div>
+  </div>
+  <p class="dont">Do not: dump productteam status · put Thinking… in the transcript · cover the composer · put harness-cli or Directive in the header · use cyan / Textual primary · invent a workspace switcher · spawn a daemon · make productteam chat launch the TUI.</p>
+</header>
+<main>
+
+<section id="tokens">
+  <h2>Tokens</h2>
+  <p class="note">Cockpit may use role identity hues. Canonical Bash CLI accent budget stays two hues (ok / err). Body text stays neutral.</p>
+  <div class="tokens">
+    <div><span class="swatch" style="background:#8a8a8a"></span>You #8a8a8a</div>
+    <div><span class="swatch" style="background:#c084fc"></span>Principal #c084fc ◆</div>
+    <div><span class="swatch" style="background:#60a5fa"></span>Analyst #60a5fa ◇</div>
+    <div><span class="swatch" style="background:#22c55e"></span>Builder #22c55e ▸</div>
+    <div><span class="swatch" style="background:#f59e0b"></span>Critic #f59e0b ◉</div>
+    <div><span class="swatch" style="background:#22c55e"></span>ok / score #22c55e ✓</div>
+    <div><span class="swatch" style="background:#ef4444"></span>err #ef4444 ✗</div>
+    <div><span class="swatch" style="background:#e4e4e4"></span>text #e4e4e4</div>
+    <div><span class="swatch" style="background:#737373"></span>mute #737373</div>
+    <div><span class="swatch" style="background:#0a0a0a"></span>canvas #0a0a0a</div>
+  </div>
+</section>
+
+<section id="boot">
+  <h2>Boot splash · R7</h2>
+  <p class="note">Once, then the cockpit. Composer and footer stay visible. Live-boot subtitle names the currently glowing head.</p>
+  <div class="grid">
+    <figure>
+      <figcaption><b>Idle boot</b><span class="locked">locked</span></figcaption>
+      <div class="term boot">
+        <div class="splash"><svg class="mark idle" width="340" height="176" viewBox="0 0 340 176" xmlns="http://www.w3.org/2000/svg" role="img"><g class="bot" data-role="principal">
+  <line x1="50" y1="12" x2="50" y2="4" stroke="currentColor" stroke-width="2"/>
+  <circle cx="50" cy="3" r="3" fill="currentColor"/>
+  <polygon points="26,14 74,14 78,46 78,84 22,84 26,46" stroke="currentColor" stroke-width="2" fill="none"/>
+  <circle cx="40" cy="40" r="5" fill="currentColor"/>
+  <circle cx="60" cy="40" r="5" fill="currentColor"/>
+  <line x1="38" y1="62" x2="62" y2="62" stroke="currentColor" stroke-width="2"/>
+  <line x1="50" y1="84" x2="50" y2="116" stroke="currentColor" stroke-width="2"/>
+  <polygon points="50,124 58,132 50,140 42,132" fill="currentColor"/>
+  <text x="50" y="164" font-size="11" font-family="IBM Plex Mono, monospace" fill="currentColor" text-anchor="middle">Principal</text>
+</g>
+<g class="bot" data-role="analyst">
+  <line x1="170" y1="12" x2="170" y2="4" stroke="currentColor" stroke-width="2"/>
+  <circle cx="170" cy="3" r="3" fill="currentColor"/>
+  <polygon points="146,14 194,14 198,46 198,84 142,84 146,46" stroke="currentColor" stroke-width="2" fill="none"/>
+  <circle cx="160" cy="40" r="5" fill="currentColor"/>
+  <circle cx="180" cy="40" r="5" fill="currentColor"/>
+  <line x1="158" y1="62" x2="182" y2="62" stroke="currentColor" stroke-width="2"/>
+  <line x1="170" y1="84" x2="170" y2="116" stroke="currentColor" stroke-width="2"/>
+  <polygon points="170,124 178,132 170,140 162,132" stroke="currentColor" stroke-width="2" fill="none"/>
+  <text x="170" y="164" font-size="11" font-family="IBM Plex Mono, monospace" fill="currentColor" text-anchor="middle">Analyst</text>
+</g>
+<g class="bot" data-role="builder">
+  <line x1="290" y1="12" x2="290" y2="4" stroke="currentColor" stroke-width="2"/>
+  <circle cx="290" cy="3" r="3" fill="currentColor"/>
+  <polygon points="266,14 314,14 318,46 318,84 262,84 266,46" stroke="currentColor" stroke-width="2" fill="none"/>
+  <circle cx="280" cy="40" r="5" fill="currentColor"/>
+  <circle cx="300" cy="40" r="5" fill="currentColor"/>
+  <line x1="278" y1="62" x2="302" y2="62" stroke="currentColor" stroke-width="2"/>
+  <line x1="290" y1="84" x2="290" y2="116" stroke="currentColor" stroke-width="2"/>
+  <polygon points="284,124 284,140 298,132" fill="currentColor"/>
+  <text x="290" y="164" font-size="11" font-family="IBM Plex Mono, monospace" fill="currentColor" text-anchor="middle">Builder</text>
+</g></svg><div class="brand">ProductTeam</div><div class="sub">principal · analyst · builder</div></div>
+        <div class="composer"><span class="cursor">▍</span></div>
+        <div class="ftr">enter continue · any key skip</div>
+      </div>
+    </figure>
+    <figure>
+      <figcaption><b>Work already live</b> · glow cycles Principal → Analyst → Builder</figcaption>
+      <div class="term boot">
+        <div class="splash"><svg class="mark cycle" width="340" height="176" viewBox="0 0 340 176" xmlns="http://www.w3.org/2000/svg" role="img"><g class="bot" data-role="principal">
+  <line x1="50" y1="12" x2="50" y2="4" stroke="currentColor" stroke-width="2"/>
+  <circle cx="50" cy="3" r="3" fill="currentColor"/>
+  <polygon points="26,14 74,14 78,46 78,84 22,84 26,46" stroke="currentColor" stroke-width="2" fill="none"/>
+  <circle cx="40" cy="40" r="5" fill="currentColor"/>
+  <circle cx="60" cy="40" r="5" fill="currentColor"/>
+  <line x1="38" y1="62" x2="62" y2="62" stroke="currentColor" stroke-width="2"/>
+  <line x1="50" y1="84" x2="50" y2="116" stroke="currentColor" stroke-width="2"/>
+  <polygon points="50,124 58,132 50,140 42,132" fill="currentColor"/>
+  <text x="50" y="164" font-size="11" font-family="IBM Plex Mono, monospace" fill="currentColor" text-anchor="middle">Principal</text>
+</g>
+<g class="bot" data-role="analyst">
+  <line x1="170" y1="12" x2="170" y2="4" stroke="currentColor" stroke-width="2"/>
+  <circle cx="170" cy="3" r="3" fill="currentColor"/>
+  <polygon points="146,14 194,14 198,46 198,84 142,84 146,46" stroke="currentColor" stroke-width="2" fill="none"/>
+  <circle cx="160" cy="40" r="5" fill="currentColor"/>
+  <circle cx="180" cy="40" r="5" fill="currentColor"/>
+  <line x1="158" y1="62" x2="182" y2="62" stroke="currentColor" stroke-width="2"/>
+  <line x1="170" y1="84" x2="170" y2="116" stroke="currentColor" stroke-width="2"/>
+  <polygon points="170,124 178,132 170,140 162,132" stroke="currentColor" stroke-width="2" fill="none"/>
+  <text x="170" y="164" font-size="11" font-family="IBM Plex Mono, monospace" fill="currentColor" text-anchor="middle">Analyst</text>
+</g>
+<g class="bot" data-role="builder">
+  <line x1="290" y1="12" x2="290" y2="4" stroke="currentColor" stroke-width="2"/>
+  <circle cx="290" cy="3" r="3" fill="currentColor"/>
+  <polygon points="266,14 314,14 318,46 318,84 262,84 266,46" stroke="currentColor" stroke-width="2" fill="none"/>
+  <circle cx="280" cy="40" r="5" fill="currentColor"/>
+  <circle cx="300" cy="40" r="5" fill="currentColor"/>
+  <line x1="278" y1="62" x2="302" y2="62" stroke="currentColor" stroke-width="2"/>
+  <line x1="290" y1="84" x2="290" y2="116" stroke="currentColor" stroke-width="2"/>
+  <polygon points="284,124 284,140 298,132" fill="currentColor"/>
+  <text x="290" y="164" font-size="11" font-family="IBM Plex Mono, monospace" fill="currentColor" text-anchor="middle">Builder</text>
+</g></svg><div class="brand">ProductTeam</div><div class="sub live"><span class="who">◆ Principal</span> is working · 0:18</div></div>
+        <div class="composer">team is working</div>
+        <div class="ftr">ctrl+c interrupt · total 0:18</div>
+      </div>
+    </figure>
+  </div>
+</section>
+
+<section id="open">
+  <h2>Open · Q1 Q3 R8</h2>
+  <p class="note">Three recent scored sessions for this directory. No activity strip while idle. Home rows are not a picker. Default target Principal.</p>
+  <div class="grid">
+    <figure>
+      <figcaption><b>Idle home</b> · 80×24<span class="locked">locked</span></figcaption>
+      <div class="term">
+        <div class="hdr"><span class="heads">▣─▣─▣</span>ProductTeam<span class="project dim"> · this repo · </span><span class="score">9.5</span></div>
+        <div class="rule"></div>
+        <div class="log top"><div class="home"><span>●</span><span>harness-cli</span><span class="s">9.5</span><span>●</span><span>agcode-learning</span><span class="s">8.3</span><span>●</span><span>onboarding-flight</span><span class="s">9.5</span></div></div>
+        <div class="chips"><span class="sel">◆ Principal</span><span>◇ Analyst</span><span>▸ Builder</span><span>◉ Critic</span></div>
+        <div class="composer">@Principal <span class="cursor">▍</span></div>
+        <div class="ftr">enter send · / commands · tab agents</div>
+      </div>
+    </figure>
+  </div>
+</section>
+
+<section id="think">
+  <h2>Prompt sent · thinking stays in activity</h2>
+  <p class="note">Your prompt is a gray-railed You turn. Silent workers appear only in activity, from workers.tsv. Header middle head pulses.</p>
+  <div class="grid">
+    <figure>
+      <figcaption><b>Thinking</b> · no fake agent message<span class="locked">locked</span></figcaption>
+      <div class="term">
+        <div class="hdr"><span class="heads">▣─<span class="pulse">▣</span>─▣</span>ProductTeam<span class="project dim"> · this repo · </span><span class="score">9.5</span></div>
+        <div class="rule"></div>
+        <div class="log">
+          <div class="turn user"><div class="rail"></div><div><div class="role you">You</div><div class="body">Make the cockpit compact and tell me which route is safer.</div></div></div>
+        </div>
+        <div class="activity">
+          <div class="line"><span class="agent principal"><span class="spin"></span> ◆ Principal</span><span>planning the response</span><span class="elapsed">0:04</span></div>
+          <div class="line"><span class="agent analyst"><span class="spin"></span> ◇ Analyst</span><span>inspecting evidence</span><span class="elapsed">0:03</span></div>
+        </div>
+        <div class="chips"><span class="agent principal">◆ Principal</span><span class="agent analyst">◇ Analyst</span><span>▸ Builder</span><span>◉ Critic</span></div>
+        <div class="composer">team is working</div>
+        <div class="ftr">ctrl+c interrupt · 0:04 · claude</div>
+      </div>
+    </figure>
+    <figure>
+      <figcaption><b>Three silent workers</b> · activity stays bounded</figcaption>
+      <div class="term">
+        <div class="hdr"><span class="heads">▣─<span class="pulse">▣</span>─▣</span>ProductTeam<span class="project dim"> · this repo · </span><span class="score">9.5</span></div>
+        <div class="rule"></div>
+        <div class="log">
+          <div class="turn user"><div class="rail"></div><div><div class="role you">You</div><div class="body">Make the cockpit compact and tell me which route is safer.</div></div></div>
+        </div>
+        <div class="activity">
+          <div class="line"><span class="agent principal"><span class="spin"></span> ◆ Principal</span><span>coordinating</span><span class="elapsed">0:09</span></div>
+          <div class="line"><span class="agent analyst"><span class="spin"></span> ◇ Analyst</span><span>checking resize evidence</span><span class="elapsed">0:08</span></div>
+          <div class="line"><span class="agent critic"><span class="spin"></span> ◉ Critic</span><span>probing regressions</span><span class="elapsed">0:05</span></div>
+        </div>
+        <div class="chips"><span class="agent principal">◆ Principal</span><span class="agent analyst">◇ Analyst</span><span>▸ Builder</span><span class="agent critic">◉ Critic</span></div>
+        <div class="composer">team is working</div>
+        <div class="ftr">ctrl+c interrupt · 0:09 · claude</div>
+      </div>
+    </figure>
+  </div>
+</section>
+
+<section id="speak">
+  <h2>Speaking · markdown-lite · completion card</h2>
+  <p class="note">A colored turn starts only when the role emits text. Markdown-lite lives inside that turn. Done is a card on the turn, not a new message.</p>
+  <div class="grid">
+    <figure>
+      <figcaption><b>Streaming</b> · Builder speaking, Critic still thinking<span class="locked">locked</span></figcaption>
+      <div class="term">
+        <div class="hdr"><span class="heads">▣─<span class="pulse">▣</span>─▣</span>ProductTeam<span class="project dim"> · this repo · </span><span class="score">9.5</span></div>
+        <div class="rule"></div>
+        <div class="log">
+          <div class="turn user"><div class="rail"></div><div><div class="role you">You</div><div class="body">Make the cockpit compact and tell me which route is safer.</div></div></div>
+          <div class="turn builder"><div class="rail"></div><div><div class="role builder">▸ Builder</div><div class="body"><span class="md">Done when</span>
+header is compact
+<span class="plus">+</span> keep composer
+<span class="del">-</span> dump status
+The explicit 40-column mode is safer…</div></div></div>
+        </div>
+        <div class="activity">
+          <div class="line"><span class="agent builder"><span class="spin"></span> ▸ Builder</span><span>responding</span><span class="elapsed">0:18</span></div>
+          <div class="line"><span class="agent critic"><span class="spin"></span> ◉ Critic</span><span>checking the recommendation</span><span class="elapsed">0:06</span></div>
+        </div>
+        <div class="chips"><span>◆ Principal</span><span>◇ Analyst</span><span class="agent builder">▸ Builder</span><span class="agent critic">◉ Critic</span></div>
+        <div class="composer">Builder is responding</div>
+        <div class="ftr">ctrl+c interrupt · 0:18 · claude</div>
+      </div>
+    </figure>
+    <figure>
+      <figcaption><b>Completed</b> · activity collapses, card on the turn</figcaption>
+      <div class="term">
+        <div class="hdr"><span class="heads">▣─▣─▣</span>ProductTeam<span class="project dim"> · this repo · </span><span class="score">9.5</span></div>
+        <div class="rule"></div>
+        <div class="log">
+          <div class="turn user"><div class="rail"></div><div><div class="role you">You</div><div class="body">Make the cockpit compact and tell me which route is safer.</div></div></div>
+          <div class="turn builder"><div class="rail"></div><div><div class="role builder">▸ Builder</div><div class="body"><span class="md">Done when</span>
+header is compact
+<span class="plus">+</span> keep composer
+<span class="del">-</span> dump status
+The explicit 40-column mode is safer.
+<div class="card ok">✓ ▸ Builder · 18s · w12.txt</div></div></div></div>
+          <div class="turn critic"><div class="rail"></div><div><div class="role critic">◉ Critic</div><div class="body">Agreed, provided 60→40 resize is exercised in the PTY gate.
+<div class="card ok">✓ ◉ Critic · 6s · w13.txt</div></div></div></div>
+        </div>
+        <div class="chips"><span>◆ Principal</span><span>◇ Analyst</span><span class="done">✓ ▸ Builder</span><span class="done">✓ ◉ Critic</span></div>
+        <div class="composer">@Principal <span class="cursor">▍</span></div>
+        <div class="ftr">enter send · / commands · tab agents</div>
+      </div>
+    </figure>
+  </div>
+</section>
+
+<section id="ask">
+  <h2>Ask-back · Q6</h2>
+  <p class="note">The question is a real Principal turn. Options dock above the composer. Never a modal over the transcript.</p>
+  <div class="grid">
+    <figure>
+      <figcaption><b>OMP dock</b><span class="locked">locked</span></figcaption>
+      <div class="term">
+        <div class="hdr"><span class="heads">▣─▣─▣</span>ProductTeam<span class="project dim"> · this repo · </span><span class="score">9.5</span></div>
+        <div class="rule"></div>
+        <div class="log">
+          <div class="turn principal"><div class="rail"></div><div><div class="role principal">◆ Principal</div><div class="body">One product choice is required before I continue.</div></div></div>
+        </div>
+        <div class="chips"><span class="sel agent principal">◆ Principal</span><span>◇ Analyst</span><span>▸ Builder</span><span>◉ Critic</span></div>
+        <div class="dock">
+          <div class="ask-head">Agent identity <span class="count">1 of 1</span></div>
+          <div class="ask-q">Where should each role’s color appear?</div>
+          <div class="option sel"><span class="radio">●</span><span><b>Label + rail</b><small>Color the role label, chip, and 2px turn rail.</small></span><em>recommended</em></div>
+          <div class="option"><span class="radio">○</span><span><b>Label only</b><small>Keep the rail neutral.</small></span><em></em></div>
+          <div class="option"><span class="radio">○</span><span><b>Chip only</b><small>Keep transcript identity monochrome.</small></span><em></em></div>
+        </div>
+        <div class="composer"><span class="cursor">▍</span></div>
+        <div class="ftr">↑↓ choose · enter confirm · esc skip</div>
+      </div>
+    </figure>
+  </div>
+</section>
+
+<section id="slash">
+  <h2>Slash · R2</h2>
+  <p class="note">Palette docks immediately above the composer. Input stays the filter. Run, refuse, and usage are mute Command rails — never a Builder color.</p>
+  <div class="grid">
+    <figure>
+      <figcaption><b>Palette</b><span class="locked">locked</span></figcaption>
+      <div class="term">
+        <div class="hdr"><span class="heads">▣─▣─▣</span>ProductTeam<span class="project dim"> · this repo · </span><span class="score">9.5</span></div>
+        <div class="rule"></div>
+        <div class="log top"><div class="home"><span>●</span><span>harness-cli</span><span class="s">9.5</span><span>●</span><span>agcode-learning</span><span class="s">8.3</span><span>●</span><span>onboarding-flight</span><span class="s">9.5</span></div></div>
+        <div class="chips"><span class="sel">◆ Principal</span> ◇ Analyst ▸ Builder ◉ Critic</div>
+        <div class="dock">
+          <div class="opt sel"><span class="k">›</span><span>/status</span><span>productteam status [--json]</span></div>
+          <div class="opt"><span></span><span>/score</span><span>productteam score &lt;client&gt; --iter</span></div>
+          <div class="opt"><span></span><span>/skill</span><span>productteam skill …</span></div>
+          <div class="opt off"><span></span><span>/style</span><span>unsupported</span></div>
+        </div>
+        <div class="composer">/s<span class="cursor">▍</span></div>
+        <div class="ftr">enter run · tab complete · ↑↓ choose · esc close</div>
+      </div>
+    </figure>
+    <figure>
+      <figcaption><b>Run / refuse / usage</b></figcaption>
+      <div class="term">
+        <div class="hdr"><span class="heads">▣─▣─▣</span>ProductTeam<span class="project dim"> · this repo · </span><span class="score">9.5</span></div>
+        <div class="rule"></div>
+        <div class="log">
+          <div class="turn cmd"><div class="rail"></div><div><div class="role cmd">/status</div><div class="body dim">● harness-cli  9.5
+● agcode-learning  8.3</div></div></div>
+          <div class="turn cmd"><div class="rail"></div><div><div class="role cmd">/gate</div><div class="body dim">refused — owner-gated durable decisions
+use the CLI: productteam gate &lt;client&gt; …</div></div></div>
+          <div class="turn cmd"><div class="rail"></div><div><div class="role cmd">/score</div><div class="body dim">usage: productteam score &lt;client&gt; --iter &lt;n&gt;</div></div></div>
+        </div>
+        <div class="chips"><span class="sel">◆ Principal</span> ◇ Analyst ▸ Builder ◉ Critic</div>
+        <div class="composer"><span class="cursor">▍</span></div>
+        <div class="ftr">enter send · / commands · tab agents</div>
+      </div>
+    </figure>
+  </div>
+</section>
+
+<section id="evidence">
+  <h2>Evidence · R3</h2>
+  <p class="note">Long file lists do not drown chat. Summary stays a Command turn. The file list is a bordered labelled panel.</p>
+  <div class="grid">
+    <figure>
+      <figcaption><b>Bordered evidence panel</b><span class="locked">locked</span></figcaption>
+      <div class="term">
+        <div class="hdr"><span class="heads">▣─▣─▣</span>ProductTeam<span class="project dim"> · this repo · </span><span class="score">9.5</span></div>
+        <div class="rule"></div>
+        <div class="log">
+          <div class="turn cmd"><div class="rail"></div><div><div class="role cmd">/report harness-cli</div><div class="body dim">KEEP lib/tui/. Reviewer ceaab23a scored every mandatory dim ≥ 9.0.</div></div></div>
+        </div>
+        <div class="ev-panel">
+          <div class="ev-head"><span>evidence</span><span class="t">3 files · ↑↓ · enter</span></div>
+          <div class="ev-row"><span class="plus">+0.0</span><span class="path">runs/iter-3/scores.json</span></div>
+          <div class="ev-row"><span>·</span><span>iter-3/reviewer-gate.md</span></div>
+          <div class="ev-row"><span>·</span><span>iter-3/pytest.txt</span></div>
+        </div>
+        <div class="chips"><span class="sel">◆ Principal</span> ◇ Analyst ▸ Builder ◉ Critic</div>
+        <div class="composer"><span class="cursor">▍</span></div>
+        <div class="ftr">↑↓ inspect · enter open · esc close</div>
+      </div>
+    </figure>
+  </div>
+</section>
+
+<section id="confirm">
+  <h2>Confirm write · R4</h2>
+  <p class="note">Only real registry verbs that write. Dock above the composer. Cancel spawns nothing.</p>
+  <div class="grid">
+    <figure>
+      <figcaption><b>Confirm dock</b><span class="locked">locked</span></figcaption>
+      <div class="term short">
+        <div class="hdr"><span class="heads">▣─▣─▣</span>ProductTeam<span class="project dim"> · this repo · </span><span class="score">9.5</span></div>
+        <div class="rule"></div>
+        <div class="log">
+          <div class="turn cmd"><div class="rail"></div><div><div class="role cmd">/gh merge</div><div class="body dim">this writes a GitHub merge. Confirm to run the real CLI.</div></div></div>
+        </div>
+        <div class="chips"><span class="sel">◆ Principal</span> ◇ Analyst ▸ Builder ◉ Critic</div>
+        <div class="dock">
+          <div class="ask-head">Confirm write <span class="count">1 of 1</span></div>
+          <div class="ask-q">Run <b>productteam gh merge</b>?</div>
+          <div class="option sel"><span class="radio">●</span><span><b>Run</b><small>argv to bin/productteam. Output streams as a Command turn.</small></span><em></em></div>
+          <div class="option"><span class="radio">○</span><span><b>Cancel</b><small>Nothing is spawned.</small></span><em></em></div>
+        </div>
+        <div class="composer"><span class="cursor">▍</span></div>
+        <div class="ftr">↑↓ choose · enter confirm · esc cancel</div>
+      </div>
+    </figure>
+  </div>
+</section>
+
+<section id="toast">
+  <h2>Toasts · R5</h2>
+  <p class="note">Fail and interrupt are toasts, not extra transcript lines. Session verbs stay mute.</p>
+  <div class="grid">
+    <figure>
+      <figcaption><b>Fail / interrupt</b><span class="locked">locked</span></figcaption>
+      <div class="term short">
+        <div class="toast">✗ provider failed</div>
+        <div class="hdr"><span class="heads">▣─▣─▣</span>ProductTeam<span class="project dim"> · this repo · </span><span class="score">9.5</span></div>
+        <div class="rule"></div>
+        <div class="log">
+          <div class="turn user"><div class="rail"></div><div><div class="role you">You</div><div class="body">keep going</div></div></div>
+          <div class="turn builder"><div class="rail"></div><div><div class="role builder">▸ Builder</div><div class="body dim">partial output left on disk (w14.txt)
+<div class="card err">✗ ▸ Builder · 4s · w14.txt</div></div></div></div>
+        </div>
+        <div class="chips"><span>◆ Principal</span><span>◇ Analyst</span><span class="fail">✗ ▸ Builder</span><span>◉ Critic</span></div>
+        <div class="composer">@Principal <span class="cursor">▍</span></div>
+        <div class="ftr">enter send · / commands · tab agents</div>
+      </div>
+    </figure>
+    <figure>
+      <figcaption><b>Session verb</b> · mute toast</figcaption>
+      <div class="term short">
+        <div class="toast mute">wrote state/.cli/sessions/tui-20260814.md</div>
+        <div class="hdr"><span class="heads">▣─▣─▣</span>ProductTeam<span class="project dim"> · this repo · </span><span class="score">9.5</span></div>
+        <div class="rule"></div>
+        <div class="log top"><div class="home"><span>●</span><span>harness-cli</span><span class="s">9.5</span><span>●</span><span>agcode-learning</span><span class="s">8.3</span><span>●</span><span>onboarding-flight</span><span class="s">9.5</span></div></div>
+        <div class="chips"><span class="sel">◆ Principal</span> ◇ Analyst ▸ Builder ◉ Critic</div>
+        <div class="composer">@Principal <span class="cursor">▍</span></div>
+        <div class="ftr">enter send · / commands · tab agents</div>
+      </div>
+    </figure>
+  </div>
+</section>
+
+<section id="compact">
+  <h2>40-col · Q5</h2>
+  <p class="note">Explicit compact mode, not wrapping. Drop heads and directory. One activity line plus +N. Composer stays.</p>
+  <div class="grid">
+    <figure>
+      <figcaption><b>Thinking at 40×20</b><span class="locked">locked</span></figcaption>
+      <div class="term n40">
+        <div class="hdr">ProductTeam <span class="score">9.5</span></div>
+        <div class="rule"></div>
+        <div class="log">
+          <div class="turn user"><div class="rail"></div><div><div class="role you">You</div><div class="body">Which route is safer?</div></div></div>
+        </div>
+        <div class="activity"><div class="line"><span class="agent principal"><span class="spin"></span> ◆</span><span>planning · +1 working</span><span class="elapsed">0:04</span></div></div>
+        <div class="chips"><span class="agent principal">◆ Principal</span><span>+3</span></div>
+        <div class="composer">team is working</div>
+        <div class="ftr"><span>ctrl+c · 0:04</span></div>
+      </div>
+    </figure>
+  </div>
+</section>
+
+<section id="empty">
+  <h2>Empty states</h2>
+  <p class="note">Honest first screens when there is no provider or no scored engagement. Not the status dump.</p>
+  <div class="grid">
+    <figure>
+      <figcaption><b>No provider</b><span class="locked">locked</span></figcaption>
+      <div class="term short">
+        <div class="hdr"><span class="heads">▣─▣─▣</span>ProductTeam<span class="project dim"> · this repo · </span><span class="score">—</span></div>
+        <div class="rule"></div>
+        <div class="log top"><div class="dim">no installed agent
+run /agents  or  productteam onboarding</div></div>
+        <div class="chips">◆ Principal ◇ Analyst ▸ Builder ◉ Critic</div>
+        <div class="composer">@Principal <span class="cursor">▍</span></div>
+        <div class="ftr">/agents · /onboarding · /help</div>
+      </div>
+    </figure>
+    <figure>
+      <figcaption><b>No scored sessions</b></figcaption>
+      <div class="term short">
+        <div class="hdr"><span class="heads">▣─▣─▣</span>ProductTeam<span class="project dim"> · this repo · </span><span class="score">—</span></div>
+        <div class="rule"></div>
+        <div class="log top"><div class="dim">no scored sessions in this directory
+bare text talks to the selected role
+/help lists commands</div></div>
+        <div class="chips"><span class="sel">◆ Principal</span> ◇ Analyst ▸ Builder ◉ Critic</div>
+        <div class="composer">@Principal <span class="cursor">▍</span></div>
+        <div class="ftr">enter send · / commands</div>
+      </div>
+    </figure>
+  </div>
+</section>
+
+</main>
+<script>
+const ORDER = [
+  {role:'principal', who:'◆ Principal'},
+  {role:'analyst',    who:'◇ Analyst'},
+  {role:'builder',    who:'▸ Builder'}
+];
+function cycle(root) {
+  const bots = [...root.querySelectorAll('.bot')];
+  if (!bots.length) return;
+  let i = 0;
+  const who = root.closest('.term')?.querySelector('.sub.live .who');
+  function tick() {
+    bots.forEach(b => b.classList.toggle('on', b.dataset.role === ORDER[i].role));
+    if (who) who.textContent = ORDER[i].who;
+    i = (i + 1) % ORDER.length;
+  }
+  tick();
+  setInterval(tick, 900);
+}
+document.querySelectorAll('svg.cycle').forEach(cycle);
+</script>
+</body>
+</html>

@@ -1,0 +1,7 @@
+018c2d0c406e80ffa5127749b5bf3e122b679f993e88020d24901afd939b7bca  state/harness-evolution/runs/tui-polish-20260814/frozen-benchmark.md
+4c2dd198bbcd8b7ca100758a844eb13146eb7e4436d9c5ef0f0c7651c48baf34  state/harness-evolution/runs/tui-polish-20260814/GOAL-LOOP.md
+5721e48378be7de7d1ee3d85f66abc6492dde04da9ec66a1105738e69e0d8458  state/harness-evolution/runs/tui-polish-20260814/inspect.md
+7fc7d699988b8b7f79560a2a53f2f6b42e76437bb7e457d79e731bee833af494  state/harness-evolution/runs/tui-migration-20260812/visualizer/locked/index.html
+cc827fff0e185799f430cb7a1608d45bb0ea5396443ae61ffcd355d86bdc9b18  state/harness-evolution/runs/tui-cockpit-20260813/frozen-benchmark.md
+37588684ce3e889ea32ecf82a688d43e2cc18d5994a4d1e295a44cdc8129fe14  state/harness-evolution/runs/tui-cockpit-20260813/final-report.md
+bb85f0893acf3e6ed60db1d54b17adfba1b61f0fef2b91377f4ab848896bf735  state/harness-evolution/runs/tui-cockpit-20260813/lessons.md
