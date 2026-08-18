@@ -244,6 +244,8 @@ def test_home_recency_mtime_order(tmp_path, monkeypatch):
             names = [name for name, _score, _rest in rows]
             assert names == ["here-client", "new-client", "mid-client"], names
             assert [score for _name, score, _rest in rows] == ["8.5", "9.0", "8.9"]
+            assert app._overall == 8.5, "mapped engagement owns _overall"
+            assert str(app.header.render()).endswith(" · 8.5")
             assert len(rows) == 3, "cap stays three"
             for absent in ("lex-client", "old-client", "smoke-client", "idle-client"):
                 assert absent not in names, f"{absent} must not seed home"
@@ -279,8 +281,12 @@ def test_home_recency_numeric_and_client_tiebreak(tmp_path, monkeypatch):
         app = ProductTeamApp()
         async with app.run_test(size=(80, 24)) as pilot:
             text = await _boot_home(pilot, app)
-            names = [name for name, _score, _rest in HOME_ROW_RE.findall(text)]
+            rows = HOME_ROW_RE.findall(text)
+            names = [name for name, _score, _rest in rows]
             assert names == ["tie-b", "tie-a", "name-a"], names
+            assert app._overall is None, "unmapped cwd must not acquire an engagement score"
+            assert str(app.header.render()).endswith(" · 9.2"), (
+                "unmapped header mirrors the most recent displayed home row")
 
     asyncio.run(run())
 
@@ -533,6 +539,18 @@ def test_role_chips_focusable_and_selectable():
             assert app._target_role == "Builder", "Enter on the focused chip selects Builder"
             assert "@Builder" in str(prefix.render()), "prefix chrome follows the target"
             assert app.focused is app.composer, "selection restores composer focus"
+            # Arrow navigation changes focus only: the pin, prefix, and send
+            # route remain Builder even while Analyst is focused.
+            app.query_one("#role-builder", Static).focus()
+            await pilot.press("left")
+            await pilot.pause()
+            assert app.focused is app.query_one("#role-analyst", Static)
+            assert app._target_role == "Builder" and app._pinned is True
+            assert app._route_role == "Builder"
+            assert "@Builder" in str(prefix.render())
+            app.composer.text = "keep the pinned route"
+            app.submit_composer()
+            assert app._active_turn_role == "Builder"
             # click selects and restores focus the same way
             await pilot.click("#role-critic")
             await pilot.pause()
@@ -639,7 +657,9 @@ def test_activity_file_backed_caps_footer_and_resize(tmp_path, monkeypatch):
 
             await pilot.resize_terminal(40, 20)
             await pilot.pause(0.25)
-            assert str(app.header.render()) == "ProductTeam —"
+            header_score = (f"{app._header_score:.1f}"
+                            if app._header_score is not None else "—")
+            assert str(app.header.render()) == f"ProductTeam {header_score}"
             compact = str(app.activity.render())
             assert compact.count("\n") == 1 and "+2" in compact
             assert re.match(
@@ -1946,6 +1966,27 @@ def test_chip_done_status_on_chip_and_card(tmp_path, monkeypatch):
             chip = str(app.query_one("#role-builder", Static).render())
             assert "✓" in chip, f"done chip must carry ✓: {chip!r}"
             assert "✓ done" in app.transcript_text(), "card keeps its ✓ status"
+
+    asyncio.run(run())
+
+
+def test_chip_failed_status_on_chip_and_card(tmp_path, monkeypatch):
+    """L14: failure and interrupt both carry the existing `✗ failed`
+    language on the role chip and attached completion card."""
+    monkeypatch.setenv("CONSULT_STATE_ROOT", str(tmp_path / "state"))
+
+    async def run():
+        app = ProductTeamApp()
+        async with app.run_test(size=(80, 24)) as pilot:
+            await _boot_home(pilot, app)
+            for role, rc in (("Builder", 1), ("Analyst", 130)):
+                app._active_turn_role = role
+                app._provider_done(rc, str(tmp_path / f"{role}.txt"))
+                await pilot.pause()
+                chip = str(app.query_one(f"#role-{role.lower()}", Static).render())
+                assert "✗" in chip, f"failed chip must carry ✗: {chip!r}"
+            assert app.transcript_text().count("✗ failed") >= 2, (
+                "failure and interrupt cards keep their ✗ status")
 
     asyncio.run(run())
 

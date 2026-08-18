@@ -327,6 +327,7 @@ class ProductTeamApp(App):
         self.register_theme(PRODUCTTEAM_THEME)
         self._cwd_label = Path.cwd().name or str(Path.cwd())
         self._overall: float | None = None
+        self._header_score: float | None = None
         self._turns: list[tuple[str, str]] = []
         self._md_fence = False
         self._md_buffer = ""
@@ -1085,9 +1086,10 @@ class ProductTeamApp(App):
         except Exception:
             data = None
         engagements = (data or {}).get("engagements", [])
-        # Honest cwd projection: the score exists only when an engagement's
-        # Repo: metadata resolves to this process's cwd. No match → `—`;
-        # never fall back to harness-cli or a Mode/Directive read.
+        # Honest cwd projection: _overall exists only when an engagement's
+        # Repo: metadata resolves to this process's cwd. An unmapped header
+        # may later mirror the newest displayed home row; it never reads a
+        # Mode/Directive or picks a special engagement name.
         cwd = Path.cwd().resolve()
         mapped: str | None = None
         for e in engagements:
@@ -1097,6 +1099,7 @@ class ProductTeamApp(App):
                 break
         self._cwd_label = cwd.name or str(cwd)
         self._overall = self._read_overall(mapped) if mapped else None
+        self._header_score = self._overall
         if self._check_no_provider():
             self._no_provider = True
             self._call(self._render_header)
@@ -1156,11 +1159,11 @@ class ProductTeamApp(App):
         return found[1] if found else None
 
     def _render_header(self) -> None:
-        score = f"{self._overall:.1f}" if self._overall is not None else "—"
+        score = f"{self._header_score:.1f}" if self._header_score is not None else "—"
         if self.size.width <= 40:
             t = Text()
             t.append("ProductTeam ", style="bold")
-            t.append(score, style="bold " + OK if (self._overall or 0) >= 9 else MUTE)
+            t.append(score, style="bold " + OK if (self._header_score or 0) >= 9 else MUTE)
             self.header.update(t)
             return
         t = Text()
@@ -1169,7 +1172,7 @@ class ProductTeamApp(App):
         t.append("─▣ ProductTeam", style="bold")
         t.append(f" · {self._cwd_label or '—'}", style=MUTE)
         t.append(" · ")
-        t.append(score, style="bold " + OK if (self._overall or 0) >= 9 else MUTE)
+        t.append(score, style="bold " + OK if (self._header_score or 0) >= 9 else MUTE)
         self.header.update(t)
 
     # ── home: at most three scored rows, exclusions enforced ─────────
@@ -1211,6 +1214,9 @@ class ProductTeamApp(App):
                     rows.insert(0, row)
                     break
         rows = rows[:3]
+        if mapped is None:
+            self._header_score = float(rows[0]["overall"]) if rows else None
+            self._render_header()
         if not rows:
             self.transcript.write(
                 Text("No scored sessions yet — bench <client> to score", style=MUTE)
@@ -1276,15 +1282,14 @@ class ProductTeamApp(App):
         self.composer.focus()
 
     def cycle_role(self, delta: int) -> None:
-        """Left/Right on the chips row move focus between the role chips
-        and preview the target. Focus/preview never pins — pinning happens
-        on click/Enter/Space (L6)."""
+        """Left/Right on the chips row move focus only. Target, pin,
+        prefix, and routing change only when a role is activated."""
         if len(self._ROLE_CHIP_ORDER) < 2:
             return
-        idx = self._ROLE_CHIP_ORDER.index(self._target_role)
+        focused = self.focused
+        role = focused._role if isinstance(focused, RoleChip) else self._target_role
+        idx = self._ROLE_CHIP_ORDER.index(role)
         role = self._ROLE_CHIP_ORDER[(idx + delta) % len(self._ROLE_CHIP_ORDER)]
-        self._target_role = role
-        self._render_chips()
         self.query_one(f"#role-{role.lower()}", RoleChip).focus()
 
     @property
