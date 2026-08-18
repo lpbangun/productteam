@@ -1,0 +1,6 @@
+Workflow completed with 1 child run(s). Return: {
+  "key": "iter-2-score",
+  "ok": true,
+  "agent": "reviewer",
+  "runId": "28bfdc80",
+  "output": "# Reviewer handoff — iter-2 score\n\nIndependent score of `tui-fidelity-20260818` / `iter-2` against the immutable freeze.\nNo app/product, test, snapshot, freeze, or source-page edits.\n\n## Freeze\n\n- File: `state/harness-evolution/runs/tui-fidelity-20260818/frozen-benchmark.md`\n- Live `sha256sum`: `da6335f2a7c100ee4a0f4a46c117986ddb1edf6adbe7a13e198c5dbd70794acd`\n- Matches `FREEZE-SHA.txt` and `iter-2/freeze-sha-verified.txt`\n\n## Files written by this review\n\n- `state/harness-evolution/runs/tui-fidelity-20260818/iter-2/scores.json`\n- `state/harness-evolution/runs/tui-fidelity-20260818/iter-2/reviewer-gate.md`\n- this file\n\nProduct / test diff inspected: iter-2 worker changed only `lib/tui/tests/test_all_verbs.py` and `lib/tui/tests/test_slash.py` (L8/L10/L17 test-contract retarget). Parent `iter-2/diff-stat.txt` is the cumulative worktree TUI delta vs HEAD (app/theme/layout/ Trace: 2 event(s).

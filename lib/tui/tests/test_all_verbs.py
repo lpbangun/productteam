@@ -7,7 +7,7 @@ import re
 import adapter
 from app import ProductTeamApp
 
-HOME_ROW_RE = re.compile(r"^\s*(\d+\.\d)\s+(\S+)(.*)$", re.M)
+HOME_ROW_RE = re.compile(r"^\s*●\s+(\S+)\s+…+\s+(\d+\.\d)(.*)$", re.M)
 
 VALID_ARGS = {
     "bench": "harness-cli",
@@ -61,7 +61,11 @@ async def _boot_home(pilot, app):
         await pilot.pause()
     for _ in range(600):
         text = app.transcript_text()
-        if HOME_ROW_RE.search(text) or "No scored sessions yet" in text:
+        if (
+            HOME_ROW_RE.search(text)
+            or "No scored sessions yet" in text
+            or "no installed agent" in text  # L10 no-provider first-run
+        ):
             return
         await pilot.pause()
     raise AssertionError("home projection never seeded")

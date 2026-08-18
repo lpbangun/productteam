@@ -1,0 +1,11 @@
+--- compressed first paint 80x24 ---
+▣─▣─▣ ProductTeam · exp-tui-migration · —
+● osint-loop-research …… 9.5
+● onboarding-flight-control …… 9.5
+● harness-cli …… 9.5
+◆ Principal ◇ Analyst ▸ Builder ◉ Critic
+PREFIX=''
+enter send · / commands · tab agents
+=== FAIL LIST ===
+=== 0 FAIL(S) ===
+EXIT_CODE=0

@@ -41,7 +41,7 @@ SNAPSHOT_DIR = Path(__file__).resolve().parent / "__snapshots__"
 HEX_RE = re.compile(r"#[0-9a-fA-F]{6}")
 ANSI_ACCENT_RE = re.compile(r"\\e\[(?:3[0-7]|9[0-7])m")
 BANNED_ENGAGEMENT = ("smoke", "run-loop", "gate-smoke", "overnight-rehears")
-HOME_ROW_RE = re.compile(r"^\s*(\d+\.\d)\s+(\S+)(.*)$", re.M)
+HOME_ROW_RE = re.compile(r"^\s*●\s+(\S+)\s+…+\s+(\d+\.\d)(.*)$", re.M)
 
 
 async def _run_size(width, height):
@@ -119,7 +119,7 @@ def test_home_seed_filtered():
             text = await _boot_home(pilot, app)
             rows = HOME_ROW_RE.findall(text)
             assert 1 <= len(rows) <= 3, f"home must show at most three scored rows: {rows}"
-            for _score, name, _rest in rows:
+            for name, _score, _rest in rows:
                 low = name.lower()
                 assert not any(b in low for b in BANNED_ENGAGEMENT), (
                     f"banned engagement seeded into home: {name}"
@@ -155,7 +155,7 @@ def test_home_empty_copy_when_no_scored(monkeypatch):
             assert "Product Consulting Harness" not in text
             assert "Product Judgment Layer" not in text
             assert "not scored" not in text
-            assert "@Principal" in str(app.query_one("#role-prefix", Static).render())
+            assert "@" not in str(app.query_one("#role-prefix", Static).render())
             assert str(app.query_one("#footer", Static).render()) == (
                 "enter send · / commands · tab agents"
             )
@@ -241,9 +241,9 @@ def test_home_recency_mtime_order(tmp_path, monkeypatch):
         async with app.run_test(size=(80, 24)) as pilot:
             text = await _boot_home(pilot, app)
             rows = HOME_ROW_RE.findall(text)
-            names = [name for _score, name, _rest in rows]
+            names = [name for name, _score, _rest in rows]
             assert names == ["here-client", "new-client", "mid-client"], names
-            assert [score for score, _name, _rest in rows] == ["8.5", "9.0", "8.9"]
+            assert [score for _name, score, _rest in rows] == ["8.5", "9.0", "8.9"]
             assert len(rows) == 3, "cap stays three"
             for absent in ("lex-client", "old-client", "smoke-client", "idle-client"):
                 assert absent not in names, f"{absent} must not seed home"
@@ -279,7 +279,7 @@ def test_home_recency_numeric_and_client_tiebreak(tmp_path, monkeypatch):
         app = ProductTeamApp()
         async with app.run_test(size=(80, 24)) as pilot:
             text = await _boot_home(pilot, app)
-            names = [name for _score, name, _rest in HOME_ROW_RE.findall(text)]
+            names = [name for name, _score, _rest in HOME_ROW_RE.findall(text)]
             assert names == ["tie-b", "tie-a", "name-a"], names
 
     asyncio.run(run())
@@ -516,9 +516,10 @@ def test_role_chips_focusable_and_selectable():
         app._start_provider_turn = lambda prompt: None  # presentation-only slice
         async with app.run_test(size=(80, 24)) as pilot:
             await _boot_home(pilot, app)
-            assert app._target_role == "Principal", "idle home defaults to Principal"
+            assert app._target_role == "Principal", "team briefs still route through Principal"
+            assert app._pinned is False, "idle home is team mode — no pinned role"
             prefix = app.query_one("#role-prefix")
-            assert "@Principal" in str(prefix.render()), "composer shows @Role chrome"
+            assert "@" not in str(prefix.render()), "team mode shows no @Role chrome"
             for role in ("principal", "analyst", "builder", "critic"):
                 chip = app.query_one(f"#role-{role}", Static)
                 assert chip.can_focus, f"{role} chip must be focusable"
@@ -538,6 +539,15 @@ def test_role_chips_focusable_and_selectable():
             assert app._target_role == "Critic", "click selects the clicked role"
             assert "@Critic" in str(prefix.render())
             assert app.focused is app.composer, "click selection restores composer focus"
+            # L6: a second activation on the already-pinned chip unpins back
+            # to team — prefix collapses (width 0), no @Role chrome.
+            await pilot.click("#role-critic")
+            await pilot.pause()
+            assert app._pinned is False, "second click on the pinned chip unpins"
+            assert "@" not in str(prefix.render()), "unpinned prefix carries no @Role"
+            assert str(prefix.styles.width) in ("0", "0w", "0h"), (
+                f"unpinned prefix must collapse to width 0: {prefix.styles.width!r}")
+            assert app.focused is app.composer
 
     asyncio.run(run())
 
@@ -858,15 +868,18 @@ def test_ask_dock_single_exact_question_and_answer(tmp_path, monkeypatch):
             assert _turn_has_hue(app, "▸ Builder", BUILDER), (
                 "question turn must carry the Builder identity hue"
             )
-            # labels + mute descriptions + recommended mark + defaults
-            row0 = _ask_dock_row(app, 0)
-            assert "Label + rail" in row0.plain and "★" in row0.plain
+            # labels + mute descriptions + literal recommended + defaults
+            title = _ask_dock_row(app, 0)
+            assert "Ask" in title.plain and "1 of 2" in title.plain, title.plain
+            row0 = _ask_dock_row(app, 1)
+            assert "Label + rail" in row0.plain and "recommended" in row0.plain
+            assert "★" not in row0.plain, "L16: the literal word replaces ★"
             assert "Color the role label, chip, and 2px turn rail." in row0.plain
             assert "bold" in [s.style for s in row0.spans], "recommended label is bold"
             assert row0.plain.startswith("●"), "default option shows the selected marker"
-            row1 = _ask_dock_row(app, 1)
+            row1 = _ask_dock_row(app, 2)
             assert "Label only" in row1.plain and "Keep the rail neutral." in row1.plain
-            assert "★" not in row1.plain
+            assert "recommended" not in row1.plain
             assert "bold" not in [s.style for s in row1.spans]
             # live k of n + arrows + Space (single selects the highlighted id)
             assert str(app.query_one("#footer").render()) == (
@@ -880,7 +893,7 @@ def test_ask_dock_single_exact_question_and_answer(tmp_path, monkeypatch):
             await pilot.press("space")
             await pilot.pause()
             assert app._ask_selection == ["label-only"]
-            assert app.dock.highlighted == 1
+            assert app.dock.highlighted == 2
             # Enter atomically persists the structured answer and closes
             await pilot.press("enter")
             await pilot.pause()
@@ -1428,7 +1441,7 @@ def test_splash_idle_neutral_and_exact_art(monkeypatch):
                 f"composer too narrow under the splash: {composer.region.width}")
             assert composer.region.height > 0
             assert footer.region.height == 1 and footer.region.width > 0
-            assert "@Principal" in str(app.query_one("#role-prefix", Static).render())
+            assert "@" not in str(app.query_one("#role-prefix", Static).render())
             assert str(footer.render()) == "enter continue · any key skip"
             # exact art: 39-column wide join of the three 11-column heads
             text = splash.render()
@@ -1442,7 +1455,7 @@ def test_splash_idle_neutral_and_exact_art(monkeypatch):
             assert lines[0] == "     |             |             |     "
             assert lines[0] == joined[0]
             assert lines[1] == "    /^\\           /^\\           /^\\    "
-            assert lines[5] == "    / \\            ◇             ▸     "
+            assert lines[5] == "     #             o             >     "
             assert lines[6] == " Principal      Analyst       Builder  "
             assert lines[7] == ""
             assert lines[8] == "ProductTeam"
@@ -1476,9 +1489,9 @@ def test_splash_stepper_glow_order_one_ok_head(monkeypatch):
     MUTE — observed on the widget's displayed spans."""
     monkeypatch.delenv("CONSULT_NO_SPLASH", raising=False)
     distinct = {
-        "Principal": ("    / \\    ", " Principal "),
-        "Analyst": ("     ◇     ", "  Analyst  "),
-        "Builder": ("     ▸     ", "  Builder  "),
+        "Principal": ("     #     ", " Principal "),
+        "Analyst": ("     o     ", "  Analyst  "),
+        "Builder": ("     >     ", "  Builder  "),
     }
 
     async def run():
@@ -1513,9 +1526,11 @@ def test_splash_stepper_glow_order_one_ok_head(monkeypatch):
 
 
 def test_splash_natural_finish_home_and_focus(monkeypatch):
-    """D16: the fifth advance finishes naturally — splash hidden,
-    transcript unhidden with the seeded home (never splash art), idle
-    footer, composer focus restored; a further advance is a no-op."""
+    """L1/D01: the splash never auto-finishes — the glow stepper wraps
+    Principal → Analyst → Builder → Principal forever; Enter (continue)
+    finishes it, the seeded home shows (never splash art), the idle footer
+    returns, composer focus restores; a further advance after the finish
+    is a no-op."""
     monkeypatch.delenv("CONSULT_NO_SPLASH", raising=False)
 
     async def run():
@@ -1524,10 +1539,18 @@ def test_splash_natural_finish_home_and_focus(monkeypatch):
         async with app.run_test(size=(80, 24)) as pilot:
             if app._splash_timer is not None:
                 app._splash_timer.stop()
-            for _ in range(5):
+            for _ in range(6):
                 ProductTeamApp._splash_advance(app)
             await pilot.pause()
-            assert app._splash_step == 5 and not app._splash_active
+            assert app._splash_active, (
+                "the splash must persist past the old fifth tick")
+            assert app._splash_step == 2, (
+                f"glow wraps 1..4, got step {app._splash_step}")
+            assert app.splash.has_class("visible")
+            assert app.transcript.has_class("splashed")
+            await pilot.press("enter")
+            await pilot.pause()
+            assert not app._splash_active
             assert not app.splash.has_class("visible")
             assert not app.transcript.has_class("splashed")
             assert str(app.query_one("#footer", Static).render()) == (
@@ -1540,7 +1563,7 @@ def test_splash_natural_finish_home_and_focus(monkeypatch):
                 "finish leaves no splash art in the transcript")
             # the finished splash is idempotent: further advances do nothing
             ProductTeamApp._splash_advance(app)
-            assert app._splash_step == 5 and not app._splash_active
+            assert not app._splash_active
             assert not app.splash.has_class("visible")
             assert "/^\\" not in app.transcript_text()
 
@@ -1859,5 +1882,108 @@ def test_splash_ctrl_p_palette_guard(monkeypatch):
             assert str(app.query_one("#footer", Static).render()) == (
                 "enter send · / commands · tab agents"
             )
+
+    asyncio.run(run())
+
+
+# ── iter-1 fidelity locks (L8/L10/L12/L14) ──────────────────────────
+
+def test_home_row_lock_shape():
+    """L8: each scored home row is exactly `● {client} …… {score:.1f}` —
+    bullet, name, leader dots, score last; no iter/trend metadata."""
+    app = ProductTeamApp()
+    assert app._home_row({"client": "harness-cli", "overall": 9.5}).plain == (
+        "● harness-cli …… 9.5")
+    assert app._home_row({"client": "agcode-learning", "overall": 8.3}).plain == (
+        "● agcode-learning …… 8.3")
+
+
+def test_compact_chips_single_plus_count(tmp_path, monkeypatch):
+    """L12: at 40 columns exactly one identity chip renders with the
+    hidden count (`◆ Principal +3`); 80 columns restores all four."""
+    monkeypatch.setenv("CONSULT_STATE_ROOT", str(tmp_path / "state"))
+
+    async def run():
+        app = ProductTeamApp()
+        async with app.run_test(size=(40, 20)) as pilot:
+            for _ in range(300):
+                if app.transcript_text():
+                    break
+                await pilot.pause()
+            visible = [
+                r for r in ("principal", "analyst", "builder", "critic")
+                if str(app.query_one(f"#role-{r}", Static).styles.display) != "none"
+            ]
+            assert visible == ["principal"], visible
+            assert str(app.query_one("#role-principal", Static).render()).strip() == (
+                "◆ Principal +3")
+            await pilot.resize_terminal(80, 24)
+            await pilot.pause(0.25)
+            visible = [
+                r for r in ("principal", "analyst", "builder", "critic")
+                if str(app.query_one(f"#role-{r}", Static).styles.display) != "none"
+            ]
+            assert visible == ["principal", "analyst", "builder", "critic"], visible
+            assert "+3" not in str(app.query_one("#role-principal", Static).render())
+
+    asyncio.run(run())
+
+
+def test_chip_done_status_on_chip_and_card(tmp_path, monkeypatch):
+    """L14: after a role completes, its chip carries `✓` and the attached
+    completion card keeps its `✓` status."""
+    monkeypatch.setenv("CONSULT_STATE_ROOT", str(tmp_path / "state"))
+
+    async def run():
+        app = ProductTeamApp()
+        async with app.run_test(size=(80, 24)) as pilot:
+            await _boot_home(pilot, app)
+            app._active_turn_role = "Builder"
+            app._append_provider_chunk("done body\n")
+            await pilot.pause()
+            app._provider_done(0, str(tmp_path / "w12.txt"))
+            await pilot.pause()
+            chip = str(app.query_one("#role-builder", Static).render())
+            assert "✓" in chip, f"done chip must carry ✓: {chip!r}"
+            assert "✓ done" in app.transcript_text(), "card keeps its ✓ status"
+
+    asyncio.run(run())
+
+
+def test_no_provider_first_run_copy(monkeypatch):
+    """L10: an empty `agents --json` paints the locked no-provider
+    first-run copy and footer — not the status dump, not the scored-home
+    empty copy — even when scored sessions exist."""
+
+    def fake(args, **kw):
+        if list(args) == ["agents", "--json"]:
+            return subprocess.CompletedProcess(
+                args, 0, json.dumps({"agents": [], "installed": []}), "")
+        if list(args) == ["status", "--json"]:
+            return subprocess.CompletedProcess(args, 0, json.dumps({
+                "selected": None,
+                "engagements": [
+                    {"client": "harness-cli", "scored": True, "overall": 9.5,
+                     "last_iter": "iter-1", "trend": "+0.0", "desc": ""},
+                ],
+            }), "")
+        return subprocess.CompletedProcess(args, 0, "", "")
+
+    monkeypatch.setattr(adapter, "run_argv", fake)
+
+    async def run():
+        app = ProductTeamApp()
+        async with app.run_test(size=(80, 24)) as pilot:
+            for _ in range(300):
+                if app.transcript_text():
+                    break
+                await pilot.pause()
+            text = app.transcript_text()
+            assert "no installed agent" in text, text
+            assert "run /agents  or  productteam onboarding" in text, text
+            assert "harness-cli" not in text, (
+                "scored rows must not seed under the no-provider first-run")
+            assert str(app.query_one("#footer", Static).render()) == (
+                "/agents · /onboarding · /help")
 
     asyncio.run(run())

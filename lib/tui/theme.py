@@ -368,32 +368,35 @@ def split_evidence_line(line: str) -> tuple[str | None, str | None]:
 
 SPLASH_ROLES = ("Principal", "Analyst", "Builder")
 
+# Pure-ASCII heads only: `· ─ ◇ ▸ ▐▌ ═` have ambiguous or wide cell
+# advances and slant under real mono fonts. `| / \ ^ - _ o # >` are
+# exactly one cell in every terminal, so the three heads stay aligned.
 SPLASH_HEADS = {
     "Principal": (
         "     |     ",
         "    /^\\    ",
-        "   | · · | ",
-        "   |  ─  | ",
-        "     |     ",
-        "    / \\    ",
+        "   /---\\   ",
+        "  | o o |  ",
+        "  |  -  |  ",
+        "     #     ",
         " Principal ",
     ),
     "Analyst": (
         "     |     ",
         "    /^\\    ",
-        "   | · · | ",
-        "   |  ─  | ",
-        "     |     ",
-        "     ◇     ",
+        "   /---\\   ",
+        "  | o o |  ",
+        "  |  -  |  ",
+        "     o     ",
         "  Analyst  ",
     ),
     "Builder": (
         "     |     ",
         "    /^\\    ",
-        "   | · · | ",
-        "   |  ─  | ",
-        "     |     ",
-        "     ▸     ",
+        "   /---\\   ",
+        "  | o o |  ",
+        "  |  -  |  ",
+        "     >     ",
         "  Builder  ",
     ),
 }

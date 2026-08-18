@@ -1,0 +1,6 @@
+Workflow completed with 1 child run(s). Return: {
+  "key": "iter-2-test-contract",
+  "ok": true,
+  "agent": "worker",
+  "runId": "2efbc09c",
+  "output": "# Iteration 2 worker handoff — test-contract integration fix (D19)\n\n## Task\n\nApply only the reviewer-approved smallest test-contract fix for D19: retarget\nstale score-first home-row detection and stale confirm assertions in two test\nfiles to the frozen L8 / L10 / L17 chrome. No product code was touched.\n\n## Changed files (scope-limited to the two test files)\n\n- `lib/tui/tests/test_all_verbs.py`\n- `lib/tui/tests/test_slash.py`\n\n## Diff summary\n\n1. `test_all_verbs.py`:\n   - `HOME_ROW_RE` retargeted from stale score-first\n     `^\\s*(\\d+\\.\\d)\\s+(\\S+)(.*)$` to the frozen L8 shape\n     `^\\s*●\\s+(\\S+)\\s+…+\\s+(\\d+\\.\\d)(.*)$` (identical to `test_layout.py`).\n   - `_boot_home` now also accepts the mandatory L10 `no installed agent`\n     first-run copy as a valid seeded boot state.\n2. `test_slash.py`:\n   - `HOME_ROW_RE` retargeted to the same L8 shape (used Trace: 2 event(s).

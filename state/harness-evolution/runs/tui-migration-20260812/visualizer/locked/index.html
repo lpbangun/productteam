@@ -161,9 +161,9 @@ figcaption b{color:var(--text);font-weight:600}
     <div class="row"><span class="k">R4 confirm</span><span class="v">confirm dock before chat-supported writes (/gh merge, /checks --allow-dirty, /onboarding --yes).</span></div>
     <div class="row"><span class="k">R5 toasts</span><span class="v">done = card on the turn. fail/interrupt = toast + error card. session verbs = mute toast.</span></div>
     <div class="row"><span class="k">R6 footer</span><span class="v">idle = hints. busy = facts (interrupt, elapsed, provider). Ask/slash replace hints while those docks are open.</span></div>
-    <div class="row"><span class="k">R7 splash</span><span class="v">futuristic angular line-art heads, once, then cockpit. Idle all-neutral. Live-boot glow cycles Principal → Analyst → Builder → Principal. Ships as ASCII. Not the six-node graph. Not ROBOTS_MARK half-blocks.</span></div>
+    <div class="row"><span class="k">R7 splash</span><span class="v">futuristic angular line-art heads, once, then cockpit. Idle all-neutral. Live-boot glow cycles Principal → Analyst → Builder → Principal (one at a time). Ships as ASCII identical 11×7 bodies with # / o / > marks (not distinct silhouettes). Splash-only plane: hide header and chips; composer and footer stay. Persist until Enter continue or any key skip — do not auto-finish. Not the six-node graph. Not ROBOTS_MARK half-blocks.</span></div>
     <div class="row"><span class="k">R8 home</span><span class="v">home rows are display only. Header follows cwd. No project picker.</span></div>
-    <div class="row"><span class="k">target</span><span class="v">chips focusable. Composer shows @Role. Session-local. Pass role as argv to provider_turn.sh. Idle home defaults to @Principal. Stop hardcoding Analyst.</span></div>
+    <div class="row"><span class="k">target</span><span class="v">chips focusable/clickable. Click pins that role (composer shows @Role in the role hue). Click the already-pinned chip to unpin back to team. Default is team chat — no @Role tag; #role-prefix width collapses to zero when unpinned; bare text briefs the whole ProductTeam (Principal coordinates under the hood). Session-local. Pass the pinned role as argv to provider_turn.sh. Stop hardcoding Analyst.</span></div>
     <div class="row"><span class="k">defaults</span><span class="v">dim timestamps on turns. Copy is a session verb, not chrome. High-contrast is these tokens.</span></div>
   </div>
   <p class="dont">Do not: dump productteam status · put Thinking… in the transcript · cover the composer · put harness-cli or Directive in the header · use cyan / Textual primary · invent a workspace switcher · spawn a daemon · make productteam chat launch the TUI.</p>
@@ -189,7 +189,7 @@ figcaption b{color:var(--text);font-weight:600}
 
 <section id="boot">
   <h2>Boot splash · R7</h2>
-  <p class="note">Once, then the cockpit. Composer and footer stay visible. Live-boot subtitle names the currently glowing head.</p>
+  <p class="note">Once, then the cockpit. Splash-only plane (no header/chips). Composer and footer stay visible. Persist until Enter or any key. Live-boot subtitle names the currently glowing head.</p>
   <div class="grid">
     <figure>
       <figcaption><b>Idle boot</b><span class="locked">locked</span></figcaption>
@@ -276,7 +276,7 @@ figcaption b{color:var(--text);font-weight:600}
 
 <section id="open">
   <h2>Open · Q1 Q3 R8</h2>
-  <p class="note">Three recent scored sessions for this directory. No activity strip while idle. Home rows are not a picker. Default target Principal.</p>
+  <p class="note">Three recent scored sessions for this directory. No activity strip while idle. Home rows are not a picker. Team chat — no @Role tag by default.</p>
   <div class="grid">
     <figure>
       <figcaption><b>Idle home</b> · 80×24<span class="locked">locked</span></figcaption>
@@ -284,8 +284,8 @@ figcaption b{color:var(--text);font-weight:600}
         <div class="hdr"><span class="heads">▣─▣─▣</span>ProductTeam<span class="project dim"> · this repo · </span><span class="score">9.5</span></div>
         <div class="rule"></div>
         <div class="log top"><div class="home"><span>●</span><span>harness-cli</span><span class="s">9.5</span><span>●</span><span>agcode-learning</span><span class="s">8.3</span><span>●</span><span>onboarding-flight</span><span class="s">9.5</span></div></div>
-        <div class="chips"><span class="sel">◆ Principal</span><span>◇ Analyst</span><span>▸ Builder</span><span>◉ Critic</span></div>
-        <div class="composer">@Principal <span class="cursor">▍</span></div>
+        <div class="chips"><span>◆ Principal</span><span>◇ Analyst</span><span>▸ Builder</span><span>◉ Critic</span></div>
+        <div class="composer"><span class="cursor">▍</span></div>
         <div class="ftr">enter send · / commands · tab agents</div>
       </div>
     </figure>
@@ -377,7 +377,7 @@ The explicit 40-column mode is safer.
 <div class="card ok">✓ ◉ Critic · 6s · w13.txt</div></div></div></div>
         </div>
         <div class="chips"><span>◆ Principal</span><span>◇ Analyst</span><span class="done">✓ ▸ Builder</span><span class="done">✓ ◉ Critic</span></div>
-        <div class="composer">@Principal <span class="cursor">▍</span></div>
+        <div class="composer"><span class="cursor">▍</span></div>
         <div class="ftr">enter send · / commands · tab agents</div>
       </div>
     </figure>
@@ -421,7 +421,7 @@ The explicit 40-column mode is safer.
         <div class="hdr"><span class="heads">▣─▣─▣</span>ProductTeam<span class="project dim"> · this repo · </span><span class="score">9.5</span></div>
         <div class="rule"></div>
         <div class="log top"><div class="home"><span>●</span><span>harness-cli</span><span class="s">9.5</span><span>●</span><span>agcode-learning</span><span class="s">8.3</span><span>●</span><span>onboarding-flight</span><span class="s">9.5</span></div></div>
-        <div class="chips"><span class="sel">◆ Principal</span> ◇ Analyst ▸ Builder ◉ Critic</div>
+        <div class="chips"><span>◆ Principal</span> ◇ Analyst ▸ Builder ◉ Critic</div>
         <div class="dock">
           <div class="opt sel"><span class="k">›</span><span>/status</span><span>productteam status [--json]</span></div>
           <div class="opt"><span></span><span>/score</span><span>productteam score &lt;client&gt; --iter</span></div>
@@ -444,7 +444,7 @@ The explicit 40-column mode is safer.
 use the CLI: productteam gate &lt;client&gt; …</div></div></div>
           <div class="turn cmd"><div class="rail"></div><div><div class="role cmd">/score</div><div class="body dim">usage: productteam score &lt;client&gt; --iter &lt;n&gt;</div></div></div>
         </div>
-        <div class="chips"><span class="sel">◆ Principal</span> ◇ Analyst ▸ Builder ◉ Critic</div>
+        <div class="chips"><span>◆ Principal</span> ◇ Analyst ▸ Builder ◉ Critic</div>
         <div class="composer"><span class="cursor">▍</span></div>
         <div class="ftr">enter send · / commands · tab agents</div>
       </div>
@@ -470,7 +470,7 @@ use the CLI: productteam gate &lt;client&gt; …</div></div></div>
           <div class="ev-row"><span>·</span><span>iter-3/reviewer-gate.md</span></div>
           <div class="ev-row"><span>·</span><span>iter-3/pytest.txt</span></div>
         </div>
-        <div class="chips"><span class="sel">◆ Principal</span> ◇ Analyst ▸ Builder ◉ Critic</div>
+        <div class="chips"><span>◆ Principal</span> ◇ Analyst ▸ Builder ◉ Critic</div>
         <div class="composer"><span class="cursor">▍</span></div>
         <div class="ftr">↑↓ inspect · enter open · esc close</div>
       </div>
@@ -490,7 +490,7 @@ use the CLI: productteam gate &lt;client&gt; …</div></div></div>
         <div class="log">
           <div class="turn cmd"><div class="rail"></div><div><div class="role cmd">/gh merge</div><div class="body dim">this writes a GitHub merge. Confirm to run the real CLI.</div></div></div>
         </div>
-        <div class="chips"><span class="sel">◆ Principal</span> ◇ Analyst ▸ Builder ◉ Critic</div>
+        <div class="chips"><span>◆ Principal</span> ◇ Analyst ▸ Builder ◉ Critic</div>
         <div class="dock">
           <div class="ask-head">Confirm write <span class="count">1 of 1</span></div>
           <div class="ask-q">Run <b>productteam gh merge</b>?</div>
@@ -520,7 +520,7 @@ use the CLI: productteam gate &lt;client&gt; …</div></div></div>
 <div class="card err">✗ ▸ Builder · 4s · w14.txt</div></div></div></div>
         </div>
         <div class="chips"><span>◆ Principal</span><span>◇ Analyst</span><span class="fail">✗ ▸ Builder</span><span>◉ Critic</span></div>
-        <div class="composer">@Principal <span class="cursor">▍</span></div>
+        <div class="composer"><span class="cursor">▍</span></div>
         <div class="ftr">enter send · / commands · tab agents</div>
       </div>
     </figure>
@@ -531,8 +531,8 @@ use the CLI: productteam gate &lt;client&gt; …</div></div></div>
         <div class="hdr"><span class="heads">▣─▣─▣</span>ProductTeam<span class="project dim"> · this repo · </span><span class="score">9.5</span></div>
         <div class="rule"></div>
         <div class="log top"><div class="home"><span>●</span><span>harness-cli</span><span class="s">9.5</span><span>●</span><span>agcode-learning</span><span class="s">8.3</span><span>●</span><span>onboarding-flight</span><span class="s">9.5</span></div></div>
-        <div class="chips"><span class="sel">◆ Principal</span> ◇ Analyst ▸ Builder ◉ Critic</div>
-        <div class="composer">@Principal <span class="cursor">▍</span></div>
+        <div class="chips"><span>◆ Principal</span> ◇ Analyst ▸ Builder ◉ Critic</div>
+        <div class="composer"><span class="cursor">▍</span></div>
         <div class="ftr">enter send · / commands · tab agents</div>
       </div>
     </figure>
@@ -572,7 +572,7 @@ use the CLI: productteam gate &lt;client&gt; …</div></div></div>
         <div class="log top"><div class="dim">no installed agent
 run /agents  or  productteam onboarding</div></div>
         <div class="chips">◆ Principal ◇ Analyst ▸ Builder ◉ Critic</div>
-        <div class="composer">@Principal <span class="cursor">▍</span></div>
+        <div class="composer"><span class="cursor">▍</span></div>
         <div class="ftr">/agents · /onboarding · /help</div>
       </div>
     </figure>
@@ -582,10 +582,10 @@ run /agents  or  productteam onboarding</div></div>
         <div class="hdr"><span class="heads">▣─▣─▣</span>ProductTeam<span class="project dim"> · this repo · </span><span class="score">—</span></div>
         <div class="rule"></div>
         <div class="log top"><div class="dim">no scored sessions in this directory
-bare text talks to the selected role
+bare text briefs the whole team
 /help lists commands</div></div>
-        <div class="chips"><span class="sel">◆ Principal</span> ◇ Analyst ▸ Builder ◉ Critic</div>
-        <div class="composer">@Principal <span class="cursor">▍</span></div>
+        <div class="chips"><span>◆ Principal</span> ◇ Analyst ▸ Builder ◉ Critic</div>
+        <div class="composer"><span class="cursor">▍</span></div>
         <div class="ftr">enter send · / commands</div>
       </div>
     </figure>

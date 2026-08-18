@@ -288,9 +288,10 @@ def test_pty_confirm_cancel_keeps_composer():
         assert wait_delta(fd, out, 0, "↑↓ choose · enter run · esc cancel"), \
             "confirm footer shown for the intercepted write"
         txt = _strip_ansi(b"".join(out)).decode("utf-8", "replace")
-        assert "Run /gh merge" in txt, "confirm dock shows the Run option"
-        assert "Cancel" in txt, "confirm dock shows the Cancel option"
-        assert "@Principal" in txt, "composer @Principal prefix on screen"
+        assert "Confirm write" in txt, "confirm dock shows the Confirm write title"
+        assert "Run" in txt and "Cancel" in txt, "confirm dock shows Run / Cancel options"
+        assert "/gh merge" in txt, "the intercepted verb echo stays in the transcript"
+        assert "@Principal" not in txt, "team mode shows no default @Role tag"
         _drain(fd, out, 0.5)
         mark = len(_strip_ansi(b"".join(out)))
         _send(fd, "\x1b")  # Esc cancels the write: executes nothing
@@ -359,7 +360,8 @@ def test_pty_sigwinch_compact():
         assert b"ProductTeam" in compact
         assert "▣─▣─▣".encode() not in compact
         assert cwd not in compact
-        assert b"@Principal" in compact
+        assert b"@Principal" not in compact, "team mode shows no default @Role tag"
+        assert b"enter send" in compact, "composer + idle footer retained at compact"
 
         mark = len(_strip_ansi(b"".join(out)))
         fcntl.ioctl(fd, termios.TIOCSWINSZ, struct.pack("HHHH", 24, 80, 0, 0))

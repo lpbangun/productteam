@@ -13,7 +13,7 @@ import pytest
 import adapter
 from app import ProductTeamApp
 
-HOME_ROW_RE = re.compile(r"^\s*(\d+\.\d)\s+(\S+)(.*)$", re.M)
+HOME_ROW_RE = re.compile(r"^\s*●\s+(\S+)\s+…+\s+(\d+\.\d)(.*)$", re.M)
 
 FAKE_HELP = {
     "contract": "cli-interface-20260812-v3",
@@ -405,8 +405,12 @@ async def _confirm_open(pilot, app):
     assert app._dock_kind == "confirm", "write intercept opens the confirm dock"
     assert app.dock_visible()
     assert str(app.query_one("#footer").render()) == "↑↓ choose · enter run · esc cancel"
-    texts = [app.dock.get_option_at_index(i).prompt.plain for i in range(2)]
-    assert texts[1] == "Cancel"
+    texts = [app.dock.get_option_at_index(i).prompt.plain for i in range(3)]
+    assert "Confirm write" in texts[0] and "1 of 2" in texts[0]
+    assert texts[1].startswith("● Run"), texts[1]
+    assert "argv to bin/productteam. Output streams as a Command turn." in texts[1]
+    assert texts[2].startswith("○ Cancel"), texts[2]
+    assert "Nothing is spawned." in texts[2]
 
 
 def test_confirm_run_exact_argv_for_all_three_intercepts(fake_env):
@@ -426,7 +430,8 @@ def test_confirm_run_exact_argv_for_all_three_intercepts(fake_env):
                 await pilot.press("enter")
                 await pilot.pause()
                 await _confirm_open(pilot, app)
-                assert app.dock.get_option_at_index(0).prompt.plain == f"Run {slash}"
+                assert "Confirm write" in app.dock.get_option_at_index(0).prompt.plain
+                assert app.dock.get_option_at_index(1).prompt.plain.startswith("● Run")
                 await pilot.press("enter")  # Run is default-highlighted
                 ok = await _wait_for(pilot, lambda: spawns[-1:] == [expected], timeout=5)
                 assert ok, f"Run must execute the exact original argv: {spawns}"

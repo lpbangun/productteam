@@ -51,6 +51,8 @@ from theme import (
     role_tag,
     splash_render,
     split_evidence_line,
+    status_glyph,
+    status_style,
     turn,
 )
 
@@ -152,9 +154,14 @@ RoleChip:focus {{
 }}
 #role-prefix {{
     height: 3;
+    width: 0;
+    padding: 0;
+    background: {FIELD};
+    overflow: hidden;
+}}
+#role-prefix.pinned {{
     width: 12;
     padding: 0 0 0 1;
-    background: {FIELD};
 }}
 #composer {{
     height: 3;
@@ -172,6 +179,12 @@ RoleChip:focus {{
     color: {MUTE};
     padding: 0 1;
     background: {CANVAS};
+}}
+#header.splashed,
+#rule.splashed,
+#activity.splashed,
+#chips.splashed {{
+    display: none;
 }}
 """
 
@@ -250,15 +263,24 @@ class RoleChip(Static):
 
     def _refresh(self) -> None:
         app: "ProductTeamApp" = self.app
-        active = self._focused or app._target_role == self._role
+        active = self._focused or (app._pinned and app._target_role == self._role)
         tag = role_tag(self._role, active=active)
-        if self._lead:
-            t = Text()
+        status = app._role_status.get(self._role)
+        t = Text()
+        if status:
+            # L14: a completed/failed role carries ✓/✗ on its chip too.
+            t.append(status_glyph(status), style=status_style(status))
             t.append(" ")
             t.append_text(tag)
-            self.update(t)
         else:
-            self.update(tag)
+            if self._lead:
+                t.append(" ")
+            t.append_text(tag)
+        # L12: at <=40 columns exactly one identity renders with the hidden
+        # count (`{glyph} {role} +N`); the other chips are display:none.
+        if app.size.width <= 40 and self.styles.display != "none":
+            t.append(f" +{len(app._ROLE_CHIP_ORDER) - 1}", style=MUTE)
+        self.update(t)
 
     def on_mount(self) -> None:
         self._refresh()
@@ -328,6 +350,7 @@ class ProductTeamApp(App):
         self._alive = True
         self._cli_busy = False
         self._target_role = "Principal"
+        self._pinned = False  # team mode by default; a chip or typed @Role pins
         self._active_turn_role = "Principal"
         self._provider_speech_opened = False
         self._activity_session_dir = (
@@ -356,6 +379,10 @@ class ProductTeamApp(App):
         self._splash_active = False
         self._splash_step = 0
         self._splash_timer = None
+        # L14: per-role completion status for the chip row (done/failed).
+        self._role_status: dict[str, str] = {}
+        # L10: first-run no-provider flag, set by the seed thread.
+        self._no_provider = False
 
     # ── compose / mount ──────────────────────────────────────────────
     def compose(self) -> ComposeResult:
@@ -561,7 +588,7 @@ class ProductTeamApp(App):
                 n = len(self._ask_options)
                 if self._ask_mode == "single":
                     idx = self.dock.highlighted
-                    k = 0 if idx is None else min(idx + 1, n)
+                    k = 0 if idx is None else min(max(idx, 1), n)
                     verb = "select"
                 else:
                     k = len(self._ask_selection)
@@ -580,7 +607,10 @@ class ProductTeamApp(App):
             return
         busy = self._provider_active or bool(self._live_activity_rows())
         if not busy:
-            footer.update("enter send · / commands · tab agents")
+            if self._no_provider:
+                footer.update("/agents · /onboarding · /help")
+            else:
+                footer.update("enter send · / commands · tab agents")
             return
         elapsed, provider = self._busy_context()
         if self.size.width <= 40:
@@ -606,6 +636,7 @@ class ProductTeamApp(App):
         self._activity_spinner = (self._activity_spinner + 1) % 10
         self._render_activity()
         self._render_footer()
+        self._render_chips()
         self._render_header()
     def on_resize(self, event: events.Resize) -> None:
         # Resize is chrome-only: preserve the current focus target. It
@@ -613,6 +644,7 @@ class ProductTeamApp(App):
         # keeps #splash hidden; the stepper repaints on its own ticks).
         self._render_header()
         self._render_activity()
+        self._render_chips()
         self._render_footer()
 
 
@@ -627,31 +659,38 @@ class ProductTeamApp(App):
     # _splash_advance directly.
 
     def _splash_show(self) -> None:
-        """Paint the idle splash now and start the 0.4s glow stepper."""
+        """Paint the idle splash now and start the 0.4s glow stepper. L2
+        splash-only plane: header, rule, activity, and chips are hidden
+        while the splash lives; the composer and footer stay visible."""
         self._splash_active = True
         self._splash_step = 0
         self.splash.update(splash_render(self.size.width, None))
         self.splash.add_class("visible")
         self.transcript.add_class("splashed")
+        for wid in ("header", "rule", "activity", "chips"):
+            try:
+                self.query_one(f"#{wid}").add_class("splashed")
+            except Exception:
+                pass
         self._render_footer()
         self._splash_timer = self.set_interval(0.4, self._splash_advance)
 
     def _splash_advance(self) -> None:
-        """One stepper tick: next glow, then finish on the fifth advance.
-        A no-op once the splash has finished."""
+        """One stepper tick: the glow cycles Principal → Analyst → Builder
+        → Principal (steps 1..4 wrap forever). L1: never auto-finishes —
+        the splash persists until Enter (continue) or any other key
+        (skip)."""
         if not self._splash_active:
             return
-        self._splash_step += 1
-        if self._splash_step >= 5:
-            self._splash_finish()
-            return
+        self._splash_step = (self._splash_step % 4) + 1
         glow = SPLASH_ROLES[(self._splash_step - 1) % len(SPLASH_ROLES)]
         self.splash.update(splash_render(self.size.width, glow))
 
     def _splash_finish(self) -> None:
         """Hide the splash and restore the idle cockpit. Idempotent; shared
-        by any-key skip, Ctrl+C, and natural finish. Never clears or writes
-        the transcript — the seeded home simply becomes visible."""
+        by any-key skip, Enter continue, Ctrl+C, and other skip bindings.
+        Never clears or writes the transcript — the seeded home simply
+        becomes visible."""
         if not self._splash_active:
             return
         if self._splash_timer is not None:
@@ -660,6 +699,11 @@ class ProductTeamApp(App):
         self._splash_active = False
         self.splash.remove_class("visible")
         self.transcript.remove_class("splashed")
+        for wid in ("header", "rule", "activity", "chips"):
+            try:
+                self.query_one(f"#{wid}").remove_class("splashed")
+            except Exception:
+                pass
         self.composer.focus()
         self._render_footer()
 
@@ -795,20 +839,36 @@ class ProductTeamApp(App):
         self._render_ask_dock()
 
     def _render_ask_dock(self, highlight: int | None = None) -> None:
-        self.dock.set_options(
-            [self._ask_option_row(i) for i in range(len(self._ask_options))]
-        )
+        """OMP ask chrome (L16): row 0 is the title `Ask · k of n`, rows
+        1..n are the options. The dock stays above the composer, which
+        keeps focus."""
+        options = [self._ask_title_row()]
+        options += [self._ask_option_row(i) for i in range(len(self._ask_options))]
+        self.dock.set_options(options)
         self.dock.add_class("visible")
         idx = self.dock.highlighted if highlight is None else highlight
         if idx is None:
-            idx = 0
-        self.dock.highlighted = max(0, min(len(self._ask_options) - 1, idx))
+            idx = 1
+        self.dock.highlighted = max(1, min(len(self._ask_options), idx))
         self.composer.focus()
         self._render_footer()
 
+    def _ask_title_row(self) -> Option:
+        """Mute title row: `Ask · {k} of {n}` — the in-dock live count."""
+        n = len(self._ask_options)
+        if self._ask_mode == "multi":
+            k = len(self._ask_selection)
+        else:
+            k = 1 if self._ask_selection else 0
+        t = Text()
+        t.append("Ask", style="bold")
+        t.append(f" · {k} of {n}", style=MUTE)
+        return Option(t, "_ask_title")
+
     def _ask_option_row(self, index: int) -> Option:
         """One ask row: selection marker, label (bold when recommended or in
-        default), recommended mark, then a mute description line."""
+        default), the literal `recommended` mark (never ★), then a mute
+        description line."""
         opt = self._ask_options[index]
         oid = opt["id"]
         selected = oid in self._ask_selection
@@ -818,7 +878,7 @@ class ProductTeamApp(App):
         t.append("● " if selected else "○ ", style=OK if selected else MUTE)
         t.append(opt["label"], style="bold" if (recommended or in_default) else None)
         if recommended:
-            t.append("  ★", style=OK)
+            t.append("  recommended", style=OK)
         t.append("\n")
         t.append("   ", style=MUTE)
         t.append(opt["description"], style=MUTE)
@@ -830,9 +890,9 @@ class ProductTeamApp(App):
         if self._dock_kind != "ask" or not self._ask_options:
             return
         idx = self.dock.highlighted
-        if idx is None or idx >= len(self._ask_options):
+        if idx is None or idx < 1 or idx > len(self._ask_options):
             return
-        oid = self._ask_options[idx]["id"]
+        oid = self._ask_options[idx - 1]["id"]
         if self._ask_mode == "single":
             self._ask_selection = [oid]
         elif oid in self._ask_selection:
@@ -888,27 +948,42 @@ class ProductTeamApp(App):
     )
 
     def _open_confirm(self, verb: str, args: str, argv: list[str]) -> None:
-        """Open the single #dock in confirm state: `Run /verb args`
-        (default highlighted) and `Cancel`. Does not call _exec_cli yet."""
+        """Open the single #dock in confirm state (L17): title row
+        `Confirm write · 1 of 2`, then `Run` (default highlighted) and
+        `Cancel` with the locked descriptions. Does not call _exec_cli
+        yet."""
         self._dock_kind = "confirm"
         self._confirm_argv = argv
         self._confirm_label = f"/{verb}" + (f" {args}" if args else "")
+        title = Text()
+        title.append("Confirm write", style="bold")
+        title.append(" · 1 of 2", style=MUTE)
         run_t = Text()
-        run_t.append("Run ", style=OK)
-        run_t.append(self._confirm_label, style=TEXT)
-        cancel_t = Text("Cancel", style=TEXT)
-        self.dock.set_options([Option(run_t, "run"), Option(cancel_t, "cancel")])
+        run_t.append("● ", style=OK)
+        run_t.append("Run", style="bold")
+        run_t.append("\n   ", style=MUTE)
+        run_t.append("argv to bin/productteam. Output streams as a Command turn.", style=MUTE)
+        cancel_t = Text()
+        cancel_t.append("○ ", style=MUTE)
+        cancel_t.append("Cancel", style=TEXT)
+        cancel_t.append("\n   ", style=MUTE)
+        cancel_t.append("Nothing is spawned.", style=MUTE)
+        self.dock.set_options([
+            Option(title, "_confirm_title"),
+            Option(run_t, "run"),
+            Option(cancel_t, "cancel"),
+        ])
         self.dock.add_class("visible")
-        self.dock.highlighted = 0
+        self.dock.highlighted = 1
         self.composer.focus()
         self._render_footer()
 
     def _confirm_choice(self) -> None:
-        """Enter on the confirm dock: Run (highlighted) executes the stored
-        original argv — never re-tokenized, never rewritten; Cancel
-        (highlighted) executes nothing."""
+        """Enter on the confirm dock: Run (highlighted != 2) executes the
+        stored original argv — never re-tokenized, never rewritten; Cancel
+        (highlighted == 2) executes nothing."""
         argv = self._confirm_argv
-        run = self.dock.highlighted != 1
+        run = self.dock.highlighted != 2
         self._close_dock()
         if run and argv is not None:
             self._exec_cli(argv)
@@ -969,6 +1044,40 @@ class ProductTeamApp(App):
     # ── seed: filtered status --json home + honest cwd header ────────
     # Home rows are a display-only projection of scored sessions; the full
     # `status` prose never enters the transcript or `_turns`.
+    def _check_no_provider(self) -> bool:
+        """L10: `agents --json` reports no installed runtime/provider → the
+        locked first-run copy owns the first paint (even when scored
+        sessions exist). Any CLI failure or unparseable output counts as
+        provider-present, so a broken probe can never fake the empty state."""
+        try:
+            cp = adapter.run_argv(["agents", "--json"])
+            if cp.returncode != 0:
+                return False
+            data = json.loads(cp.stdout or "{}")
+        except Exception:
+            return False
+        if isinstance(data, list):
+            return not any(
+                isinstance(a, dict) and a.get("status") == "found" for a in data
+            )
+        if isinstance(data, dict):
+            found_keys = [k for k in ("agents", "installed")
+                          if isinstance(data.get(k), list)]
+            if not found_keys:
+                return False  # unknown shape → provider-present
+            return not any(data.get(k) for k in found_keys)
+        return False
+
+    def _seed_no_provider(self) -> None:
+        """The locked no-provider first-run copy — display only, never the
+        status dump, never the scored-home empty copy. Chips + empty
+        composer remain (L10)."""
+        t = Text()
+        t.append("no installed agent", style=MUTE)
+        t.append("\n", style=MUTE)
+        t.append("run /agents  or  productteam onboarding", style=MUTE)
+        self.transcript.write(t)
+
     def _seed(self) -> None:
         try:
             cp = adapter.run_argv(["status", "--json"])
@@ -988,6 +1097,13 @@ class ProductTeamApp(App):
                 break
         self._cwd_label = cwd.name or str(cwd)
         self._overall = self._read_overall(mapped) if mapped else None
+        if self._check_no_provider():
+            self._no_provider = True
+            self._call(self._render_header)
+            self._call(self._render_footer)
+            self._call(self._seed_no_provider)
+            return
+        self._no_provider = False
         self._call(self._render_header)
         self._call(self._seed_home, engagements, mapped)
 
@@ -1104,53 +1220,78 @@ class ProductTeamApp(App):
             self.transcript.write(self._home_row(e))
 
     def _home_row(self, e: dict) -> Text:
-        """One compact display-only home row: score, client, latest iter, trend."""
+        """One compact display-only home row (L8): `● {client} ……
+        {overall:.1f}` — bullet, name, leader dots, score last. No
+        iter/trend metadata, no score-first layout."""
         name = e.get("client", "")
         overall = float(e["overall"])
         t = Text()
-        t.append("  ", style=MUTE)
-        t.append(f"{overall:.1f}", style="bold " + OK if overall >= 9 else MUTE)
-        t.append("  ", style=MUTE)
+        t.append("● ", style=MUTE)
         t.append(name, style=TEXT)
-        meta = [m for m in (e.get("last_iter") or "", e.get("trend") or "") if m]
-        if meta:
-            t.append(" · " + " · ".join(meta), style=MUTE)
+        t.append(" …… ", style=MUTE)
+        t.append(f"{overall:.1f}", style="bold " + OK if overall >= 9 else MUTE)
         return t
 
     # ── chips: one focusable/clickable role row + session-local target ──
     _ROLE_CHIP_ORDER = ("Principal", "Analyst", "Builder", "Critic")
 
     def _render_chips(self) -> None:
+        """One role chip per permanent role. L12: at <=40 columns the row
+        collapses to exactly the live/pinned identity plus the hidden
+        count (`{glyph} {role} +N`); 80+ restores all four."""
+        compact = self.size.width <= 40
+        show_role = self._target_role if self._pinned else "Principal"
         for role in self._ROLE_CHIP_ORDER:
-            self.query_one(f"#role-{role.lower()}", RoleChip)._refresh()
+            chip = self.query_one(f"#role-{role.lower()}", RoleChip)
+            chip.styles.display = "none" if (compact and role != show_role) else "block"
+            chip._refresh()
 
     def _render_role_prefix(self) -> None:
+        """Team mode (unpinned) collapses the prefix to width 0 so the
+        caret sits flush left (L4); a pinned or typed role expands it to
+        `@Role` in the role hue."""
+        prefix = self.query_one("#role-prefix", Static)
+        if not self._pinned:
+            prefix.remove_class("pinned")
+            prefix.update("")
+            return
+        prefix.add_class("pinned")
         _, hue = ROLE_STYLES.get(self._target_role, ("", MUTE))
-        self.query_one("#role-prefix", Static).update(
-            Text(f"@{self._target_role}", style=hue)
-        )
+        prefix.update(Text(f"@{self._target_role}", style=hue))
 
     def select_role(self, role: str) -> None:
-        """Click/Enter/Space select: set the target, refresh chrome, and
-        restore composer focus (overlay-close analogue)."""
+        """Click/Enter/Space: the first activation pins the role; a second
+        activation on the already-pinned chip unpins back to team (L6);
+        any other chip pins that role. Restores composer focus. A fresh
+        boot is team mode (no @Role pin)."""
         if role not in self._ROLE_CHIP_ORDER:
             return
-        self._target_role = role
+        if self._pinned and self._target_role == role:
+            self._pinned = False
+        else:
+            self._target_role = role
+            self._pinned = True
         self._render_chips()
         self._render_role_prefix()
         self.composer.focus()
 
     def cycle_role(self, delta: int) -> None:
-        """Left/Right on the chips row cycles the target; focus follows the
-        chip so repeated arrows keep working."""
+        """Left/Right on the chips row move focus between the role chips
+        and preview the target. Focus/preview never pins — pinning happens
+        on click/Enter/Space (L6)."""
         if len(self._ROLE_CHIP_ORDER) < 2:
             return
         idx = self._ROLE_CHIP_ORDER.index(self._target_role)
         role = self._ROLE_CHIP_ORDER[(idx + delta) % len(self._ROLE_CHIP_ORDER)]
         self._target_role = role
         self._render_chips()
-        self._render_role_prefix()
         self.query_one(f"#role-{role.lower()}", RoleChip).focus()
+
+    @property
+    def _route_role(self) -> str:
+        """The role bare text targets: the pinned role, else Principal
+        (team chat — Principal coordinates under the hood, L15)."""
+        return self._target_role if self._pinned else "Principal"
 
     @staticmethod
     def _strip_role_token(text: str) -> tuple[str, str]:
@@ -1331,14 +1472,14 @@ class ProductTeamApp(App):
             if not n:
                 return
             cur = self.dock.highlighted
-            cur = 0 if cur is None else cur
-            self.dock.highlighted = max(0, min(n - 1, cur + delta))
+            cur = 1 if cur is None else cur
+            self.dock.highlighted = max(1, min(n, cur + delta))
             self._render_footer()
             return
         if self._dock_kind == "confirm":
             cur = self.dock.highlighted
             cur = 0 if cur is None else cur
-            self.dock.highlighted = max(0, min(1, cur + delta))
+            self.dock.highlighted = max(0, min(2, cur + delta))
             return
         if self._dock_kind == "evidence":
             # Display-only: arrows scroll/highlight the panel rows; they
@@ -1402,6 +1543,7 @@ class ProductTeamApp(App):
         typed_role, rest = self._strip_role_token(text)
         if typed_role:
             self._target_role = typed_role
+            self._pinned = True
             self._render_chips()
             self._render_role_prefix()
         text = rest
@@ -1424,7 +1566,7 @@ class ProductTeamApp(App):
         if first.startswith("/"):
             self._run_slash(typed_verb, typed_args)
         else:
-            self._active_turn_role = self._target_role
+            self._active_turn_role = self._route_role
             self._add_turn("user", text)
             self._write_turn("You", text)
             self._start_provider_turn(text)
@@ -1558,17 +1700,19 @@ class ProductTeamApp(App):
 
     # ── bare text → real provider turn (process-group safe) ──────────
     def _start_provider_turn(self, prompt: str) -> None:
-        self._active_turn_role = self._target_role
+        self._active_turn_role = self._route_role
         self._provider_active = True
         self._provider_interrupted = False
         self._provider_speech_opened = False
         self._md_buffer = ""
         self._md_fence = False
+        self._role_status = {}  # a new turn clears stale chip ✓/✗
         self._provider_started_at = time.monotonic()
         # A stale artifact from a previous turn must never serve its old
         # ask.json before the new ARTIFACT= line arrives.
         self._active_artifact = None
         self._render_header()
+        self._render_chips()
         self._render_footer()
         threading.Thread(target=self._provider_thread, args=(prompt,), daemon=True).start()
 
@@ -1654,6 +1798,8 @@ class ProductTeamApp(App):
             # Interrupt: exactly one attached failed card names the partial
             # artifact. The interrupt toast was already shown once at the
             # first Ctrl+C — no second notify, no extra mute echo.
+            self._role_status[self._active_turn_role] = "failed"
+            self._render_chips()
             self.transcript.write(completion_card(
                 self._active_turn_role,
                 "failed",
@@ -1663,6 +1809,9 @@ class ProductTeamApp(App):
             ))
             return
         state = "done" if rc == 0 else "failed"
+        # L14: ✓/✗ on the chip row and on the attached card.
+        self._role_status[self._active_turn_role] = state
+        self._render_chips()
         # One rail-continuation card on the speaking turn's rail; never
         # replays the spoken body, never clears the transcript.
         self.transcript.write(completion_card(

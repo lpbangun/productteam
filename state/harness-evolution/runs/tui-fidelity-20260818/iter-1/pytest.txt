@@ -1,0 +1,273 @@
+...........FF........................................................... [ 93%]
+..FF.                                                                    [100%]
+=================================== FAILURES ===================================
+________________ test_all_18_supported_verbs_in_tui_transcript _________________
+
+    def test_all_18_supported_verbs_in_tui_transcript():
+        data = adapter.help_json()
+        supported = [c["name"] for c in data["commands"] if c["chat_supported"]]
+        assert len(supported) == 18
+        os.environ.setdefault("CONSULT_NO_SPLASH", "1")
+        os.environ.setdefault("CONSULT_SMOKE_SKIP_CLIENT", "1")
+        real_stream = adapter.run_argv_stream
+    
+        def stream(args, on_line=None, env=None, timeout=60):
+            # smoke / harness-checks print their banner immediately, then run long.
+            # Cap so the TUI still receives real stdout and the turn ends.
+            if args and args[0] in ("smoke", "harness-checks"):
+                timeout = 12
+            return real_stream(args, on_line=on_line, env=env, timeout=timeout)
+    
+        adapter.run_argv_stream = stream
+        try:
+>           asyncio.run(_run_supported(supported))
+
+lib/tui/tests/test_all_verbs.py:87: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib/python3.12/asyncio/runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/asyncio/base_events.py:687: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+lib/tui/tests/test_all_verbs.py:95: in _run_supported
+    await _boot_home(pilot, app)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=ProductTeamApp(title='ProductTeam', classes={'-dark-mode', '-theme-productteam'}, pseudo_classes={'dark', 'focus'})>
+app = ProductTeamApp(title='ProductTeam', classes={'-dark-mode', '-theme-productteam'}, pseudo_classes={'dark', 'focus'})
+
+    async def _boot_home(pilot, app):
+        """Wait for the locked home projection (header + home rows or the honest
+        empty copy) — the removed prose-status seed is never a boot needle."""
+        for _ in range(600):
+            if "▣─▣─▣ ProductTeam" in str(app.query_one("#header").render()):
+                break
+            await pilot.pause()
+        for _ in range(600):
+            text = app.transcript_text()
+            if HOME_ROW_RE.search(text) or "No scored sessions yet" in text:
+                return
+            await pilot.pause()
+>       raise AssertionError("home projection never seeded")
+E       AssertionError: home projection never seeded
+
+lib/tui/tests/test_all_verbs.py:67: AssertionError
+______________ test_every_unsupported_verb_refuses_without_spawn _______________
+
+    def test_every_unsupported_verb_refuses_without_spawn():
+        data = adapter.help_json()
+        unsupported = [c["name"] for c in data["commands"] if not c["chat_supported"]]
+        assert "tui" in unsupported and "chat" in unsupported and "gate" in unsupported
+        spawns: list[list[str]] = []
+        real_stream = adapter.run_argv_stream
+    
+        def wrapped(args, on_line=None, env=None, timeout=60):
+            spawns.append(list(args))
+            return real_stream(args, on_line=on_line, env=env, timeout=timeout)
+    
+        adapter.run_argv_stream = wrapped
+        try:
+    
+            async def run():
+                async with ProductTeamApp().run_test(size=(80, 24)) as pilot:
+                    app = pilot.app
+                    await _boot_home(pilot, app)
+                    for verb in unsupported:
+                        before = app.transcript_text()
+                        app._run_slash(verb, "")
+                        hit = await _wait(
+                            app,
+                            lambda v=verb, b=before: (
+                                f"/{v} — " in app.transcript_text()[len(b):]
+                                and "use the CLI:" in app.transcript_text()[len(b):]
+                            ),
+                        )
+                        assert hit, f"/{verb} must refuse with reason + usage"
+                        snippet = adapter.reason_for(verb).split(";", 1)[0][:24]
+                        assert snippet in app.transcript_text()[len(before):]
+    
+>           asyncio.run(run())
+
+lib/tui/tests/test_all_verbs.py:147: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib/python3.12/asyncio/runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/asyncio/base_events.py:687: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+lib/tui/tests/test_all_verbs.py:132: in run
+    await _boot_home(pilot, app)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=ProductTeamApp(title='ProductTeam', classes={'-dark-mode', '-theme-productteam'}, pseudo_classes={'dark', 'focus'})>
+app = ProductTeamApp(title='ProductTeam', classes={'-dark-mode', '-theme-productteam'}, pseudo_classes={'dark', 'focus'})
+
+    async def _boot_home(pilot, app):
+        """Wait for the locked home projection (header + home rows or the honest
+        empty copy) — the removed prose-status seed is never a boot needle."""
+        for _ in range(600):
+            if "▣─▣─▣ ProductTeam" in str(app.query_one("#header").render()):
+                break
+            await pilot.pause()
+        for _ in range(600):
+            text = app.transcript_text()
+            if HOME_ROW_RE.search(text) or "No scored sessions yet" in text:
+                return
+            await pilot.pause()
+>       raise AssertionError("home projection never seeded")
+E       AssertionError: home projection never seeded
+
+lib/tui/tests/test_all_verbs.py:67: AssertionError
+_____________ test_confirm_run_exact_argv_for_all_three_intercepts _____________
+
+fake_env = PosixPath('/tmp/pytest-of-logani/pytest-214/test_confirm_run_exact_argv_fo0')
+
+    def test_confirm_run_exact_argv_for_all_three_intercepts(fake_env):
+        """D13: `/gh merge`, `/checks --allow-dirty`, `/onboarding --yes` are
+        intercepted exactly; Run reuses the stored original argv list."""
+        spawns = _confirm_recorder()
+    
+        async def run():
+            async with ProductTeamApp().run_test(size=(80, 24)) as pilot:
+                app = await _boot(pilot)
+                for slash, expected in (
+                    ("/gh merge", ["gh", "merge"]),
+                    ("/checks --allow-dirty", ["checks", "--allow-dirty"]),
+                    ("/onboarding --yes", ["onboarding", "--yes"]),
+                ):
+                    await _type_slash(pilot, slash)
+                    await pilot.press("enter")
+                    await pilot.pause()
+                    await _confirm_open(pilot, app)
+                    assert "Confirm write" in app.dock.get_option_at_index(0).prompt.plain
+                    assert app.dock.get_option_at_index(1).prompt.plain.startswith("Run")
+                    await pilot.press("enter")  # Run is default-highlighted
+                    ok = await _wait_for(pilot, lambda: spawns[-1:] == [expected], timeout=5)
+                    assert ok, f"Run must execute the exact original argv: {spawns}"
+                    assert not app.dock_visible(), "confirm dock closes after Run"
+                    assert app._dock_kind == "slash"
+    
+>       asyncio.run(run())
+
+lib/tui/tests/test_slash.py:439: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib/python3.12/asyncio/runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/asyncio/base_events.py:687: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+lib/tui/tests/test_slash.py:430: in run
+    await _confirm_open(pilot, app)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=ProductTeamApp(title='ProductTeam', classes={'-dark-mode', '-theme-productteam'}, pseudo_classes={'dark', 'focus'})>
+app = ProductTeamApp(title='ProductTeam', classes={'-dark-mode', '-theme-productteam'}, pseudo_classes={'dark', 'focus'})
+
+    async def _confirm_open(pilot, app):
+        assert app._dock_kind == "confirm", "write intercept opens the confirm dock"
+        assert app.dock_visible()
+        assert str(app.query_one("#footer").render()) == "↑↓ choose · enter run · esc cancel"
+        texts = [app.dock.get_option_at_index(i).prompt.plain for i in range(3)]
+        assert "Confirm write" in texts[0] and "1 of 2" in texts[0]
+>       assert texts[1].startswith("Run"), texts[1]
+E       AssertionError: ● Run
+E            argv to bin/productteam. Output streams as a Command turn.
+E       assert False
+E        +  where False = <built-in method startswith of str object at 0x78df35e9e430>('Run')
+E        +    where <built-in method startswith of str object at 0x78df35e9e430> = '● Run\n   argv to bin/productteam. Output streams as a Command turn.'.startswith
+
+lib/tui/tests/test_slash.py:410: AssertionError
+_________________________ test_confirm_cancel_no_spawn _________________________
+
+fake_env = PosixPath('/tmp/pytest-of-logani/pytest-214/test_confirm_cancel_no_spawn0')
+
+    def test_confirm_cancel_no_spawn(fake_env):
+        """D13: choosing Cancel (or Esc) for an intercepted write executes
+        nothing — the argv log stays empty for that attempt."""
+        spawns = _confirm_recorder()
+    
+        async def run():
+            async with ProductTeamApp().run_test(size=(80, 24)) as pilot:
+                app = await _boot(pilot)
+                # /gh merge → Cancel via arrows
+                await _type_slash(pilot, "/gh merge")
+                await pilot.press("enter")
+                await pilot.pause()
+                await _confirm_open(pilot, app)
+                await pilot.press("down")
+                await pilot.press("enter")
+                await pilot.pause(0.1)
+                assert spawns == [], "Cancel must not spawn the CLI command"
+                assert not app.dock_visible(), "confirm dock closes after Cancel"
+                # /checks --allow-dirty → Esc
+                await _type_slash(pilot, "/checks --allow-dirty")
+                await pilot.press("enter")
+                await pilot.pause()
+                await _confirm_open(pilot, app)
+                await pilot.press("escape")
+                await pilot.pause(0.1)
+                assert spawns == [], "Esc must not spawn the CLI command"
+                assert not app.dock_visible()
+                # /onboarding --yes → Cancel via arrows
+                await _type_slash(pilot, "/onboarding --yes")
+                await pilot.press("enter")
+                await pilot.pause()
+                await _confirm_open(pilot, app)
+                await pilot.press("down")
+                await pilot.press("enter")
+                await pilot.pause(0.1)
+                assert spawns == [], "argv log must stay empty for every cancelled attempt"
+    
+>       asyncio.run(run())
+
+lib/tui/tests/test_slash.py:484: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib/python3.12/asyncio/runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/asyncio/base_events.py:687: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+lib/tui/tests/test_slash.py:459: in run
+    await _confirm_open(pilot, app)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=ProductTeamApp(title='ProductTeam', classes={'-dark-mode', '-theme-productteam'}, pseudo_classes={'dark', 'focus'})>
+app = ProductTeamApp(title='ProductTeam', classes={'-dark-mode', '-theme-productteam'}, pseudo_classes={'dark', 'focus'})
+
+    async def _confirm_open(pilot, app):
+        assert app._dock_kind == "confirm", "write intercept opens the confirm dock"
+        assert app.dock_visible()
+        assert str(app.query_one("#footer").render()) == "↑↓ choose · enter run · esc cancel"
+        texts = [app.dock.get_option_at_index(i).prompt.plain for i in range(3)]
+        assert "Confirm write" in texts[0] and "1 of 2" in texts[0]
+>       assert texts[1].startswith("Run"), texts[1]
+E       AssertionError: ● Run
+E            argv to bin/productteam. Output streams as a Command turn.
+E       assert False
+E        +  where False = <built-in method startswith of str object at 0x78df35421770>('Run')
+E        +    where <built-in method startswith of str object at 0x78df35421770> = '● Run\n   argv to bin/productteam. Output streams as a Command turn.'.startswith
+
+lib/tui/tests/test_slash.py:410: AssertionError
+=========================== short test summary info ============================
+FAILED lib/tui/tests/test_all_verbs.py::test_all_18_supported_verbs_in_tui_transcript
+FAILED lib/tui/tests/test_all_verbs.py::test_every_unsupported_verb_refuses_without_spawn
+FAILED lib/tui/tests/test_slash.py::test_confirm_run_exact_argv_for_all_three_intercepts
+FAILED lib/tui/tests/test_slash.py::test_confirm_cancel_no_spawn - AssertionE...
+4 failed, 73 passed in 382.58s (0:06:22)
+EXIT_CODE=1
