@@ -1434,8 +1434,8 @@ def _splash_deterministic(app):
 
 
 def test_splash_idle_neutral_and_exact_art(monkeypatch):
-    """D16: boot shows the idle splash — the exact 11x7 three-head art
-    with the 39-column wide join at 80, every head/subtitle span MUTE and
+    """D16: boot shows the idle splash — the exact 8x5 three-head art
+    with the 28-column wide join at 80, every head/subtitle span MUTE and
     the brand TEXT (no identity hue, no OK/ERR, no banned graph/ROBOTS/
     Critic needle anywhere), composer + footer visible, `enter continue ·
     any key skip` footer, @Principal prefix, and the art never enters the
@@ -1463,23 +1463,19 @@ def test_splash_idle_neutral_and_exact_art(monkeypatch):
             assert footer.region.height == 1 and footer.region.width > 0
             assert "@" not in str(app.query_one("#role-prefix", Static).render())
             assert str(footer.render()) == "enter continue · any key skip"
-            # exact art: 39-column wide join of the three 11-column heads
+            # exact art: 28-column wide join of the three 8-column heads
             text = splash.render()
             lines = text.plain.splitlines()
-            assert len(lines) == 10, f"splash must be 10 lines: {lines!r}"
+            assert len(lines) == 8, f"splash must be 8 lines: {lines!r}"
             joined = [
                 (" " * SPLASH_GAP_WIDE).join(SPLASH_HEADS[r][row] for r in SPLASH_ROLES)
-                for row in range(7)
+                for row in range(5)
             ]
-            assert all(len(row) == 39 for row in joined), "wide join is 39 columns"
-            assert lines[0] == "     |             |             |     "
+            assert all(len(row) == 28 for row in joined), "wide join is 28 columns"
             assert lines[0] == joined[0]
-            assert lines[1] == "    /^\\           /^\\           /^\\    "
-            assert lines[5] == "     #             o             >     "
-            assert lines[6] == " Principal      Analyst       Builder  "
-            assert lines[7] == ""
-            assert lines[8] == "ProductTeam"
-            assert lines[9] == "principal · analyst · builder"
+            assert lines[5] == ""
+            assert lines[6] == "ProductTeam"
+            assert lines[7] == "principal · analyst · builder"
             # idle spans: heads + subtitle MUTE, brand TEXT, nothing else
             spans = _splash_spans(app)
             assert ("ProductTeam", TEXT) in spans
@@ -1491,8 +1487,9 @@ def test_splash_idle_neutral_and_exact_art(monkeypatch):
                 assert hue not in [c for _cov, c in spans], (
                     f"idle must not use {hue}")
             # the unique splash needle is on the widget, never in the transcript
-            assert "/^\\" in text.plain, "angular head needle present in the splash"
-            assert "/^\\" not in app.transcript_text(), (
+            needle = SPLASH_HEADS["Principal"][0]
+            assert needle in text.plain, "braille head needle present in the splash"
+            assert needle not in app.transcript_text(), (
                 "splash art must never enter the transcript")
             for needle in BANNED_SPLASH_NEEDLES:
                 assert needle not in text.plain, f"banned needle in splash: {needle!r}"
@@ -1508,11 +1505,8 @@ def test_splash_stepper_glow_order_one_ok_head(monkeypatch):
     with the exact live subtitle in OK while the other two heads stay
     MUTE — observed on the widget's displayed spans."""
     monkeypatch.delenv("CONSULT_NO_SPLASH", raising=False)
-    distinct = {
-        "Principal": ("     #     ", " Principal "),
-        "Analyst": ("     o     ", "  Analyst  "),
-        "Builder": ("     >     ", "  Builder  "),
-    }
+    # one unique art row per role (row 0); the row-4 underline is shared
+    distinct = {role: SPLASH_HEADS[role][0] for role in SPLASH_ROLES}
 
     async def run():
         app = ProductTeamApp()
@@ -1527,17 +1521,15 @@ def test_splash_stepper_glow_order_one_ok_head(monkeypatch):
                 assert app._splash_step == step and app._splash_active
                 spans = _splash_spans(app)
                 ok = [(cov, color) for cov, color in spans if color == OK]
-                # exactly one head (7 rows) + the live subtitle are OK
-                assert len(ok) == 8, (
+                # exactly one head (5 art rows) + the live subtitle are OK
+                assert len(ok) == 6, (
                     f"step {step}: expected one head + subtitle OK, got {ok!r}")
                 assert (f"{GLYPHS[role]} {role}", OK) in ok, (
                     f"step {step}: live subtitle identifies {role}")
-                foot, label = distinct[role]
-                assert (foot, OK) in ok and (label, OK) in ok
+                assert (distinct[role], OK) in ok
                 for other in SPLASH_ROLES:
                     if other != role:
-                        ofoot, olabel = distinct[other]
-                        assert (ofoot, MUTE) in spans and (olabel, MUTE) in spans, (
+                        assert (distinct[other], MUTE) in spans, (
                             f"step {step}: {other} must stay MUTE")
                 assert ("principal · analyst · builder", MUTE) not in spans
                 assert app.splash.has_class("visible"), "still glowing at step"
@@ -1579,13 +1571,13 @@ def test_splash_natural_finish_home_and_focus(monkeypatch):
             assert app.focused is app.composer, "finish restores composer focus"
             home = await _boot_home(pilot, app)
             assert HOME_ROW_RE.search(home) or "No scored sessions yet" in home
-            assert "/^\\" not in app.transcript_text(), (
+            assert SPLASH_HEADS["Principal"][0] not in app.transcript_text(), (
                 "finish leaves no splash art in the transcript")
             # the finished splash is idempotent: further advances do nothing
             ProductTeamApp._splash_advance(app)
             assert not app._splash_active
             assert not app.splash.has_class("visible")
-            assert "/^\\" not in app.transcript_text()
+            assert SPLASH_HEADS["Principal"][0] not in app.transcript_text()
 
     asyncio.run(run())
 
@@ -1712,7 +1704,7 @@ def test_splash_env_short_circuit(monkeypatch):
 
 
 def test_splash_compact_40x20_does_not_cover(monkeypatch):
-    """D07/D01: at 40x20 the splash shows the 35-column compact join and
+    """D07/D01: at 40x20 the splash shows the 26-column compact join and
     never covers the composer (splash bottom <= composer top); the
     composer stays >= 20 wide, the footer stays visible, and skip still
     works."""
@@ -1736,14 +1728,13 @@ def test_splash_compact_40x20_does_not_cover(monkeypatch):
             assert str(footer.render()) == "enter continue · any key skip"
             assert splash.region.y + splash.region.height <= composer.region.y, (
                 "the splash must never cover the composer")
-            # the widget shows the compact 35-column join, not the wide 39
+            # the widget shows the compact 26-column join, not the wide 28
             text = splash.render()
             lines = text.plain.splitlines()
             compact = (" " * SPLASH_GAP_COMPACT).join(
                 SPLASH_HEADS[r][0] for r in SPLASH_ROLES)
-            assert len(compact) == 35, "compact join is 35 columns"
+            assert len(compact) == 26, "compact join is 26 columns"
             assert lines[0] == compact, lines[0]
-            assert lines[0] == "     |           |           |     "
             # skip still works at compact
             await pilot.press("enter")
             await pilot.pause()

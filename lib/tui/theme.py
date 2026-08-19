@@ -359,65 +359,63 @@ def split_evidence_line(line: str) -> tuple[str | None, str | None]:
 
 # ── boot splash (D16/D26) ───────────────────────────────────────────
 # The TUI-owned boot splash lives here so the art never leaks into app.py
-# or the RichLog. Freeze R7: three angular heads (Principal, Analyst,
-# Builder — no Critic), futuristic line-art, ASCII inside Textual, live
-# glow = OK. Each head is exactly 11 columns x 7 rows (six art rows plus
-# the label row); the heads join side by side with a 3-column gap at
-# width >= 41 and a 1-column gap at width <= 40, giving the 39/35-column
-# joins that fit inside 80/40 with the #splash `0 1` padding.
+# or the RichLog. Freeze R7: three 8x5 braille heads (Principal, Analyst,
+# Builder — no Critic), distinct silhouettes (D1 reopened by owner lock
+# B), one cell per braille glyph in a real terminal, no ASCII mixed into
+# the art rows, live glow = OK. Each head is exactly 8 columns x 5 rows;
+# the heads join side by side with a 2-column gap at width >= 41 and a
+# 1-column gap at width <= 40, giving the 28/26-column joins that fit
+# inside 80/40 with the #splash `0 1` padding. Still no Critic and no
+# CLI graph needles.
 
 SPLASH_ROLES = ("Principal", "Analyst", "Builder")
 
-# Pure-ASCII heads only: `· ─ ◇ ▸ ▐▌ ═` have ambiguous or wide cell
-# advances and slant under real mono fonts. `| / \ ^ - _ o # >` are
-# exactly one cell in every terminal, so the three heads stay aligned.
+# Gallery B heads, one braille glyph per terminal cell: every art row is
+# exactly 8 braille characters, so the three heads stay aligned under
+# real mono fonts and the joined art is 28 columns wide (26 compact).
 SPLASH_HEADS = {
     "Principal": (
-        "     |     ",
-        "    /^\\    ",
-        "   /---\\   ",
-        "  | o o |  ",
-        "  |  -  |  ",
-        "     #     ",
-        " Principal ",
+        "⠀⠀⣠⣾⣷⣄⠀⠀",
+        "⠀⢸⡏⠖⠲⢹⡇⠀",
+        "⠀⠘⠓⣻⣟⠚⠃⠀",
+        "⠀⠀⠈⠻⠟⠁⠀⠀",
+        "⠉⠉⠉⠉⠉⠉⠉⠉",
     ),
     "Analyst": (
-        "     |     ",
-        "    /^\\    ",
-        "   /---\\   ",
-        "  | o o |  ",
-        "  |  -  |  ",
-        "     o     ",
-        "  Analyst  ",
+        "⠀⠀⡠⠊⠑⢄⠀⠀",
+        "⠀⢸⡇⠖⠲⢸⡇⠀",
+        "⠀⠘⠓⡲⢖⠚⠃⠀",
+        "⠀⠀⠈⠢⠔⠁⠀⠀",
+        "⠉⠉⠉⠉⠉⠉⠉⠉",
     ),
     "Builder": (
-        "     |     ",
-        "    /^\\    ",
-        "   /---\\   ",
-        "  | o o |  ",
-        "  |  -  |  ",
-        "     >     ",
-        "  Builder  ",
+        "⠀⠀⣴⣿⣿⣦⠀⠀",
+        "⠀⢸⣇⠢⠔⣸⡇⠀",
+        "⠀⠈⠉⡹⢯⡉⠁⠀",
+        "⠀⠀⠈⠀⠀⠉⠀⠀",
+        "⠉⠉⠉⠉⠉⠉⠉⠉",
     ),
 }
 
-SPLASH_GAP_WIDE = 3      # join gap when width >= 41
-SPLASH_GAP_COMPACT = 1   # join gap when width <= 40
+SPLASH_GAP_WIDE = 2      # 8*3 + 2*2 = 28
+SPLASH_GAP_COMPACT = 1   # 8*3 + 1*2 = 26
 
 
 def splash_render(width: int, glow: str | None = None) -> Text:
-    """The boot splash as one Text: three 11x7 heads joined side by side,
-    a blank line, the ProductTeam brand, then the idle or live subtitle.
+    """The boot splash as one Text: three 8x5 braille heads joined side
+    by side, a blank line, the ProductTeam brand, then the idle or live
+    subtitle.
 
     glow is None → the idle frame: every head row and the idle subtitle
     are MUTE, the brand is TEXT. glow in SPLASH_ROLES → exactly that one
-    head (six art rows + label) and the live subtitle `{glyph} {role}`
-    are OK; the other two heads stay MUTE. app.py never restyles it."""
+    head (all five art rows) and the live subtitle `{glyph} {role}` are
+    OK; the other two heads stay MUTE. app.py never restyles it."""
     gap = " " * (SPLASH_GAP_WIDE if width >= 41 else SPLASH_GAP_COMPACT)
     heads = [SPLASH_HEADS[role] for role in SPLASH_ROLES]
     live = glow in SPLASH_ROLES
     t = Text()
-    for row in range(7):
+    n_rows = len(heads[0])
+    for row in range(n_rows):
         for i, role in enumerate(SPLASH_ROLES):
             if i:
                 t.append(gap, style=MUTE)
