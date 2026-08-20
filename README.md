@@ -1,377 +1,390 @@
 # Product Consulting Harness
 
-A Product Judgment Layer that turns messy product intent into a clear
-improvement mission, executes it, measures the result, and retains what
-it learns. The **CLI** is the interface; judgment lives in modes, evidence,
-and a frozen benchmark contract.
+**A CLI-first product judgment and improvement loop for coding agents.**
 
-## Non-goals
+Product Consulting Harness turns an existing software repository and an open-ended
+product brief into a bounded, measurable engagement. It coordinates distinct
+Analyst, Builder, and Critic roles; freezes the benchmark before implementation;
+runs work in an isolated Git worktree; and records decisions, scores, evidence,
+and lessons as plain files.
 
-Not an IDE. Not a client-product redesign. Not a chat UI. There is no
-daemon, no server, and no database — state is plain files under `state/`.
+The project now includes a role-aware chat experience, an optional Textual
+cockpit, guided direction selection, durable judgment gates, named agent cards,
+organizational and project memory, cross-engagement experience reuse, and a
+bounded overnight loop.
 
-## First run
+> **Project status:** active development. The CLI contract and state artifacts
+> are designed to be inspectable, but interfaces may continue to evolve.
+
+## Why this exists
+
+Coding agents are good at producing changes, but a useful product-improvement
+process also needs to decide **what should change**, preserve the product's
+vision, measure whether the change helped, and retain what was learned.
+
+Product Consulting Harness supplies that missing judgment layer:
+
+- **Evidence before claims** — benchmark scores cite artifacts and paths.
+- **Frozen goals** — the benchmark contract is fixed before implementation.
+- **Separated roles** — the Principal orchestrates; the Analyst scores; the
+  Builder implements; the Critic challenges priorities and reviews outcomes.
+- **Durable decisions** — modes, gates, escalations, role receipts, and history
+  survive between sessions as Markdown and JSON.
+- **Safe client isolation** — checks and agent runs use detached Git worktrees,
+  not the client's active working tree.
+- **Bounded autonomy** — owner decisions, risk gates, iteration limits, and
+  stop conditions constrain unattended work.
+
+## What it is not
+
+This is not an IDE, a general-purpose agent framework, or a client-product
+redesign tool. There is no daemon, application server, or database. The CLI is
+the interface and plain files under `state/` are the source of truth.
+
+## Requirements
+
+Core CLI:
+
+- Bash 4+
+- Git
+- `jq`
+- Standard Unix tools (`awk`, `sed`, `grep`, `sha256sum`, `timeout`)
+- An authenticated coding-agent CLI for provider-backed work
+
+The harness detects supported coding-agent CLIs from `PATH` and from optional
+paths in `CONSULT_AGENT_DIRS`. Run `bin/productteam agents` to see what is
+available. No API key is stored by the harness.
+
+Optional TUI:
+
+- Python 3.10+
+- `venv`
+- Dependencies pinned in `lib/tui/requirements.txt`
+
+## Installation
+
+Clone the repository and run the CLI directly:
 
 ```sh
-bin/productteam onboarding --yes   # agents → provider → engagement → score
-bin/productteam splash             # knowledge-graph banner (CONSULT_NO_SPLASH=1 skips)
-bin/productteam agents             # detect coding agents (agents|runtime)
-bin/productteam runtime --check    # alias of agents; fails if none usable
-bin/productteam open <client> --repo /abs/sibling   # engagement stub + freeze + workspace
-bin/productteam baseline <client>  # iter-0 via isolated workspace (checks or honest deferred)
-bin/productteam                    # status overview (splash once on first run)
+git clone https://github.com/lpbangun/product-consulting-harness.git
+cd product-consulting-harness
+bin/productteam help
+bin/productteam runtime --check
 ```
 
-## Quickstart
+`bin/consult` remains available as a compatibility alias for
+`bin/productteam`.
+
+### Optional Textual cockpit
+
+The standard `chat` interface has no Python dependency. To enable the optional
+full-screen TUI:
 
 ```sh
-bin/productteam                  # org overview (status)
-bin/productteam status           # same overview, named explicitly
-bin/productteam help             # command table
-bin/productteam chat             # role-aware interactive session
-bin/productteam tui              # optional Textual cockpit (TTY presentation client)
-bin/productteam onboarding [--yes]
-bin/productteam splash [--frames]
-bin/productteam agents [--json] [--check]
-bin/productteam runtime          # alias of agents
-bin/productteam judge <client>   # mode + mission (also: harness-evolution)
-bin/productteam gate <client> status|implement|select|direct|challenge|override|rebut
-bin/productteam direction <client> propose|list|clear|rebut   # Guided directions (state/engagements/<client>/direction/)
-bin/productteam workspace <client> ensure|status|remove
-bin/productteam escalation <client> block|status|resume
-bin/productteam inspect <client>
-bin/productteam role <client> seal|invoke|status|close
-bin/productteam card list|show|seed-specialist   # named agent cards (state/agents/)
-bin/productteam style show|init|append|accept-lesson|rewrite   # org style memory (state/style/)
-bin/productteam project-memory show|append <client>   # per-engagement notes
-bin/productteam pool list|show|search|add   # experience excerpts (state/experience-pool/)
-bin/productteam score <client> --iter <n>   # Analyst-stamped score
-bin/productteam checks <client>  # deterministic contract checks
-bin/productteam bench <client>   # scores + history
-bin/productteam bench <client> run --iter <n>
-bin/productteam run <client> <n> # scores for iteration n
-bin/productteam run-loop <client> --max-hours <n> --max-iters <m>   # overnight loop driver
-bin/productteam report <client>  # latest iteration reasoning
-bin/productteam harness-checks   # harness-apc objective checks + secrets scan
-bin/productteam gh preflight     # GitHub auth + permissions (redacted)
-bin/productteam gh pr-create|status|checks|merge|validate
-bin/productteam memory           # durable lessons
-bin/productteam org              # roles + autonomy
-bin/productteam smoke            # CLI smoke tests
-bin/productteam skill critique|benchmark|design-sprint <target>
-
-# `bin/consult` remains a compatibility shim to `bin/productteam`.
+python3 -m venv lib/tui/.venv
+lib/tui/.venv/bin/pip install -r lib/tui/requirements.txt
+bin/productteam tui
 ```
 
-## CLI surface (frozen contract `cli-interface-20260812-v3`)
+Both `chat` and `tui` require an interactive terminal. The TUI is a presentation
+client over the same command registry; `bin/productteam` remains the only domain
+and durable-state writer.
 
-Every top-level command below is named by `productteam help`; `help` is the
-canonical command surface. The frozen command table has **33** commands:
-**18** chat-supported, **15** intentionally unsupported in chat (each with a
-non-empty safety/usefulness reason), plus **6** chat-only verbs (`provider
-workers clear export exit quit`). The historical `cli-interface-20260812-v3`
-table had **32** commands; `productteam tui` is the additive, optional TTY
-frontend added on top of that freeze (it is `chat_supported=0`, so the frozen
-32-command contract in `state/harness-evolution/runs/cli-interface-20260812/`
-stays untouched).
+## Quick start
 
-| Command | Purpose |
-|---------|---------|
-| `productteam` | Org status overview (same as `status`) |
-| `productteam help [--json]` | Command table; `--json` emits the command registry |
-| `productteam status [--json]` | Org overview; `--json` emits the engagement list |
-| `productteam chat` | Role-aware interactive session (TTY only) |
-| `productteam tui` | Optional Textual cockpit (TTY presentation client; `productteam chat` remains the fallback, and `chat` never launches the TUI) |
-| `productteam onboarding [--yes]` | First-run: agents → provider → engagement → score |
-| `productteam splash [--frames]` | Knowledge-graph banner (`CONSULT_NO_SPLASH=1` skips) |
-| `productteam agents [--json] [--check]` | Coding agents on this device; provider availability |
-| `productteam runtime [--check]` | Alias of `agents`; `--check` fails if none usable |
-| `productteam judge <client> [set <mode>]` | Judgment mode + mission |
-| `productteam open <client> --repo <abs-path>` | Cold engagement stub + freeze stamp + workspace |
-| `productteam baseline <client>` | iter-0 bootstrap via workspace + checks/score |
-| `productteam gate <client> status\|implement\|select\|direct\|challenge\|override\|rebut` | Durable judgment decisions + machine status |
-| `productteam direction <client> propose\|list\|clear\|rebut` | Guided direction proposals + Critic rebuttal |
-| `productteam workspace <client> ensure\|status\|remove` | Isolated client worktree lifecycle |
-| `productteam escalation <client> block\|status\|resume` | Durable owner block and authorized continuation |
-| `productteam inspect <client> [out]` | Regenerate the file-derived inspect pack |
-| `productteam role <client> seal\|invoke\|status\|close` | Single-turn roles, sealed input, authorship gates |
-| `productteam card list\|show\|seed-specialist` | Named agent cards (`state/agents/`) |
-| `productteam style show\|init\|append\|accept-lesson\|rewrite` | Org style memory (`state/style/`) |
-| `productteam project-memory show\|append <client>` | Per-engagement notes |
-| `productteam pool list\|show\|search\|add` | Cross-engagement experience excerpts |
-| `productteam score <client> --iter <n>` | Score via the declared scorer + Analyst stamp |
-| `productteam checks <client>` | Deterministic checks in the isolated workspace |
-| `productteam bench <client> [run --iter <n>]` | Benchmark contract + history + latest scores |
-| `productteam run <client> <n>` | Show scores for iteration n |
-| `productteam run-loop <client> --max-hours <n> --max-iters <m>` | Overnight loop driver |
-| `productteam report <client>` | Latest iteration report |
-| `productteam harness-checks [iter-dir]` | Objective harness-apc checks + secrets scan |
-| `productteam gh preflight\|pr-create\|status\|checks\|merge\|validate` | Gated GitHub (no `--admin`) |
-| `productteam skill <name> <target>` | Run a skill (`/critique|/benchmark|/design-sprint`) |
-| `productteam memory` | Organizational memory |
-| `productteam org` | Roles, loop, autonomy |
-| `productteam smoke` | CLI smoke tests |
+### 1. Run onboarding
 
-`score <client> --iter <n>` and `bench <client> run --iter <n>` are the only
-score entrypoints; a missing `--iter` is a usage error. `bench`/`run` render
-only **contract-shaped** score records (a `.scores` object plus a numeric
-`.overall`); a null or summary-shaped `runs/iter-N/scores.json` is skipped
-with a note when a newer contract-shaped run exists, and otherwise fails
-honestly (never a raw jq traceback, never a silently substituted iteration).
+```sh
+bin/productteam onboarding --yes
+bin/productteam agents
+```
 
-### Machine-readable boundaries
+### 2. Open an engagement
 
-All machine surfaces below are **derived, read-mostly views over plain files
-under `state/` — the files remain authoritative**; every surface emits valid
-JSON unless noted, parseable with `jq -e .`.
+Client repositories live beside the harness, not inside it. Use an absolute
+path:
 
-| Surface | Command / path | Shape and authority |
-|---------|----------------|---------------------|
-| Command registry | `productteam help --json` | `{commands:[{name,usage,chat_supported,chat_reason?}], chat_only:[…]}` — 33 commands, 6 chat-only verbs; drives help text, dispatch validation, slash palette, unsupported reasons |
-| Engagement list | `productteam status --json` | `{engagements:[{client,…}], …}` — engagement list / current selection, derived from `state/engagements/` |
-| Agent detection | `productteam agents --json` | array of `{name,status,path,version,note}` from `lib/provider.sh` catalog (PATH then `CONSULT_AGENT_DIRS`) |
-| Provider availability | `productteam agents` / `productteam runtime --check` | honest absence: `runtime --check` exits non-zero with a remedy when no agent is usable |
-| Inspect pack | `productteam inspect <client>` | regenerates `state/engagements/<client>/inspect-pack.json` from engagement files: mode/gate, scores + `history.jsonl`, escalation/pause, lessons, continuation, `next_suggested_action`; missing sources are explicit `missing:true` |
-| Worker activity | `state/.cli/runs/session-<pid>/workers.tsv` | TSV `id role state mission provider start elapsed artifact`; file-backed telemetry (`lib/activity.sh`), atomic temp+rename, never a supervisor |
-| Judgment gate | `productteam gate <client> status` | JSON `{client,mode,allowed,decision,reason,bound_direction,artifact,artifact_ts,…}` derived from `judgment/` files; always exits 0 |
-| Workspace | `productteam workspace <client> status` | JSON `{client,source_repo,path,sha,exists,dirty,allow_dirty_reason}` derived from engagement `workspace.json` + live worktree |
-| Role envelope | `productteam role <client> status [iter]` | JSON `{client,iter,root,asked,ran,produced,missing}` derived from `roles/iter-N/<Role>/attempt-N/` files; byte-stable |
+```sh
+bin/productteam open my-product \
+  --repo /absolute/path/to/my-product \
+  --mode Guided \
+  --scorer checks \
+  --mission "Improve onboarding without changing the product vision."
+```
 
-Provider: authenticated Cursor `agent` CLI by default (`CONSULT_PROVIDER` to swap).
-Detected agents: `bin/productteam agents`. No API keys. No mocks — skills call the
-real provider seam (`lib/provider.sh`).
-In chat, `/agents` shows installed/missing/selected providers, `/provider`
-cycles the installed catalog, and `/workers` shows the file-backed activity
-log under `state/.cli/runs/`. Prompt chrome keeps the Product Judgment mode
-and engagement score trend visible; slash prefixes show matching commands.
-Provider turns state that execution is blocking and Ctrl+C preserves any
-partial artifact. `/export` writes the timestamped markdown transcript under
-the state/.cli/sessions/ directory.
+This creates the engagement, freezes its initial benchmark contract, and
+prepares an isolated worktree under `tmp/workspaces/my-product`.
 
-`productteam tui` is the optional Textual presentation client: it derives its
-slash palette from the live registry, runs every chat-supported verb as argv
-against `bin/productteam`, refuses unsupported verbs with the registry reason,
-and keeps the same session verbs (`/provider`, `/workers`, `/clear`, `/export`,
-`/exit`). It requires a TTY and stays read-only — `bin/productteam` remains the
-sole domain, judgment, workspace, provider, and durable-state writer.
-`productteam chat` remains the fallback interactive session, and `chat` never
-launches the TUI.
+Use `--scorer checks` when the engagement has deterministic checks configured,
+or `--scorer provider` for provider-based evaluation.
 
-GitHub: `bin/productteam gh …` wraps `gh` with gates — **never** `--admin` /
-force-merge. Merge requires `state/harness-evolution/authorize-merge` (or
-`CONSULT_AUTHORIZE_MERGE`).
+### 3. Establish the baseline
 
-Learning artifacts: `docs/learning-schema.md` · harness evolution under
-`state/harness-evolution/` (locked contract `harness-apc-v1`).
+```sh
+bin/productteam baseline my-product
+bin/productteam bench my-product
+```
 
-## Environment variables
+A provider-scored baseline requires an Analyst role invocation first; the CLI
+will refuse and print the required command rather than inventing a score.
 
-| Variable | Purpose |
-|----------|---------|
-| `CONSULT_PROVIDER` | Override the active coding-agent binary |
-| `CONSULT_STATE_ROOT` | Relocate CLI first-run / onboarding state (default `state/.cli`) |
-| `CONSULT_NONINTERACTIVE` | `1` makes `productteam onboarding` write (same as `--yes`) |
-| `CONSULT_NO_SPLASH` | `1` skips the splash banner entirely |
-| `CONSULT_NO_SPINNER` | `1` disables chat spinner frames; provider execution and completion cards remain |
-| `CONSULT_SPLASH_DUMP` / `CONSULT_SPLASH_FRAMES=all` | Dump every splash frame as text |
-| `CONSULT_AGENT_DIRS` | Extra `:`-separated dirs scanned after `PATH` for agents |
-| `CONSULT_AUTHORIZE_MERGE` | Path to authorize-merge file for `gh merge` |
-| `CONSULT_PR_TITLE` / `CONSULT_PR_BODY` / `CONSULT_PR_BRANCH` | PR create overrides |
-| `CONSULT_ROOT` | Set by the CLI to the harness root (exported for child scripts) |
-| `CONSULT_SMOKE_SKIP_CLIENT` | Skip sibling-client checks inside smoke |
-| `NO_COLOR` | Disable ANSI accents |
-## Isolated client workspaces
+### 4. Select a direction and run the loop
 
-`score`, `checks`, and provider benchmark runs never use the `Repo:` working
-tree directly. They ensure a detached worktree under
-`tmp/workspaces/<client>` and persist its source/path/SHA in the engagement's
-`workspace.json`. `workspace status` emits live machine-readable JSON;
-`workspace remove` removes only a clean worktree.
+In the default **Guided** mode, implementation cannot begin until a direction
+is proposed, selected, and reviewed by the Critic:
 
-A dirty isolated worktree refuses scoring/checks with
-`workspace-dirty: <client>`. The only reuse escape is explicit and recorded:
-`--allow-dirty '<reason>'`. Each provider score stores `workspace.json` beside
-its scores; each deterministic check stores the same path/SHA/dirty evidence
-in a unique `runs/check-*/workspace.json`. The live owner tree is never the
-fallback. `CONSULT_WORKSPACE_ROOT` may relocate worktrees without changing the
-plain-file metadata seam.
+```sh
+bin/productteam direction my-product propose \
+  --title "Reduce onboarding friction" \
+  --tradeoffs "Narrow scope; preserve the existing information architecture" \
+  --lift "Expected usability and product-clarity improvement" \
+  --evidence docs/onboarding-review.md
 
-`ensure` reuses the existing detached checkout; it does not reset it to a newer
-source `HEAD`. To refresh, remove the clean workspace and ensure it again.
-Recovery is automatic and non-destructive: if the recorded `workspace.json`
-path no longer exists, `ensure` recreates it at the canonical current
-workspace (pruning only stale git registrations whose working tree is gone);
-a recorded path that still exists — e.g. a foreign worktree from another
-harness instance — is left byte-identical and the metadata is repointed to
-the canonical workspace. Existing, dirty, or foreign worktrees are never
-deleted, relocated, reset, or overwritten.
+bin/productteam direction my-product list
+bin/productteam gate my-product select d1 owner
+bin/productteam gate my-product status
+```
+
+Then use individual role and scoring commands, the interactive chat, or the
+bounded loop driver:
+
+```sh
+bin/productteam chat
+# or
+bin/productteam run-loop my-product --max-hours 6 --max-iters 5 --resume
+```
+
+See [docs/overnight-loop.md](docs/overnight-loop.md) before scheduling an
+unattended run.
+
+## How an engagement works
+
+```text
+Inspect → Benchmark → Prioritize → Debate → Implement → Test
+        → Re-benchmark → Critique → Memory → Org improvement
+```
+
+1. **Inspect** — the Analyst examines the client repository with file-level
+   evidence.
+2. **Benchmark** — the frozen contract records the baseline and target.
+3. **Prioritize and debate** — the Principal ranks work by expected lift; the
+   Critic rebuts each proposed item.
+4. **Implement** — the Builder receives sealed input and makes the smallest
+   accepted change.
+5. **Verify** — real checks run in the engagement's isolated worktree.
+6. **Re-benchmark** — the Analyst publishes iteration-bound scores.
+7. **Critique and remember** — the Critic reviews the diff, scores, and
+   organization; reports and lessons remain on disk.
+
+Convergence means every contract dimension reaches its target with evidence,
+or the engagement records an honest non-convergence report.
 
 ## Product Judgment modes
 
 | Mode | Behavior |
-|------|----------|
-| **Guided** | Propose high-leverage directions with tradeoffs |
-| **Directive** | Follow a user direction; validate risks |
-| **Challenge** | Push back with evidence when harm is likely |
-| **Override** | Follow an explicit decision; document concerns |
+|---|---|
+| **Guided** | Propose a small set of high-leverage directions; wait for selection and Critic rebuttal before implementation. |
+| **Directive** | Follow the owner's direction, document risks, and prevent silent scope expansion. |
+| **Challenge** | Refuse a harmful path with evidence and offer a safer alternative. |
+| **Override** | Follow an explicit owner decision while preserving Critic, evidence, and frozen-contract requirements. |
 
-Full text: `JUDGMENT.md`.
+The active mode is recorded in each engagement's `engagement.md`. See
+[JUDGMENT.md](JUDGMENT.md) for the complete policy and gate requirements.
 
-## Judgment gates
+## Interfaces
 
-The four modes bind implementation through **durable files** under the
-engagement: `state/engagements/<client>/judgment/` (selection, directive,
-challenge, override). `productteam gate <client> …` is the read-mostly gate:
-
-```sh
-productteam gate <client> status                                   # machine JSON
-productteam gate <client> implement [<direction>]                  # allow/refuse
-productteam gate <client> select <direction> [selected-by]         # Guided or Challenge safer alternative
-productteam gate <client> direct <direction> [risk...]             # Directive only
-productteam gate <client> challenge <harmful> <safer> <evidence>   # Challenge only
-productteam gate <client> override <direction> <risk> <critic-record> <evidence-record>
-```
-
-The current `Mode:` line in `engagement.md` is the sole authority: each verb
-works only in its mode, stale files from other modes are ignored, and a
-missing/unknown mode refuses. `implement` without an argument uses the mode's
-bound direction (Guided/Directive/Override `.direction`; Challenge
-`.safer_alternative`); an explicit direction must equal the bound one.
-
-| Mode | Implement requires | Refuses |
-|------|--------------------|---------|
-| Guided | `judgment/selection.json` with non-empty `direction` + `selected_by` | no selection yet; wrong direction |
-| Directive | `judgment/directive.json` with `direction` + `decision` (`risks` may be empty) | no durable directive |
-| Challenge | `judgment/challenge.json` (`harmful`, `safer_alternative`, `evidence`) **and** `selection.json` matching the safer alternative | the challenged harmful path always; incomplete challenge |
-| Override | `judgment/override.json`: exact direction, non-empty `risks`, `critic_record`, `evidence_record`, and `non_waivers.{critic,evidence,frozen_contract}=true` | empty risks; missing/false non-waivers |
-
-Writers persist `mode`, `ts`, and the decision atomically (tmp + rename).
-`status` emits valid JSON (`client`, `mode`, `allowed`, `decision`, `reason`,
-`bound_direction`, `artifact`, `artifact_ts`, plus required/present data) and
-always exits 0 — a later session re-derives the same decision from the files
-alone. Override **never waives the contract**: the non-waiver booleans are
-required and there is no waiver channel. Builder role invocation consumes this
-same read-only `implement` predicate after pause and seal checks.
-
-## Escalations and file-state continuation
+### Human interfaces
 
 ```sh
-productteam escalation <client> block <id> <summary> <option> [option...]
-productteam escalation <client> status
-productteam escalation <client> resume <id> <resume-token>
-productteam inspect <client>
+bin/productteam              # engagement overview
+bin/productteam chat         # role-aware interactive session
+bin/productteam tui          # optional Textual cockpit
+bin/productteam report NAME  # latest iteration reasoning
+bin/productteam bench NAME   # benchmark history and latest scores
 ```
 
-`block` writes one entry in engagement `escalations.json` and an active
-`pause.json`. The same predicate then refuses `checks`, provider scoring, and
-`gate … implement`, naming the blocking files. Options and the resume token are
-durable; the token correlates state but is not authorization.
+The chat and TUI derive their commands from the same registry. Commands that
+mutate owner-gated state remain intentionally unavailable inside a chat
+session and explain why they must be run directly.
 
-The owner must manually create `authorize-resume.json`; the CLI never creates
-it:
+### Core engagement commands
 
-```json
-{"id":"owner-1","token":"<resume-token>","authorized_by":"owner","decision":"selected option"}
+| Command | Purpose |
+|---|---|
+| `open <client> --repo <absolute-path>` | Create an engagement, freeze its contract, and prepare a workspace. |
+| `baseline <client>` | Record iteration zero using the declared scorer. |
+| `inspect <client>` | Regenerate a file-derived inspection pack. |
+| `judge <client> [set <mode>]` | Show or select the Product Judgment mode. |
+| `direction <client> propose\|list\|clear\|rebut` | Manage Guided direction proposals and Critic review. |
+| `gate <client> …` | Record and evaluate durable implementation decisions. |
+| `workspace <client> ensure\|status\|remove` | Manage the isolated client worktree. |
+| `role <client> seal\|invoke\|status\|close` | Run role envelopes and verify authorship receipts. |
+| `checks <client>` | Run deterministic checks in the isolated workspace. |
+| `score <client> --iter <n>` | Publish an Analyst-stamped score for one iteration. |
+| `run-loop <client> --max-hours <n> --max-iters <n>` | Run a bounded, resumable improvement loop. |
+| `escalation <client> block\|status\|resume` | Pause work and require explicit owner continuation. |
+
+### Organization and memory
+
+| Command | Purpose |
+|---|---|
+| `card list\|show\|seed-specialist` | Inspect permanent agent cards or seed a temporary specialist. |
+| `style show\|init\|append\|accept-lesson` | Maintain durable organizational taste, risks, stack preferences, and prohibitions. |
+| `project-memory show\|append <client>` | Maintain engagement-specific notes. |
+| `pool list\|show\|search\|add` | Reuse evidence-backed excerpts across engagements. |
+| `skill critique\|benchmark\|design-sprint <target>` | Run a first-party provider-backed product skill. |
+| `memory` | Read durable organization-wide lessons. |
+| `org` | Show roles, autonomy boundaries, and the operating loop. |
+
+Run `bin/productteam help` for the complete command surface or
+`bin/productteam help --json` for the machine-readable registry.
+
+## Safety and evidence model
+
+### Isolated workspaces
+
+Checks, scoring, and provider role invocations operate in a detached worktree.
+A dirty workspace is refused unless the caller supplies an explicit
+`--allow-dirty "reason"`; that reason is stored with the evidence. The client's
+live working tree is never used as a silent fallback.
+
+### Durable judgment gates
+
+Implementation permission is derived from mode-specific files under:
+
+```text
+state/engagements/<client>/judgment/
 ```
 
-`resume` requires exact id/token matching and non-empty owner/decision fields.
-It marks the escalation resolved, stamps pause resumed and authorization
-consumed, writes `continuation.json`, and appends a pointer to `MEMORY.md`.
-Tests relocate only the MEMORY target with `CONSULT_MEMORY_FILE`.
+`gate <client> status` emits the current decision as JSON. In Challenge mode,
+the harmful path always remains blocked. In Override mode, the Critic,
+evidence, and frozen contract cannot be waived.
 
-`inspect` regenerates `inspect-pack.json` from engagement files: mode/gate,
-scores and `history.jsonl`, escalation/pause state, latest lessons pointer,
-continuation, and `next_suggested_action`. Missing sources are explicit
-`missing:true` objects plus entries in `missing`; the pack never fills gaps from
-chat.
+### Role and score integrity
 
-## Role envelopes and authorship gates
+Role invocations write request, result, and hash-bound manifest files. Builder
+input is sealed by path and SHA-256. Analyst score publication is bound to a
+specific iteration, and the same recorded identity cannot be both Builder and
+Analyst for that iteration.
+
+### Escalation and recovery
+
+Open escalations pause implementation, checks, and scoring. Resuming requires a
+separate owner-authored `authorize-resume.json` with matching identifiers and a
+recorded decision; a token alone is not authorization.
+
+## Plain-file state
+
+The important state layout is intentionally inspectable:
+
+```text
+state/
+  engagements/<client>/
+    engagement.md             # brief, mode, and source repository
+    contract.json             # frozen benchmark contract and scorer
+    workspace.json            # isolated worktree provenance
+    judgment/                 # durable mode-specific decisions
+    roles/iter-N/             # sealed inputs and role receipts
+    runs/iter-N/              # scores, evidence, and reports
+    history.jsonl             # append-only score history
+    escalations.json          # blocked and resolved owner decisions
+    inspect-pack.json         # regenerable projection of current state
+  agents/                     # permanent and specialist agent cards
+  style/                      # organization preferences and lessons
+  experience-pool/            # reusable cross-engagement excerpts
+  .cli/                       # local sessions, worker activity, exports
+```
+
+For the full data flow and invariants, see
+[ARCHITECTURE.md](ARCHITECTURE.md).
+
+## Machine-readable output
+
+The following surfaces emit JSON suitable for automation:
 
 ```sh
-productteam role <client> seal <iter> <builder-input-file>
-productteam role <client> invoke Analyst <iter> '<single-turn task>'
-productteam role <client> invoke Builder <iter>
-productteam role <client> invoke Critic <iter> '<single-turn task>'
-productteam role <client> status [iter]
-productteam role <client> close <iter>
-productteam score <client> --iter <n>
+bin/productteam help --json
+bin/productteam status --json
+bin/productteam agents --json
+bin/productteam gate my-product status
+bin/productteam workspace my-product status
+bin/productteam role my-product status
+bin/productteam direction my-product list --json
 ```
 
-Each invoke is one `provider_ask` call in the isolated client worktree. It
-writes an atomic `request.json`, `result.json`, and hash-indexed `manifest.json`
-under `roles/iter-N/<Role>/attempt-N/`, including honest failure envelopes.
-`status` reads only those files and returns byte-stable `asked`, `ran`,
-`produced`, and `missing` arrays; it never reads chat or live process state.
+Plain files remain authoritative; JSON commands are derived views unless their
+command explicitly records a decision.
 
-Builder input is write-once per iteration. `seal` records the input file path
-and SHA-256; Builder re-hashes and reads those exact bytes, refusing missing or
-changed input before the provider call. It also composes the active pause and
-judgment gates. The seal proves input integrity, not identity or authorization.
+## Configuration
 
-A successful Analyst envelope writes `Analyst/stamp.json`, bound to its result
-hash and `CONSULT_ROLE_IDENTITY` (default `analyst`). Provider score publication
-requires `--iter N` and that exact iteration's valid stamp. Score and close
-refuse when the successful Builder identity equals the Analyst identity. Close
-also requires a successful Critic envelope, then writes `roles/iter-N/close.json`.
-The same authenticated provider may execute each role; role identity, not the
-provider binary name, enforces separation.
+| Variable | Purpose |
+|---|---|
+| `CONSULT_PROVIDER` | Override the active coding-agent executable. |
+| `CONSULT_AGENT_DIRS` | Add `:`-separated directories to provider discovery. |
+| `CONSULT_STATE_ROOT` | Relocate CLI-local onboarding and session state. |
+| `CONSULT_WORKSPACE_ROOT` | Relocate isolated client worktrees. |
+| `CONSULT_NONINTERACTIVE=1` | Apply onboarding without prompts. |
+| `CONSULT_NO_SPLASH=1` | Disable the startup splash. |
+| `CONSULT_NO_SPINNER=1` | Disable chat spinner frames. |
+| `CONSULT_AUTHORIZE_MERGE` | Point to the file authorizing a gated GitHub merge. |
+| `NO_COLOR=1` | Disable ANSI color. |
 
-## How an engagement runs
+## Testing
 
-1. Brief + mode in `state/engagements/<client>/engagement.md`
-2. Freeze `contract.json` + engagement `BENCHMARK-CONTRACT.md` before changes
-3. Build measurement tests; record iter-0 baseline
-4. Loop (max 5 iterations unless converged earlier):
+Run the core CLI smoke suite:
 
-   Inspect → Measure → Prioritize → Implement → Real tests →
-   Re-benchmark → Independently verify → Critique → Memory →
-   Safe harness improvements
+```sh
+bin/productteam smoke
+```
 
-5. Convergence: every dimension ≥ 9.0 with evidence, verifier OK,
-   no unresolved critical/high defects, no material regression.
+Run the broader shell test suite:
 
-## Layout
+```sh
+for test in tests/*.sh; do
+  printf '\n==> %s\n' "$test"
+  bash "$test"
+done
+```
 
-| Path | Purpose |
-|------|---------|
-| `CONSTITUTION.md` | Principles, autonomy, escalation |
-| `AGENTS.md` | Permanent roles |
-| `JUDGMENT.md` | Product Judgment modes + temporary specialists |
-| `BENCHMARKS.md` | Harness-wide contract v1 (prior engagements) |
-| `MEMORY.md` | Durable organizational memory |
-| `docs/learning-schema.md` | Harness-evolution learning artifact schema |
-| `docs/skills.md` | First-party skills (live provider calls) |
-| `bin/productteam` | CLI |
-| `lib/theme.sh` | Role chrome + semantic badges (ANSI literals stay in `bin/productteam`) |
-| `lib/render.sh` | Markdown-lite replies and evidence/delta highlighting |
-| `lib/activity.sh` | File-backed worker activity + bounded loading spinner |
-| `lib/repl.sh` | Interactive chat, judgment/score chrome, slash hints, interrupt-safe artifacts, transcript export |
-| `lib/provider.sh` | Provider detection, session cycling, and ask seam |
-| `lib/onboarding.sh` | First-run onboarding |
-| `lib/github.sh` | Gated PR/merge/validate helpers (no `--admin`) |
-| `lib/workspace.sh` | Isolated worktree lifecycle, dirty gate, provenance |
-| `lib/judgment-gate.sh` | Durable per-mode judgment gates + machine status |
-| `lib/engagement-state.sh` | Escalation pause/resume + file-derived inspect |
-| `lib/role-envelope.sh` | Sealed single-turn roles + authorship gates |
-| `lib/agent-cards.sh` | Named agent cards (markdown + json under state/agents/) |
-| `state/agents/` | Permanent role cards + specialist template |
-| `lib/run-checks.sh` | Deterministic checks (`scorer=checks`) |
-| `lib/harness-checks.sh` | Harness-apc objective checks + secrets scan |
-| `lib/harness-cli-checks.sh` | harness-cli-v1 check suite |
-| `lib/run-skill.sh` | Skills via real `provider_ask` |
-| `tests/consult-smoke.sh` | CLI smoke |
-| `tests/workspace-smoke.sh` | Real-worktree isolation refusal/pass probe |
-| `tests/judgment-gate-smoke.sh` | Real-CLI judgment gate refuse/pass probe |
-| `tests/escalation-smoke.sh` | Real block/authorize/resume/inspect probe |
-| `tests/role-envelope-smoke.sh` | Real-provider seal/envelope/authorship probe |
-| `tests/agent-cards-smoke.sh` | Agent card list/show/seed + envelope display_name |
-| `state/` | Engagements, scores, history, and plain-file CLI sessions |
-| `state/harness-evolution/` | APC self-improvement (locked `harness-apc-v1`) |
+Some tests exercise real Git worktrees, TTY behavior, or an installed coding
+provider. Read the test output rather than treating a skipped external
+capability as a pass.
 
-Client products live as **sibling repos**; each brief has `Repo: /absolute/path`
-and `contract.json` declares `scorer: checks|provider`. Use `productteam score`.
+For the optional TUI tests:
 
-## Principles
+```sh
+lib/tui/.venv/bin/pip install pytest
+lib/tui/.venv/bin/pytest -q lib/tui/tests
+```
 
-Delete before adding. Evidence over opinion. Never move the goalposts.
-Client vision is a constraint. Full text in `CONSTITUTION.md`.
+## Project documentation
+
+- [ARCHITECTURE.md](ARCHITECTURE.md) — layers, state model, and enforcement seams
+- [CONSTITUTION.md](CONSTITUTION.md) — principles, autonomy, and definition of done
+- [AGENTS.md](AGENTS.md) — permanent roles and collaboration protocol
+- [JUDGMENT.md](JUDGMENT.md) — judgment modes and temporary specialists
+- [BENCHMARKS.md](BENCHMARKS.md) — benchmark contracts
+- [docs/overnight-loop.md](docs/overnight-loop.md) — cron/systemd operation and stop conditions
+- [docs/skills.md](docs/skills.md) — first-party provider-backed skills
+- [docs/learning-schema.md](docs/learning-schema.md) — learning artifact schema
+
+## Contributing
+
+Issues and focused pull requests are welcome. Before submitting a change:
+
+1. Keep the scope small and explain the product or benchmark lift.
+2. Preserve the frozen command and state contracts unless the change explicitly
+   updates them.
+3. Add or update a deterministic check for behavior changes.
+4. Run the relevant smoke tests and include the exact commands and results.
+5. Do not commit provider credentials, session exports, local state, virtual
+   environments, or generated worktrees.
+
+Architecture, authentication, autonomy-policy, destructive, and client-vision
+changes require owner review under [CONSTITUTION.md](CONSTITUTION.md).
+
+## License
+
+A license file has not yet been added to this repository. Until one is
+published, copyright law applies by default; do not assume permission to copy,
+modify, or redistribute the project.
