@@ -36,7 +36,7 @@ NEEDLES = {
     "checks": ("no engagement 'nosuchclient'",),
     "harness-checks": ("Harness checks",),
     "skill": ("cannot resolve target",),
-    "gh": ("Logged in to github.com",),
+    "gh": ("Logged in to github.com", "auth: not logged in", "gh_user="),
     "onboarding": ("Detect the coding agents here",),
     "splash": ("▣",),
     "smoke": ("productteam smoke",),
