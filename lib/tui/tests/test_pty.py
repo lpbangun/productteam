@@ -160,9 +160,23 @@ def _run_status_gate_session():
         _send(fd, "/status\r")
         assert _wait_for(fd, out, "Product Consulting Harness", 25), \
             "real status output reached the transcript"
+        # The cockpit runs one turn at a time: the busy guard refuses a
+        # second submit while /status is still streaming, so wait for the
+        # streamed command turn to finish (its final line) before /gate.
+        # The needle must survive Textual's width crop of the rendered line.
+        assert _wait_for(fd, out, "bench <client> for scores", 25), \
+            "status command turn completed before /gate"
         _send(fd, "/gate\r")
-        assert _wait_for(fd, out, "use the CLI: productteam gate", 25), \
-            "unsupported /gate refuses with the registry usage"
+        # The busy guard can still win the final instant of the /status
+        # stream; when it refuses, /gate stays in the composer, so a second
+        # Enter re-submits it. An Enter on the already-refused empty composer
+        # is a no-op, which keeps this loop idempotent.
+        for _ in range(3):
+            if _wait_for(fd, out, "use the CLI: productteam gate", 10):
+                break
+            _send(fd, "\r")
+        else:
+            assert False, "unsupported /gate refuses with the registry usage"
         _send(fd, "/exit\r")
         _drain(fd, out, 3)
     finally:

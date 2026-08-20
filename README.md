@@ -236,6 +236,44 @@ session and explain why they must be run directly.
 | `memory` | Read durable organization-wide lessons. |
 | `org` | Show roles, autonomy boundaries, and the operating loop. |
 
+### Complete command surface
+
+```sh
+bin/productteam agents                              # coding agents on this device
+bin/productteam baseline <client>                   # iter-0 via isolated workspace + checks
+bin/productteam bench <client>                      # benchmark history and latest scores
+bin/productteam card list|show|seed-specialist      # named agent cards (state/agents/)
+bin/productteam chat                                # role-aware interactive session (TTY)
+bin/productteam checks <client>                     # deterministic checks in the isolated workspace
+bin/productteam direction <client> propose|list|clear|rebut
+bin/productteam escalation <client> block|status|resume
+bin/productteam gate <client> status|implement|select|direct|challenge|override|rebut
+bin/productteam gh preflight|pr-create|status|checks|merge|validate
+bin/productteam harness-checks                      # objective harness checks + secrets scan
+bin/productteam help [--json]                       # command table; --json emits the registry
+bin/productteam inspect <client>                    # regenerate the file-derived inspect pack
+bin/productteam judge <client> [set <mode>]
+bin/productteam memory                              # durable organization-wide lessons
+bin/productteam onboarding [--yes]
+bin/productteam open <client> --repo <abs-path> [--mode …] [--scorer …]
+bin/productteam org                                 # roles, loop, autonomy
+bin/productteam pool list|show|search|add           # experience excerpts (state/experience-pool/)
+bin/productteam project-memory show|append <client>
+bin/productteam report <client>                     # latest iteration reasoning
+bin/productteam role <client> seal|invoke|status|close
+bin/productteam run <client> <iter>                 # scores for one iteration
+bin/productteam run-loop <client> --max-hours <n> --max-iters <m>
+bin/productteam runtime [--check]                   # alias of agents
+bin/productteam score <client> --iter <n>           # Analyst-stamped score
+bin/productteam skill critique|benchmark|design-sprint <target>
+bin/productteam smoke                               # CLI smoke tests
+bin/productteam splash [--frames]                   # knowledge-graph banner (CONSULT_NO_SPLASH=1 skips)
+bin/productteam status [--json]                     # engagement overview
+bin/productteam style show|init|append|accept-lesson|rewrite
+bin/productteam tui                                 # optional Textual cockpit
+bin/productteam workspace <client> ensure|status|remove
+```
+
 Run `bin/productteam help` for the complete command surface or
 `bin/productteam help --json` for the machine-readable registry.
 

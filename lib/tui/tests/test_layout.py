@@ -1106,6 +1106,11 @@ def test_composer_width_visible_in_dock_states(tmp_path, monkeypatch):
             assert composer.region.width >= 20, "composer too narrow with ask dock"
             await pilot.press("escape")
             await pilot.pause()
+            # The cockpit runs one turn at a time (guard, see
+            # test_busy_refuses_second_turn): the ask seam above simulated a
+            # live provider turn, so finish that simulated turn before the
+            # CLI submit below — otherwise /gh merge is refused as busy.
+            app._provider_active = False
             # confirm state (real registry: gh is a supported verb)
             await pilot.press(*list("/gh merge"))
             await pilot.press("enter")
