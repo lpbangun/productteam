@@ -502,3 +502,126 @@ def test_confirm_non_matching_gh_unchanged(fake_env):
             assert not app.dock_visible()
 
     asyncio.run(run())
+
+
+def test_confirm_checks_with_client_intercepted(fake_env):
+    """`/checks <client> --allow-dirty <reason>` is a runnable write argv,
+    so it must open the confirm dock too (the exact two-token tuple it
+    replaced matched an invocation `checks` can never run — it requires the
+    <client> first arg); `/checks <client>` without the flag stays
+    immediate."""
+    spawns = _confirm_recorder()
+
+    async def run():
+        async with ProductTeamApp().run_test(size=(80, 24)) as pilot:
+            app = await _boot(pilot)
+            await _type_slash(pilot, '/checks harness-cli --allow-dirty "why"')
+            await pilot.press("enter")
+            await pilot.pause()
+            await _confirm_open(pilot, app)
+            assert app._confirm_label == '/checks harness-cli --allow-dirty "why"'
+            await pilot.press("enter")  # Run is default-highlighted
+            ok = await _wait_for(
+                pilot,
+                lambda: spawns[-1:] == [["checks", "harness-cli", "--allow-dirty", "why"]],
+                timeout=5,
+            )
+            assert ok, f"Run must execute the exact original argv: {spawns}"
+            assert app._dock_kind == "slash", "confirm dock closes after Run"
+            # No flag → not a write intercept; runs immediately.
+            await _type_slash(pilot, "/checks harness-cli")
+            await pilot.press("enter")
+            ok = await _wait_for(
+                pilot,
+                lambda: spawns[-1:] == [["checks", "harness-cli"]],
+                timeout=5,
+            )
+            assert ok, f"no-flag checks must run immediately, unchanged: {spawns}"
+            assert app._dock_kind == "slash", "no confirm dock without --allow-dirty"
+
+    asyncio.run(run())
+    assert spawns == [
+        ["checks", "harness-cli", "--allow-dirty", "why"],
+        ["checks", "harness-cli"],
+    ], "argv log must show exactly the two runs, in order"
+
+
+def test_provider_path_accepted(fake_env):
+    """/provider accepts an executable path the way the REPL's runtime_have
+    does (lib/provider.sh: `*/*` → -x file), not just catalog names."""
+    import shutil as _shutil
+
+    probe = _shutil.which("python3")
+    assert probe and "/" in probe
+
+    async def run():
+        async with ProductTeamApp().run_test(size=(80, 24)) as pilot:
+            app = await _boot(pilot)
+            await _type_slash(pilot, f'/provider {probe}')
+            await pilot.press("enter")
+            ok = await _wait_for(
+                pilot,
+                lambda: any(m == f"provider → {probe}" and s == "information"
+                            for m, s in app._toasts),
+            )
+            assert ok, "path provider accepted via runtime_have-style check"
+            assert os.environ.get("CONSULT_PROVIDER") == probe
+            # A path that is not an executable file is still refused.
+            await pilot.press(*list("/provider /definitely/not/a/real/agent"))
+            await pilot.press("enter")
+            ok = await _wait_for(
+                pilot,
+                lambda: any(
+                    m == "provider /definitely/not/a/real/agent is not a usable installed agent"
+                    and s == "information" for m, s in app._toasts),
+            )
+            assert ok, "non-executable path still refused"
+
+    asyncio.run(run())
+
+
+def test_busy_refuses_second_turn(fake_env):
+    """A submit while a provider turn or CLI stream is in flight must not
+    start a second turn (shared turn state would interleave and Ctrl+C
+    would orphan the newer provider group); session verbs stay local."""
+    spawns = _confirm_recorder()
+
+    async def run():
+        async with ProductTeamApp().run_test(size=(80, 24)) as pilot:
+            app = await _boot(pilot)
+            # Provider in flight: bare text is refused, composer keeps it.
+            app._provider_active = True
+            await pilot.press("h", "i")
+            await pilot.press("enter")
+            ok = await _wait_for(
+                pilot,
+                lambda: any(m == "still busy — wait for the current turn"
+                            and s == "warning" for m, s in app._toasts),
+            )
+            assert ok, "busy provider refuses a second bare-text turn"
+            assert app.composer.text == "hi", "refused text stays in the composer"
+            assert "│ You" not in app.transcript_text(), (
+                "no second You turn while the provider turn is live")
+            # Slash CLI verbs are refused while a stream is in flight.
+            app._provider_active = False
+            app._cli_busy = True
+            app.composer.clear()
+            app._toasts.clear()
+            await _type_slash(pilot, "/status")
+            await pilot.press("enter")
+            ok = await _wait_for(
+                pilot,
+                lambda: any(m == "still busy — wait for the current turn"
+                            and s == "warning" for m, s in app._toasts),
+            )
+            assert ok, "busy CLI stream refuses a second /status"
+            assert spawns == [], "no CLI spawn while busy"
+            # Session verbs are local and stay usable while busy.
+            app.composer.clear()
+            app._toasts.clear()
+            await pilot.press(*list("/clear"))
+            await pilot.press("enter")
+            await pilot.pause()
+            assert app.transcript_text().strip() == "", "/clear stays available"
+
+    asyncio.run(run())

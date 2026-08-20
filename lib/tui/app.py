@@ -938,15 +938,23 @@ class ProductTeamApp(App):
         self._close_dock()
 
     # ── confirm: pre-run write intercept (D13) ───────────────────────
-    # Only these three exact tokenized argvs are intercepted before the
+    # Only these write-carrying tokenized argvs are intercepted before the
     # supported branch of _run_slash; every other argv (including `/gh
     # preflight`) takes the unchanged path. Run reuses the stored original
-    # argv list; Cancel/Esc executes nothing.
+    # argv list; Cancel/Esc executes nothing. `checks ... --allow-dirty` is
+    # matched by flag anywhere after the verb because checks requires a
+    # <client> first arg — the legacy two-token tuple matched an argv the
+    # real command can never run (`checks` dies on a client named
+    # `--allow-dirty`).
     _CONFIRM_ARGVS = (
         ("gh", "merge"),
-        ("checks", "--allow-dirty"),
         ("onboarding", "--yes"),
     )
+
+    def _needs_confirm(self, argv: list[str]) -> bool:
+        if tuple(argv) in self._CONFIRM_ARGVS:
+            return True
+        return argv[:1] == ["checks"] and "--allow-dirty" in argv[1:]
 
     def _open_confirm(self, verb: str, args: str, argv: list[str]) -> None:
         """Open the single #dock in confirm state (L17): title row
@@ -1552,9 +1560,20 @@ class ProductTeamApp(App):
             self._render_chips()
             self._render_role_prefix()
         text = rest
-        dock_visible = self.dock_visible()
         first = text.split("\n", 1)[0].strip()
         typed_verb, typed_args = session.split_slash(first)
+        if (self._provider_active or self._cli_busy) and typed_verb not in (
+            "exit", "quit", "clear", "export", "provider", "workers"
+        ):
+            # One in-flight turn owns the shared turn state (artifact path,
+            # md buffer, proc pointer, command rail); a second submit would
+            # interleave chunks on the wrong rails and orphan the Ctrl+C
+            # interrupt path for the newer provider group. Session verbs
+            # stay available — they are local, cheap, and never spawn a
+            # provider or CLI turn; /exit already defers for _cli_busy.
+            self.notify("still busy — wait for the current turn", severity="warning")
+            return
+        dock_visible = self.dock_visible()
         if dock_visible:
             idx = self.dock.highlighted
             if idx is not None and idx < len(self._dock_verbs):
@@ -1647,7 +1666,7 @@ class ProductTeamApp(App):
             self._command_body(f"use the CLI: {usage}")
         elif kind == "supported":
             argv = [verb, *tokens]
-            if tuple(argv) in self._CONFIRM_ARGVS:
+            if self._needs_confirm(argv):
                 self._open_confirm(verb, args, argv)
                 return
             self._exec_cli(argv)

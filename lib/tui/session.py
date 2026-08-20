@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import json
 import os
+import shutil
 from datetime import datetime
 from pathlib import Path
 
@@ -104,21 +105,43 @@ def _found_agents() -> list[str]:
     return [a["name"] for a in data if a.get("status") == "found"]
 
 
+def _executable_provider(name: str) -> bool:
+    """runtime_have parity for non-catalog providers: an executable path, or
+    a name resolvable on PATH / CONSULT_AGENT_DIRS (lib/provider.sh
+    runtime_have: `*/*` → -x and not a directory; bare names → agent_locate
+    found, which searches PATH then the extra dirs)."""
+    if "/" in name:
+        return os.path.isfile(name) and os.access(name, os.X_OK)
+    if shutil.which(name):
+        return True
+    for d in os.environ.get("CONSULT_AGENT_DIRS", "").split(":"):
+        if d:
+            cand = os.path.join(d, name)
+            if os.path.isfile(cand) and os.access(cand, os.X_OK):
+                return True
+    return False
+
+
 def set_provider(name: str | None) -> tuple[bool, str]:
-    """Session-only CONSULT_PROVIDER (runtime_have / runtime_cycle semantics)."""
+    """Session-only CONSULT_PROVIDER (runtime_have / runtime_cycle semantics).
+
+    A named provider is accepted when it is a catalog agent reported found,
+    or when it is an executable path / PATH-resolvable name — the same
+    acceptance runtime_have gives the REPL. Cycling (no name) walks the
+    installed catalog only, exactly like runtime_cycle."""
     try:
         found = _found_agents()
     except Exception as exc:  # noqa: BLE001 — surface honestly
         return False, f"provider: {exc}"
+    if name:
+        if name in found or _executable_provider(name):
+            os.environ["CONSULT_PROVIDER"] = name
+            return True, f"provider → {name}"
+        return False, f"provider {name} is not a usable installed agent"
     if not found:
         return False, "no installed agent to cycle to — run `productteam agents`"
     current = os.environ.get("CONSULT_PROVIDER", "")
     base = os.path.basename(current) if current else ""
-    if name:
-        if name in found:
-            os.environ["CONSULT_PROVIDER"] = name
-            return True, f"provider → {name}"
-        return False, f"provider {name} is not a usable installed agent"
     if base in found:
         idx = found.index(base)
         nxt = found[(idx + 1) % len(found)]
