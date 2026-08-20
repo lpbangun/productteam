@@ -19,9 +19,9 @@ cmd_reg_add() { # name aliases usage summary min_args handler chat_supported cha
   CMD_REGISTRY+=("$name$_csep$aliases$_csep$usage$_csep$summary$_csep$min_args$_csep$handler$_csep$chat$_csep$reason")
 }
 
-# ── frozen membership: the 32-command table (help is the canonical surface) ──
+# ── frozen membership: the 33-command table (help is the canonical surface) ──
 # chat_supported: 18 read/delegated CLI commands safe in a session.
-# chat_reason:    non-empty safety/usefulness reason for the 14 unsupported.
+# chat_reason:    non-empty safety/usefulness reason for the 15 unsupported.
 # Chat-only verbs (palette-only, not CLI commands) live in CMD_CHAT_ONLY.
 cmd_reg_add 'agents'          ''    'productteam agents [--json]'                                    'Coding agents on this device' 0 cmd_agents 1 ''
 cmd_reg_add 'baseline'        ''    'productteam baseline <client> [--allow-dirty <reason>]'         'iter-0 via workspace + checks/score entrypoints' 1 cmd_baseline 0 'usefulness: one-shot iter-0 bootstrap gated by --allow-dirty; owner-gated write'
@@ -54,6 +54,7 @@ cmd_reg_add 'smoke'           ''    'productteam smoke'                         
 cmd_reg_add 'splash'          ''    'productteam splash [--frames]'                                  'Knowledge-graph banner (CONSULT_NO_SPLASH=1 skips)' 0 cmd_splash 1 ''
 cmd_reg_add 'status'          ''    'productteam status [--json]'                                    'The same overview, named explicitly' 0 cmd_status 1 ''
 cmd_reg_add 'style'           ''    'productteam style show|init|append|accept-lesson|rewrite …'     'Org taste/risk/stack/never (state/style/)' 1 cmd_style 0 'safety: org style is owner-edited durable memory; read side via style show CLI'
+cmd_reg_add 'tui'             ''    'productteam tui'                                               'Optional Textual cockpit (TTY)' 0 cmd_tui 0 'safety/usefulness: optional presentation client; TTY required; must not nest inside chat'
 cmd_reg_add 'workspace'       'worktree' 'productteam workspace <client> ensure|status|remove'        'Isolated client worktree lifecycle' 2 cmd_workspace 0 'safety: worktree mutation; in-session invocation could touch dirty/foreign worktrees'
 
 # ── chat-only verbs: palette-only, never CLI commands ───────────────────
@@ -105,7 +106,7 @@ cmd_reg_chat_names() { # → registry-ordered chat-supported command names, one 
   done
 }
 
-cmd_help_json() { # → `help --json`: 32-command registry + chat-only verbs (frozen shape)
+cmd_help_json() { # → `help --json`: 33-command registry + chat-only verbs (frozen shape)
   local tsv='' i co_json line
   for i in "${!CMD_REGISTRY[@]}"; do
     cmd_reg_get "$i"

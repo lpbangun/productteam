@@ -1,0 +1,36 @@
+{
+  "commands": [
+    {
+      "argv": [
+        "/home/logani/.herdr/worktrees/Product Consulting Harness/exp-tui-migration/spikes/textual/.venv/bin/python",
+        "-m",
+        "compileall",
+        "-q",
+        "/home/logani/.herdr/worktrees/Product Consulting Harness/exp-tui-migration/spikes/textual/src"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/home/logani/.herdr/worktrees/Product Consulting Harness/exp-tui-migration/spikes/textual/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q"
+      ],
+      "exit_code": 0,
+      "stdout": "..................................................                       [100%]\n--------------------------- snapshot report summary ----------------------------\n8 snapshots passed.\n50 passed in 16.61s\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/home/logani/.herdr/worktrees/Product Consulting Harness/exp-tui-migration/spikes/textual/.venv/bin/python",
+        "/home/logani/.herdr/worktrees/Product Consulting Harness/exp-tui-migration/spikes/textual/scripts/package.py"
+      ],
+      "exit_code": 0,
+      "stdout": "packaged productteam-tui-textual-1.0.0.zip (22788 bytes, 7 entries)\n",
+      "stderr": ""
+    }
+  ]
+}

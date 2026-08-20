@@ -1,0 +1,552 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ProductTeam — fidelity decisions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#070707;--canvas:#0a0a0a;--field:#141414;--rule:#2a2a2a;--text:#e4e4e4;--mute:#737373;--you:#8a8a8a;--principal:#c084fc;--analyst:#60a5fa;--builder:#22c55e;--critic:#f59e0b;--ok:#22c55e;--err:#ef4444;--cell:12.5px;--lh:19px}
+*{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--text);font-family:"IBM Plex Mono",ui-monospace,monospace}
+body{padding:40px 24px 96px}
+header.page,main{max-width:1240px;margin:auto}
+header.page{margin-bottom:36px}
+h1{font-size:14px;margin:0 0 8px;letter-spacing:.04em}
+.lede,.note{color:var(--mute);font-size:12px;line-height:1.55;margin:0;max-width:92ch}
+.lede{margin-bottom:12px}
+.lock{color:var(--ok);font-size:12px;margin-top:12px}
+.toc{display:flex;flex-wrap:wrap;gap:8px 16px;margin:16px 0 0;font-size:11px}
+.toc a{color:var(--mute);text-decoration:none}.toc a:hover{color:var(--text)}
+section{margin:0 0 56px}
+h2{font-size:11px;color:var(--mute);text-transform:uppercase;letter-spacing:.12em;margin:0 0 6px}
+.note{margin:0 0 14px}
+.pair{display:grid;grid-template-columns:repeat(auto-fit,minmax(420px,1fr));gap:28px 36px;align-items:start}
+.pair.three{grid-template-columns:repeat(auto-fit,minmax(320px,1fr))}
+figure{margin:0}
+figcaption{font-size:11px;color:var(--mute);margin:0 0 9px;letter-spacing:.03em}
+figcaption b{color:var(--text);font-weight:600}
+.tag{font-size:10px;font-weight:600;margin-left:7px}
+.tag.rec{color:var(--ok)}
+.tag.mock{color:var(--analyst)}
+.tag.now{color:var(--critic)}
+.live{font-size:11px;color:var(--mute);margin:10px 0 0}
+.term{--cols:80;--rows:18;width:calc(var(--cols)*.62em);max-width:100%;height:calc(var(--rows)*var(--lh));background:var(--canvas);font-size:var(--cell);line-height:var(--lh);display:grid;grid-template-rows:auto 1px 1fr auto auto auto auto;overflow:hidden;position:relative;border:1px solid var(--rule)}
+.term.short{--rows:14;height:calc(14*var(--lh))}
+.term.n40{--cols:40;--rows:16;--cell:12px;--lh:18px}
+.term.boot{grid-template-rows:1fr auto auto;--rows:16}
+.hdr,.chips,.composer,.ftr,.activity{padding:0 8px;white-space:nowrap;overflow:hidden}
+.hdr{font-weight:600;min-height:var(--lh)}
+.heads{color:var(--mute);margin-right:7px;font-weight:400}
+.heads .pulse{color:var(--ok);animation:pulse 1s steps(2) infinite}
+.dim{color:var(--mute);font-weight:400}
+.score{color:var(--ok)}
+.rule{height:1px;background:var(--rule)}
+.log{min-height:0;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end;gap:8px;padding:6px 8px 5px}
+.log.top{justify-content:flex-start}
+.home{display:grid;grid-template-columns:1.4ch 1fr 4ch;gap:0 8px;color:var(--mute)}
+.home .s{color:var(--ok);text-align:right}
+.home-live{color:var(--mute);white-space:pre}
+.home-live b{color:var(--ok);font-weight:600}
+.home-live .n{color:var(--text);font-weight:400}
+.turn{display:grid;grid-template-columns:2px 1fr;gap:10px}
+.rail{background:#3f3f3f}
+.turn.principal .rail{background:var(--principal)}
+.turn.builder .rail{background:var(--builder)}
+.turn.cmd .rail{background:#3f3f3f}
+.role{font-weight:600}
+.role.you{color:var(--you);font-weight:400}
+.role.cmd{color:var(--mute);font-weight:400}
+.role.principal{color:var(--principal)}
+.role.builder{color:var(--builder)}
+.body{white-space:pre-wrap;min-width:0}
+.card{color:var(--mute);margin-top:4px}
+.card.ok{color:var(--ok)}
+.card.err{color:var(--err)}
+.activity{background:#0e0e0e;border-top:1px solid var(--rule);padding-top:3px;padding-bottom:3px;color:var(--mute)}
+.activity .line{display:flex;gap:8px;overflow:hidden}
+.agent{font-weight:600}
+.agent.principal{color:var(--principal)}
+.agent.analyst{color:var(--analyst)}
+.agent.builder{color:var(--builder)}
+.agent.critic{color:var(--critic)}
+.chips{display:flex;gap:13px;color:var(--mute);min-height:var(--lh)}
+.chips .sel{color:var(--text)}
+.chips .done{color:var(--ok)}
+.chips .fail{color:var(--err)}
+.composer{background:var(--field);min-height:calc(var(--lh)*3);padding-top:4px;color:var(--mute)}
+.cursor{color:var(--text)}
+.gutter{display:inline-block;width:12ch}
+.ftr{color:var(--mute);display:flex;gap:14px}
+.dock{background:var(--field);border-top:1px solid var(--rule);padding:4px 0 2px}
+.ask-head{font-weight:600;padding:0 8px}
+.count{float:right;color:var(--mute);font-weight:400}
+.ask-q{padding:0 8px 4px}
+.option{display:grid;grid-template-columns:2ch 1fr 11ch;gap:6px;color:var(--mute);padding:2px 8px}
+.option.sel{background:#1c1c1c;color:var(--text)}
+.option.sel .radio,.option em{color:var(--ok)}
+.option b,.option small{display:block}
+.option small{font-size:10px;line-height:14px;color:var(--mute)}
+.option em{font-size:9px;text-align:right;font-style:normal}
+.opt{display:grid;grid-template-columns:1.4ch 12ch 1fr;gap:8px;color:var(--mute);padding:0 8px}
+.opt.sel{color:var(--text);font-weight:600;background:#1c1c1c}
+.opt.sel .k{color:var(--ok)}
+.ev-panel{border:1px solid var(--rule);border-radius:2px;background:#0e0e0e;margin:2px 8px;overflow:hidden}
+.ev-head{display:flex;color:var(--mute);padding:1px 8px;border-bottom:1px solid var(--rule)}
+.ev-head .t{margin-left:auto}
+.ev-row{display:grid;grid-template-columns:5ch 1fr;gap:8px;padding:1px 8px;color:var(--mute)}
+.ev-row .plus{color:var(--ok)}
+.ev-row .path{font-weight:600;color:var(--text)}
+.toast{position:absolute;top:8px;right:8px;color:var(--err);background:var(--canvas);z-index:2}
+.toast.bar{left:0;right:0;top:0;padding:0 8px;background:#1a0a0a}
+.splash{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:0;padding:8px 8px 0}
+.splash svg{width:300px;height:auto}
+.brand{font-weight:600;margin-top:8px}
+.sub{color:var(--mute);font-size:11px;margin-top:4px}
+.bot{color:#a3a3a3}
+.bot.on{color:var(--ok)}
+.ascii{display:grid;margin:0 auto;color:var(--mute);font-variant-ligatures:none}
+.ascii span{display:flex;align-items:center;justify-content:center;width:var(--cell);height:var(--lh)}
+.ascii span.on{color:var(--ok)}
+@keyframes pulse{50%{opacity:.3}}
+.mini{display:grid;gap:18px}
+.row5{display:grid;grid-template-columns:18ch 1fr 1fr;gap:10px 16px;font-size:11px;color:var(--mute);align-items:center;padding:8px 0;border-top:1px solid var(--rule)}
+.row5 b{color:var(--text);font-weight:600}
+.row5 .k{color:var(--ok)}
+</style>
+</head>
+<body>
+<header class="page">
+  <h1>ProductTeam · fidelity decisions</h1>
+  <p class="lede">Functionality is already green (73/73). These frames are the remaining visual locks. Left is the locked HTML mock. Right is the recommended ship for a real terminal. Team chat (no default @Role) is already locked and not reopened here.</p>
+  <p class="lock">No code will change until you lock these. Ask UI matches D1–D14.</p>
+  <nav class="toc">
+    <a href="#d1">D1 splash art</a>
+    <a href="#d2">D2 linger</a>
+    <a href="#d3">D3 header</a>
+    <a href="#d4">D4 gutter</a>
+    <a href="#d5">D5 chips</a>
+    <a href="#d6">D6 unpin</a>
+    <a href="#d7">D7 busy box</a>
+    <a href="#d8">D8 home</a>
+    <a href="#d9">D9 no provider</a>
+    <a href="#d10">D10 compact</a>
+    <a href="#d11">D11 chip status</a>
+    <a href="#d12">D12 docks</a>
+    <a href="#d13">D13 evidence</a>
+    <a href="#d14">D14 chrome pack</a>
+  </nav>
+</header>
+<main>
+
+<section id="d1">
+  <h2>D1 · Splash silhouettes</h2>
+  <p class="note">The locked Futuristic heads are three different machines (filled diamond chin / outlined diamond / chevron). Live ASCII copies one body three times and only swaps <b># / o / &gt;</b>. That is why it feels cheaper than the mock. Recommendation keeps futuristic + pure ASCII cells, but gives each head a different silhouette. No <code>· ─ ◇ ▸</code>.</p>
+  <div class="pair three">
+    <figure>
+      <figcaption><b>Mock</b> · locked SVG<span class="tag mock">mock</span></figcaption>
+      <div class="term boot" data-frame="d1-mock"></div>
+    </figure>
+    <figure>
+      <figcaption><b>Live today</b> · identical bodies<span class="tag now">now</span></figcaption>
+      <div class="term boot" data-frame="d1-now"></div>
+    </figure>
+    <figure>
+      <figcaption><b>Recommendation</b> · distinct ASCII<span class="tag rec">rec</span></figcaption>
+      <div class="term boot" data-frame="d1-rec"></div>
+    </figure>
+  </div>
+</section>
+
+<section id="d2">
+  <h2>D2 · Splash linger</h2>
+  <p class="note">“Stay put as is” can mean keep the Futuristic design, or keep the splash on screen until you continue. Live auto-finishes in about 2s and still shows header/chips underneath. Mock is splash + composer + footer only, until a key.</p>
+  <div class="pair">
+    <figure>
+      <figcaption><b>Mock</b> · until key, no header<span class="tag mock">mock</span></figcaption>
+      <div class="term boot" data-frame="d2-mock"></div>
+    </figure>
+    <figure>
+      <figcaption><b>Recommendation</b> · until key, splash-only plane<span class="tag rec">rec</span></figcaption>
+      <div class="term boot" data-frame="d2-rec"></div>
+    </figure>
+  </div>
+  <p class="live">Live today: header + chips stay visible; 400ms ticks; auto-finish at step 5 (~2s). Any key already skips.</p>
+</section>
+
+<section id="d3">
+  <h2>D3 · Header heads</h2>
+  <p class="note"><code>▣</code> is ~14px vs ~9px for ASCII, so <code>▣─▣─▣</code> gaps the same way splash did. Recommendation keeps three heads + middle live pulse, redrawn even-width: Principal <code>#</code>, Analyst <code>o</code>, Builder <code>&gt;</code>.</p>
+  <div class="pair">
+    <figure>
+      <figcaption><b>Mock</b> · ▣─▣─▣<span class="tag mock">mock</span></figcaption>
+      <div class="term short" data-frame="d3-mock"></div>
+    </figure>
+    <figure>
+      <figcaption><b>Recommendation</b> · #-o-&gt;<span class="tag rec">rec</span></figcaption>
+      <div class="term short" data-frame="d3-rec"></div>
+    </figure>
+  </div>
+</section>
+
+<section id="d4">
+  <h2>D4 · Composer gutter</h2>
+  <p class="note">Team mode correctly shows no @Role, but <code>#role-prefix</code> is still a fixed 12-column gutter, so the caret sits indented. Mock caret is flush left.</p>
+  <div class="pair">
+    <figure>
+      <figcaption><b>Live today</b> · 12-col empty prefix<span class="tag now">now</span></figcaption>
+      <div class="term short" data-frame="d4-now"></div>
+    </figure>
+    <figure>
+      <figcaption><b>Recommendation</b> · collapse until pinned<span class="tag rec">rec</span></figcaption>
+      <div class="term short" data-frame="d4-rec"></div>
+    </figure>
+  </div>
+</section>
+
+<section id="d5">
+  <h2>D5 · Idle chip color</h2>
+  <p class="note">Mock idle chips are mute gray. You later locked distinct role color on the chip. Live already colors them always, bold when pinned or focused.</p>
+  <div class="pair">
+    <figure>
+      <figcaption><b>Mock</b> · mute until working<span class="tag mock">mock</span></figcaption>
+      <div class="term short" data-frame="d5-mock"></div>
+    </figure>
+    <figure>
+      <figcaption><b>Recommendation</b> · always role-hued<span class="tag rec">rec</span></figcaption>
+      <div class="term short" data-frame="d5-rec"></div>
+    </figure>
+  </div>
+  <p class="live">Live today already matches the recommendation.</p>
+</section>
+
+<section id="d6">
+  <h2>D6 · Unpin back to the team</h2>
+  <p class="note">You locked: click a chip to pin; click the already-pinned chip to unpin. Live pin-only (keyboard Enter had been toggling off). Recommendation: pin on first click, unpin only on a second click of that same chip.</p>
+  <div class="pair">
+    <figure>
+      <figcaption><b>Pinned</b> · composer shows @Builder<span class="tag mock">state a</span></figcaption>
+      <div class="term short" data-frame="d6-pin"></div>
+    </figure>
+    <figure>
+      <figcaption><b>Recommendation</b> · second click returns to team<span class="tag rec">rec</span></figcaption>
+      <div class="term short" data-frame="d6-rec"></div>
+    </figure>
+  </div>
+</section>
+
+<section id="d7">
+  <h2>D7 · Busy composer</h2>
+  <p class="note">Mock writes <code>team is working</code> / <code>Builder is responding</code> into the composer. Live keeps the box empty and puts facts in the footer, so you can still type / or Ctrl+C.</p>
+  <div class="pair">
+    <figure>
+      <figcaption><b>Mock</b> · occupied composer<span class="tag mock">mock</span></figcaption>
+      <div class="term short" data-frame="d7-mock"></div>
+    </figure>
+    <figure>
+      <figcaption><b>Recommendation</b> · empty box, footer facts<span class="tag rec">rec</span></figcaption>
+      <div class="term short" data-frame="d7-rec"></div>
+    </figure>
+  </div>
+  <p class="live">Live today already matches the recommendation.</p>
+</section>
+
+<section id="d8">
+  <h2>D8 · Home rows</h2>
+  <p class="note">Mock is quieter. Live is more useful (iter + trend). Both are display-only, max three scored rows, smoke/run-loop excluded.</p>
+  <div class="pair">
+    <figure>
+      <figcaption><b>Mock</b> · ● name …… 9.5<span class="tag mock">mock</span></figcaption>
+      <div class="term short" data-frame="d8-mock"></div>
+    </figure>
+    <figure>
+      <figcaption><b>Recommendation</b> · keep live score · iter · trend<span class="tag rec">rec</span></figcaption>
+      <div class="term short" data-frame="d8-rec"></div>
+    </figure>
+  </div>
+</section>
+
+<section id="d9">
+  <h2>D9 · No-provider screen</h2>
+  <p class="note">Locked gallery has a first-run empty: <code>no installed agent</code>. Live only handles no scored sessions. Recommendation: ship the mock first-run, still display-only.</p>
+  <div class="pair">
+    <figure>
+      <figcaption><b>Mock</b> · no installed agent<span class="tag mock">mock</span></figcaption>
+      <div class="term short" data-frame="d9-mock"></div>
+    </figure>
+    <figure>
+      <figcaption><b>Recommendation</b> · ship that first-run<span class="tag rec">rec</span></figcaption>
+      <div class="term short" data-frame="d9-rec"></div>
+    </figure>
+  </div>
+  <p class="live">Live today: scored-home empty copy only. No dedicated no-provider screen.</p>
+</section>
+
+<section id="d10">
+  <h2>D10 · Compact chips</h2>
+  <p class="note">At 40 columns the mock collapses chips to the live role + <code>+3</code>. Live already collapses activity to 1+N, but still tries to fit all four chips.</p>
+  <div class="pair">
+    <figure>
+      <figcaption><b>Live today</b> · four chips at 40 cols<span class="tag now">now</span></figcaption>
+      <div class="term n40 short" data-frame="d10-now"></div>
+    </figure>
+    <figure>
+      <figcaption><b>Recommendation</b> · ◆ Principal +3<span class="tag rec">rec</span></figcaption>
+      <div class="term n40 short" data-frame="d10-rec"></div>
+    </figure>
+  </div>
+</section>
+
+<section id="d11">
+  <h2>D11 · Done / fail on chips</h2>
+  <p class="note">Mock paints <code>✓ ▸ Builder</code> / <code>✗ ▸ Builder</code> on the chip row. Live already attaches done/fail cards on the turn. Recommendation: keep chips as identity, leave status on the card — less duplicate chrome.</p>
+  <div class="pair">
+    <figure>
+      <figcaption><b>Mock</b> · status glyphs on chips<span class="tag mock">mock</span></figcaption>
+      <div class="term short" data-frame="d11-mock"></div>
+    </figure>
+    <figure>
+      <figcaption><b>Recommendation</b> · cards only<span class="tag rec">rec</span></figcaption>
+      <div class="term short" data-frame="d11-rec"></div>
+    </figure>
+  </div>
+</section>
+
+<section id="d12">
+  <h2>D12 · Ask / confirm chrome</h2>
+  <p class="note">Behavior already works (question is a real role turn; Cancel spawns nothing). This is whether the dock should look like the OMP mock (title, 1 of N, the word recommended, descriptions) or stay a compact option list.</p>
+  <div class="pair">
+    <figure>
+      <figcaption><b>Mock</b> · OMP dock<span class="tag mock">mock</span></figcaption>
+      <div class="term" data-frame="d12-mock"></div>
+    </figure>
+    <figure>
+      <figcaption><b>Recommendation</b> · match the mock chrome<span class="tag rec">rec</span></figcaption>
+      <div class="term" data-frame="d12-rec"></div>
+    </figure>
+  </div>
+  <p class="live">Live today: option rows with ★, no title / “recommended” word. Confirm is two rows: Run /gh merge and Cancel.</p>
+</section>
+
+<section id="d13">
+  <h2>D13 · Evidence placement</h2>
+  <p class="note">Mock puts a bordered panel between transcript and chips, footer <code>enter open</code>. Live uses the same #dock as slash, above the composer, display-only (Enter closes, does not open files). Recommendation: keep display-only; do not add file-open. Placement is the visual choice — rec keeps the dock-above-composer so overlays never cover the composer.</p>
+  <div class="pair">
+    <figure>
+      <figcaption><b>Mock</b> · panel in the transcript stack<span class="tag mock">mock</span></figcaption>
+      <div class="term" data-frame="d13-mock"></div>
+    </figure>
+    <figure>
+      <figcaption><b>Recommendation</b> · bordered dock above composer<span class="tag rec">rec</span></figcaption>
+      <div class="term" data-frame="d13-rec"></div>
+    </figure>
+  </div>
+</section>
+
+<section id="d14">
+  <h2>D14 · Small chrome pack</h2>
+  <p class="note">Five leftovers that do not change behavior. Recommendation is keep live for the pack — terminal-honest equivalents of the mock.</p>
+  <div class="row5"><b>item</b><b>mock</b><b>recommendation</b></div>
+  <div class="row5"><span>slash label</span><span>/status</span><span class="k">Command · HH:MM (live)</span></div>
+  <div class="row5"><span>fail toast</span><span>full-width top bar</span><span class="k">Textual corner toast (live)</span></div>
+  <div class="row5"><span>hairline</span><span>1px rule</span><span class="k">filled #2a2a2a row (live; terminals have no 1px)</span></div>
+  <div class="row5"><span>middle pulse</span><span>blinks</span><span class="k">turns green, no blink (live)</span></div>
+  <div class="row5"><span>turn rail</span><span>2px bar</span><span class="k">│ in the role hue (live)</span></div>
+</section>
+
+</main>
+<script>
+const SVG = `<svg class="mark idle" width="300" height="156" viewBox="0 0 340 176" xmlns="http://www.w3.org/2000/svg" role="img">
+<g class="bot" data-role="principal">
+  <line x1="50" y1="12" x2="50" y2="4" stroke="currentColor" stroke-width="2"/>
+  <circle cx="50" cy="3" r="3" fill="currentColor"/>
+  <polygon points="26,14 74,14 78,46 78,84 22,84 26,46" stroke="currentColor" stroke-width="2" fill="none"/>
+  <circle cx="40" cy="40" r="5" fill="currentColor"/>
+  <circle cx="60" cy="40" r="5" fill="currentColor"/>
+  <line x1="38" y1="62" x2="62" y2="62" stroke="currentColor" stroke-width="2"/>
+  <line x1="50" y1="84" x2="50" y2="116" stroke="currentColor" stroke-width="2"/>
+  <polygon points="50,124 58,132 50,140 42,132" fill="currentColor"/>
+  <text x="50" y="164" font-size="11" font-family="IBM Plex Mono, monospace" fill="currentColor" text-anchor="middle">Principal</text>
+</g>
+<g class="bot" data-role="analyst">
+  <line x1="170" y1="12" x2="170" y2="4" stroke="currentColor" stroke-width="2"/>
+  <circle cx="170" cy="3" r="3" fill="currentColor"/>
+  <polygon points="146,14 194,14 198,46 198,84 142,84 146,46" stroke="currentColor" stroke-width="2" fill="none"/>
+  <circle cx="160" cy="40" r="5" fill="currentColor"/>
+  <circle cx="180" cy="40" r="5" fill="currentColor"/>
+  <line x1="158" y1="62" x2="182" y2="62" stroke="currentColor" stroke-width="2"/>
+  <line x1="170" y1="84" x2="170" y2="116" stroke="currentColor" stroke-width="2"/>
+  <polygon points="170,124 178,132 170,140 162,132" stroke="currentColor" stroke-width="2" fill="none"/>
+  <text x="170" y="164" font-size="11" font-family="IBM Plex Mono, monospace" fill="currentColor" text-anchor="middle">Analyst</text>
+</g>
+<g class="bot" data-role="builder">
+  <line x1="290" y1="12" x2="290" y2="4" stroke="currentColor" stroke-width="2"/>
+  <circle cx="290" cy="3" r="3" fill="currentColor"/>
+  <polygon points="266,14 314,14 318,46 318,84 262,84 266,46" stroke="currentColor" stroke-width="2" fill="none"/>
+  <circle cx="280" cy="40" r="5" fill="currentColor"/>
+  <circle cx="300" cy="40" r="5" fill="currentColor"/>
+  <line x1="278" y1="62" x2="302" y2="62" stroke="currentColor" stroke-width="2"/>
+  <line x1="290" y1="84" x2="290" y2="116" stroke="currentColor" stroke-width="2"/>
+  <polygon points="284,124 284,140 298,132" fill="currentColor"/>
+  <text x="290" y="164" font-size="11" font-family="IBM Plex Mono, monospace" fill="currentColor" text-anchor="middle">Builder</text>
+</g></svg>`;
+
+const LIVE = {
+  Principal: ["     |     ","    /^\\    ","   /---\\   ","  | o o |  ","  |  -  |  ","     #     "," Principal "],
+  Analyst:   ["     |     ","    /^\\    ","   /---\\   ","  | o o |  ","  |  -  |  ","     o     ","  Analyst  "],
+  Builder:   ["     |     ","    /^\\    ","   /---\\   ","  | o o |  ","  |  -  |  ","     >     ","  Builder  "]
+};
+const REC = {
+  Principal: ["     |     ","    /^\\    ","   /###\\   ","  | o o |  ","  |  -  |  ","    /_\\    "," Principal "],
+  Analyst:   ["     |     ","    / \\    ","   /---\\   ","  | o o |  ","  |     |  ","    \\_/    ","  Analyst  "],
+  Builder:   ["     ^     ","    / \\    ","   />--\\   ","  | > < |  ","  |  _  |  ","     >     ","  Builder  "]
+};
+const ORDER = ["Principal","Analyst","Builder"];
+
+function asciiGrid(heads, glow) {
+  const gap = 3, cols = 11*3 + gap*2;
+  const wrap = document.createElement("div");
+  wrap.className = "ascii";
+  wrap.style.gridTemplateColumns = `repeat(${cols}, var(--cell))`;
+  for (let r=0;r<7;r++) {
+    ORDER.forEach((role,i) => {
+      if (i) for (let g=0;g<gap;g++) wrap.appendChild(cell(" "));
+      const on = glow === role;
+      [...heads[role][r]].forEach(ch => wrap.appendChild(cell(ch, on)));
+    });
+  }
+  return wrap;
+}
+function cell(ch, on) {
+  const s = document.createElement("span");
+  s.textContent = ch;
+  if (on) s.className = "on";
+  return s;
+}
+function splashBlock(kind, glow) {
+  const splash = document.createElement("div");
+  splash.className = "splash";
+  if (kind === "svg") splash.innerHTML = SVG;
+  else splash.appendChild(asciiGrid(kind === "rec" ? REC : LIVE, glow));
+  const brand = document.createElement("div");
+  brand.className = "brand";
+  brand.textContent = "ProductTeam";
+  const sub = document.createElement("div");
+  sub.className = "sub";
+  sub.textContent = glow ? `◆ ${glow} is working` : "principal · analyst · builder";
+  if (glow) sub.innerHTML = `<span class="who">${glow === "Principal" ? "◆ Principal" : glow === "Analyst" ? "◇ Analyst" : "▸ Builder"}</span> is working`;
+  splash.append(brand, sub);
+  return splash;
+}
+
+function hdr(kind, pulse) {
+  if (kind === "ascii") {
+    const mid = pulse ? '<span class="pulse">o</span>' : "o";
+    return `<div class="hdr"><span class="heads">#-${mid}-&gt;</span>ProductTeam<span class="dim"> · this repo · </span><span class="score">9.5</span></div>`;
+  }
+  const mid = pulse ? '<span class="pulse">▣</span>' : "▣";
+  return `<div class="hdr"><span class="heads">▣─${mid}─▣</span>ProductTeam<span class="dim"> · this repo · </span><span class="score">9.5</span></div>`;
+}
+function chips(mode) {
+  if (mode === "mute") return `<div class="chips"><span>◆ Principal</span><span>◇ Analyst</span><span>▸ Builder</span><span>◉ Critic</span></div>`;
+  if (mode === "hued") return `<div class="chips"><span class="agent principal">◆ Principal</span><span class="agent analyst">◇ Analyst</span><span class="agent builder">▸ Builder</span><span class="agent critic">◉ Critic</span></div>`;
+  if (mode === "pin-b") return `<div class="chips"><span class="agent principal">◆ Principal</span><span class="agent analyst">◇ Analyst</span><span class="agent builder sel">▸ Builder</span><span class="agent critic">◉ Critic</span></div>`;
+  if (mode === "done") return `<div class="chips"><span>◆ Principal</span><span>◇ Analyst</span><span class="done">✓ ▸ Builder</span><span class="done">✓ ◉ Critic</span></div>`;
+  if (mode === "compact-now") return `<div class="chips"><span class="agent principal">◆ Principal</span><span class="agent analyst">◇ Analyst</span><span>▸ Builder</span><span>◉ Critic</span></div>`;
+  if (mode === "compact-rec") return `<div class="chips"><span class="agent principal">◆ Principal</span><span>+3</span></div>`;
+  return `<div class="chips"><span>◆ Principal</span><span>◇ Analyst</span><span>▸ Builder</span><span>◉ Critic</span></div>`;
+}
+function composer(text, gutter) {
+  if (text) return `<div class="composer">${text}</div>`;
+  if (gutter) return `<div class="composer"><span class="gutter"></span><span class="cursor">▍</span></div>`;
+  return `<div class="composer"><span class="cursor">▍</span></div>`;
+}
+function homeMock() {
+  return `<div class="log top"><div class="home"><span>●</span><span>harness-cli</span><span class="s">9.5</span><span>●</span><span>agcode-learning</span><span class="s">8.3</span><span>●</span><span>onboarding-flight</span><span class="s">9.5</span></div></div>`;
+}
+function homeLive() {
+  return `<div class="log top"><div class="home-live"><b>9.5</b>  <span class="n">harness-cli</span> <span class="dim">· iter-2 · +0.0</span>
+<b>8.3</b>  <span class="n">agcode-learning</span> <span class="dim">· iter-1 · +0.2</span>
+<b>9.5</b>  <span class="n">onboarding-flight</span> <span class="dim">· iter-2 · +0.0</span></div></div>`;
+}
+
+const frames = {
+  "d1-mock": {boot:true, splash:"svg", glow:null},
+  "d1-now":  {boot:true, splash:"live", glow:null},
+  "d1-rec":  {boot:true, splash:"rec", glow:null},
+  "d2-mock": {boot:true, splash:"svg", glow:null},
+  "d2-rec":  {boot:true, splash:"rec", glow:null},
+  "d3-mock": {header:"box", log:"home-mock", chips:"mute", composer:"empty", footer:"enter send · / commands · tab agents"},
+  "d3-rec":  {header:"ascii", log:"home-live", chips:"hued", composer:"empty", footer:"enter send · / commands · tab agents"},
+  "d4-now":  {header:"box", log:"home-live", chips:"hued", composer:"gutter", footer:"enter send · / commands · tab agents"},
+  "d4-rec":  {header:"ascii", log:"home-live", chips:"hued", composer:"empty", footer:"enter send · / commands · tab agents"},
+  "d5-mock": {header:"box", log:"home-mock", chips:"mute", composer:"empty", footer:"enter send · / commands · tab agents"},
+  "d5-rec":  {header:"ascii", log:"home-live", chips:"hued", composer:"empty", footer:"enter send · / commands · tab agents"},
+  "d6-pin":  {header:"ascii", log:"home-live", chips:"pin-b", composer:"@Builder", footer:"enter send · / commands · tab agents"},
+  "d6-rec":  {header:"ascii", log:"home-live", chips:"hued", composer:"empty", footer:"enter send · / commands · tab agents"},
+  "d7-mock": {header:"box", pulse:true, log:"you", activity:true, chips:"hued", composer:"team is working", footer:"ctrl+c interrupt · 0:04 · claude"},
+  "d7-rec":  {header:"ascii", pulse:true, log:"you", activity:true, chips:"hued", composer:"empty", footer:"ctrl+c interrupt · 0:04 · claude"},
+  "d8-mock": {header:"box", log:"home-mock", chips:"mute", composer:"empty", footer:"enter send · / commands · tab agents"},
+  "d8-rec":  {header:"ascii", log:"home-live", chips:"hued", composer:"empty", footer:"enter send · / commands · tab agents"},
+  "d9-mock": {header:"box", scoreDash:true, log:"noprov", chips:"mute", composer:"empty", footer:"/agents · /onboarding · /help"},
+  "d9-rec":  {header:"ascii", scoreDash:true, log:"noprov", chips:"hued", composer:"empty", footer:"/agents · /onboarding · /help"},
+  "d10-now": {compact:true, log:"you", activity:true, chips:"compact-now", composer:"empty", footer:"ctrl+c · 0:04"},
+  "d10-rec": {compact:true, log:"you", activity:true, chips:"compact-rec", composer:"empty", footer:"ctrl+c · 0:04"},
+  "d11-mock":{header:"box", log:"done-mock", chips:"done", composer:"empty", footer:"enter send · / commands · tab agents"},
+  "d11-rec": {header:"ascii", log:"done-rec", chips:"hued", composer:"empty", footer:"enter send · / commands · tab agents"},
+  "d12-mock":{header:"box", log:"ask", chips:"mute", dock:"ask", composer:"empty", footer:"↑↓ choose · enter confirm · esc skip"},
+  "d12-rec": {header:"ascii", log:"ask", chips:"hued", dock:"ask", composer:"empty", footer:"↑↓ choose · enter confirm · esc skip"},
+  "d13-mock":{header:"box", log:"cmd", evidence:"panel", chips:"mute", composer:"empty", footer:"↑↓ inspect · enter open · esc close"},
+  "d13-rec": {header:"ascii", log:"cmd", chips:"hued", dock:"evidence", composer:"empty", footer:"↑↓ · esc close"}
+};
+
+function logHtml(kind) {
+  if (kind === "home-mock") return homeMock();
+  if (kind === "home-live") return homeLive();
+  if (kind === "you") return `<div class="log"><div class="turn user"><div class="rail"></div><div><div class="role you">You</div><div class="body">Which route is safer?</div></div></div></div>`;
+  if (kind === "noprov") return `<div class="log top"><div class="dim">no installed agent
+run /agents  or  productteam onboarding</div></div>`;
+  if (kind === "done-mock") return `<div class="log"><div class="turn builder"><div class="rail"></div><div><div class="role builder">▸ Builder</div><div class="body">The explicit 40-column mode is safer.
+<div class="card ok">✓ ▸ Builder · 18s · w12.txt</div></div></div></div></div>`;
+  if (kind === "done-rec") return `<div class="log"><div class="turn builder"><div class="rail"></div><div><div class="role builder">▸ Builder</div><div class="body">The explicit 40-column mode is safer.
+<div class="card ok">✓ ▸ Builder · 18s · w12.txt</div></div></div></div></div>`;
+  if (kind === "ask") return `<div class="log"><div class="turn principal"><div class="rail"></div><div><div class="role principal">◆ Principal</div><div class="body">One product choice is required before I continue.</div></div></div></div>`;
+  if (kind === "cmd") return `<div class="log"><div class="turn cmd"><div class="rail"></div><div><div class="role cmd">Command · 04:12</div><div class="body dim">KEEP lib/tui/. Reviewer scored every mandatory dim ≥ 9.0.</div></div></div></div>`;
+  return `<div class="log"></div>`;
+}
+
+function paint(node, spec) {
+  if (spec.boot) {
+    node.appendChild(splashBlock(spec.splash, spec.glow || null));
+    node.insertAdjacentHTML("beforeend", composer(""));
+    node.insertAdjacentHTML("beforeend", `<div class="ftr">enter continue · any key skip</div>`);
+    return;
+  }
+  if (spec.compact) {
+    node.insertAdjacentHTML("beforeend", `<div class="hdr">ProductTeam <span class="score">9.5</span></div><div class="rule"></div>`);
+  } else {
+    let h = hdr(spec.header === "ascii" ? "ascii" : "box", spec.pulse);
+    if (spec.scoreDash) h = h.replace("9.5", "—").replace("score", "dim");
+    node.insertAdjacentHTML("beforeend", h + `<div class="rule"></div>`);
+  }
+  node.insertAdjacentHTML("beforeend", logHtml(spec.log));
+  if (spec.activity) node.insertAdjacentHTML("beforeend", `<div class="activity"><div class="line"><span class="agent principal">⠋ ◆ Principal</span><span>planning the response</span></div></div>`);
+  if (spec.evidence === "panel") node.insertAdjacentHTML("beforeend", `<div class="ev-panel"><div class="ev-head"><span>evidence</span><span class="t">3 files · ↑↓ · esc</span></div><div class="ev-row"><span class="plus">+0.0</span><span class="path">runs/iter-3/scores.json</span></div><div class="ev-row"><span>·</span><span>iter-3/reviewer-gate.md</span></div></div>`);
+  if (spec.chips) node.insertAdjacentHTML("beforeend", chips(spec.chips));
+  if (spec.dock === "ask") node.insertAdjacentHTML("beforeend", `<div class="dock"><div class="ask-head">Agent identity <span class="count">1 of 1</span></div><div class="ask-q">Where should each role’s color appear?</div><div class="option sel"><span class="radio">●</span><span><b>Label + rail</b><small>Color the role label, chip, and 2px turn rail.</small></span><em>recommended</em></div><div class="option"><span class="radio">○</span><span><b>Label only</b><small>Keep the rail neutral.</small></span><em></em></div></div>`);
+  if (spec.dock === "evidence") node.insertAdjacentHTML("beforeend", `<div class="dock" style="border:1px solid var(--rule);margin:0 8px 4px"><div class="ask-head">evidence · 3 files</div><div class="opt sel"><span class="k">›</span><span class="plus" style="color:var(--ok)">+0.0</span><span>runs/iter-3/scores.json</span></div><div class="opt"><span></span><span>·</span><span>iter-3/reviewer-gate.md</span></div></div>`);
+  if (spec.composer === "gutter") node.insertAdjacentHTML("beforeend", composer("", true));
+  else if (spec.composer === "@Builder") node.insertAdjacentHTML("beforeend", `<div class="composer"><span class="agent builder">@Builder</span> <span class="cursor">▍</span></div>`);
+  else if (spec.composer === "team is working") node.insertAdjacentHTML("beforeend", composer("team is working"));
+  else node.insertAdjacentHTML("beforeend", composer(""));
+  node.insertAdjacentHTML("beforeend", `<div class="ftr">${spec.footer||""}</div>`);
+}
+
+document.querySelectorAll("[data-frame]").forEach(node => {
+  const spec = frames[node.dataset.frame];
+  if (spec) paint(node, spec);
+});
+</script>
+</body>
+</html>

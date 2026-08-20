@@ -1,0 +1,256 @@
+{
+  "schema": "tui-fidelity-reviewer-gate-v1",
+  "run": "tui-fidelity-20260818",
+  "iter": 1,
+  "freeze": "state/harness-evolution/runs/tui-fidelity-20260818/frozen-benchmark.md",
+  "freeze_sha256": "da6335f2a7c100ee4a0f4a46c117986ddb1edf6adbe7a13e198c5dbd70794acd",
+  "freeze_sha_verified": true,
+  "verdict": "fail",
+  "all_ge_9": false,
+  "lowest": {
+    "score": 6.0,
+    "ids": ["D19"]
+  },
+  "below_9": ["D19"],
+  "ge_9": [
+    "D01", "D02", "D03", "D04", "D05", "D06", "D07", "D08", "D09", "D10",
+    "D11", "D12", "D13", "D14", "D15", "D16", "D17", "D18", "D20"
+  ],
+  "gates": {
+    "B1": {
+      "command": "lib/tui/.venv/bin/python -m pytest lib/tui/tests --collect-only -q",
+      "exit": 0,
+      "record": "77 tests collected in 0.34s",
+      "note": "all 73 established nodeids still present; count grew only by 4 appended fidelity tests"
+    },
+    "B2": {
+      "command": "lib/tui/.venv/bin/python -m pytest lib/tui/tests -q",
+      "exit": 1,
+      "record": "4 failed, 73 passed in 382.58s (0:06:22)",
+      "failed": [
+        "lib/tui/tests/test_all_verbs.py::test_all_18_supported_verbs_in_tui_transcript",
+        "lib/tui/tests/test_all_verbs.py::test_every_unsupported_verb_refuses_without_spawn",
+        "lib/tui/tests/test_slash.py::test_confirm_run_exact_argv_for_all_three_intercepts",
+        "lib/tui/tests/test_slash.py::test_confirm_cancel_no_spawn"
+      ]
+    },
+    "B3": {
+      "command": "tests/cli-interface-parity.sh",
+      "exit": 0,
+      "record": "cli-interface parity v3: PASS"
+    },
+    "B4": {
+      "command": "tests/visual-cli.sh",
+      "exit": 1,
+      "record": "14/14 pass · 0 fail · 0 skipped · live provider proof missing",
+      "allowed": true
+    },
+    "B5": {
+      "command": "covered by B2 nodeids test_four_sizes, test_pty_sigwinch_compact, test_activity_file_backed_caps_footer_and_resize",
+      "exit": 0,
+      "record": "those three nodeids are present in pytest-collect.txt and absent from the B2 failure list"
+    },
+    "B6plus": {
+      "command": "frozen-benchmark.md §7 exact probe",
+      "exit": 0,
+      "record": "=== 0 FAIL(S) ===",
+      "note": "B6–B16 green against today's paint; first paint is L8, not the freeze-day score-first rows"
+    }
+  },
+  "dimensions": {
+    "D01": {
+      "name": "L1 splash persist",
+      "score": 9.6,
+      "citations": [
+        "lib/tui/app.py _splash_advance wraps (step % 4) + 1 and never calls _splash_finish",
+        "iter-1/b6plus.txt EXIT_CODE=0; B6 persist is not in the fail list",
+        "lib/tui/tests/test_layout.py::test_splash_natural_finish_home_and_focus (rewritten to press Enter; not in B2 failures)",
+        "lib/tui/tests/test_layout.py::test_splash_enter_skips_no_submit and test_splash_any_key_skips_consumed still collected and green"
+      ]
+    },
+    "D02": {
+      "name": "L2 splash-only plane",
+      "score": 9.4,
+      "citations": [
+        "lib/tui/app.py CSS #header.splashed,#rule.splashed,#activity.splashed,#chips.splashed { display: none }",
+        "lib/tui/app.py _splash_show/_splash_finish add and remove those classes",
+        "iter-1/b6plus.txt EXIT_CODE=0 (B7 not in fail list)",
+        "test_splash_idle_neutral_and_exact_art and test_splash_compact_40x20_does_not_cover remain collected and green"
+      ]
+    },
+    "D03": {
+      "name": "L3 identical ASCII splash",
+      "score": 9.5,
+      "citations": [
+        "lib/tui/theme.py SPLASH_HEADS are three 11x7 ASCII bodies distinguished by # / o / >",
+        "banned · ─ ◇ ▸ / ROBOTS_MARK / six-node graph absent from theme.py SPLASH_HEADS",
+        "test_splash_idle_neutral_and_exact_art asserts lines[5] == '     #             o             >     ' and passed under B2"
+      ]
+    },
+    "D04": {
+      "name": "L4 prefix width 0",
+      "score": 9.5,
+      "citations": [
+        "lib/tui/app.py #role-prefix { width: 0 } and #role-prefix.pinned { width: 12 }",
+        "lib/tui/app.py _render_role_prefix removes pinned class and updates '' when unpinned",
+        "iter-1/b6plus.txt EXIT_CODE=0 (B8 not in fail list) and PREFIX='' on 80x24 first paint",
+        "test_role_chips_focusable_and_selectable asserts unpinned styles.width in (0, 0w, 0h) and passed"
+      ]
+    },
+    "D05": {
+      "name": "L5 header ▣─▣─▣",
+      "score": 9.6,
+      "citations": [
+        "iter-1/b6plus.txt 80x24 first paint: '▣─▣─▣ ProductTeam · exp-tui-migration · —'",
+        "lib/tui/app.py _render_header: wide ▣─▣─▣ ProductTeam · cwd · score; <=40 ProductTeam {score}",
+        "test_header_pulse_middle_head_ok_when_busy and test_pty_sigwinch_compact passed (not in B2 failures)",
+        "no harness-cli / Directive in header path (cwd comment at app.py _seed)"
+      ]
+    },
+    "D06": {
+      "name": "L6 second-click unpin",
+      "score": 9.5,
+      "citations": [
+        "lib/tui/app.py select_role: same pinned chip clears _pinned; other chip pins that role",
+        "iter-1/b6plus.txt EXIT_CODE=0 (B9 not in fail list)",
+        "test_role_chips_focusable_and_selectable second-click unpin assertions passed"
+      ]
+    },
+    "D07": {
+      "name": "L7 role-hued chips",
+      "score": 9.4,
+      "citations": [
+        "lib/tui/theme.py ROLE_STYLES identity hues #c084fc #60a5fa #22c55e #f59e0b; role_tag keeps hue when idle",
+        "lib/tui/app.py RoleChip active only if focused or (_pinned and target==role)",
+        "test_snapshot_role_hues_and_no_cyan and test_cockpit_token_contract passed",
+        "lib/tui/tests/__snapshots__/cockpit-80x24.svg fill #c084fc #60a5fa #22c55e #f59e0b"
+      ]
+    },
+    "D08": {
+      "name": "L8 home ● name …… score",
+      "score": 9.6,
+      "citations": [
+        "iter-1/b6plus.txt first paint rows: '● osint-loop-research …… 9.5', '● onboarding-flight-control …… 9.5', '● harness-cli …… 9.5'",
+        "lib/tui/app.py _home_row writes ● {client} …… {overall:.1f} with no iter/trend",
+        "iter-1/b6plus.txt EXIT_CODE=0 (B10 and B16 home locks not in fail list)",
+        "test_home_row_lock_shape / test_home_seed_filtered / recency tests passed; HOME_ROW_RE retarget in test_layout.py is the freeze-allowed L8 retarget"
+      ]
+    },
+    "D09": {
+      "name": "L9 empty busy composer",
+      "score": 9.3,
+      "citations": [
+        "lib/tui/app.py submit_composer clears composer before _start_provider_turn; no 'team is working' string in app.py",
+        "lib/tui/app.py _render_footer busy: 'ctrl+c interrupt · {elapsed} · {provider}' / compact 'ctrl+c · {elapsed}'",
+        "test_activity_file_backed_caps_footer_and_resize passed and asserts those footer shapes"
+      ]
+    },
+    "D10": {
+      "name": "L10 no-provider first-run",
+      "score": 9.4,
+      "citations": [
+        "lib/tui/app.py _check_no_provider / _seed_no_provider write 'no installed agent' + 'run /agents  or  productteam onboarding'",
+        "idle no-provider footer '/agents · /onboarding · /help'",
+        "iter-1/b6plus.txt EXIT_CODE=0 (B11 not in fail list)",
+        "test_no_provider_first_run_copy passed"
+      ]
+    },
+    "D11": {
+      "name": "L11 evidence dock",
+      "score": 9.3,
+      "citations": [
+        "lib/tui/app.py compose keeps bordered labelled #dock above #composer-region",
+        "test_evidence_dock_caps_composer_focus_and_keys and test_composer_width_visible_in_dock_states passed",
+        "app.py dock_move evidence branch: arrows highlight only; 'never run, never open a file'"
+      ]
+    },
+    "D12": {
+      "name": "L12 40-col chips",
+      "score": 9.5,
+      "citations": [
+        "lib/tui/app.py _render_chips hides non-live identities at width<=40 and RoleChip appends +N",
+        "iter-1/b6plus.txt EXIT_CODE=0 (B12 and B16-SIGWINCH-40 not in fail list)",
+        "test_compact_chips_single_plus_count asserts '◆ Principal +3' at 40 and four chips at 80; passed"
+      ]
+    },
+    "D13": {
+      "name": "L13 live chrome pack",
+      "score": 9.4,
+      "citations": [
+        "lib/tui/theme.py command_open paints '│ Command · {HH:MM}'; RAIL='│'; RULE='#2a2a2a'",
+        "lib/tui/app.py notify() records then super().notify Textual corner toast",
+        "grep lib/tui for blink: no matches",
+        "test_command_rail_mute_no_role_hues and test_four_role_speaking_rails_neutral_body passed"
+      ]
+    },
+    "D14": {
+      "name": "L14 chip + card status",
+      "score": 9.2,
+      "citations": [
+        "iter-1/b6plus.txt EXIT_CODE=0 (B13 not in fail list)",
+        "test_chip_done_status_on_chip_and_card passed: ✓ on Builder chip and '✓ done' on card",
+        "lib/tui/app.py _provider_done sets _role_status done/failed and writes completion_card",
+        "lib/tui/theme.py STATUS_GLYPHS failed/fail/error → ✗; residual: no live ✗ probe this iter"
+      ]
+    },
+    "D15": {
+      "name": "L15 team default",
+      "score": 9.5,
+      "citations": [
+        "iter-1/b6plus.txt PREFIX='' on compressed first paint",
+        "lib/tui/app.py _pinned=False; _route_role returns Principal when unpinned",
+        "test_role_chips_focusable_and_selectable and test_home_empty_copy_when_no_scored assert no idle @Role and passed"
+      ]
+    },
+    "D16": {
+      "name": "L16 OMP ask",
+      "score": 9.4,
+      "citations": [
+        "lib/tui/app.py _ask_title_row 'Ask · {k} of {n}'; _ask_option_row appends literal 'recommended' not ★",
+        "iter-1/b6plus.txt EXIT_CODE=0 (B14 not in fail list)",
+        "test_ask_dock_single_exact_question_and_answer passed: title, 1 of 2, recommended, descriptions, Builder-hued question"
+      ]
+    },
+    "D17": {
+      "name": "L17 OMP confirm",
+      "score": 9.1,
+      "citations": [
+        "lib/tui/app.py _open_confirm paints 'Confirm write · 1 of 2', Run/Cancel descriptions, highlighted=1",
+        "iter-1/b6plus.txt EXIT_CODE=0 (B15 not in fail list)",
+        "test_pty_confirm_cancel_keeps_composer passed (Esc cancel, composer kept)",
+        "residual: native confirm tests red on startswith('Run') vs '● Run\\n   argv...'; confirm dock_move still allows highlight 0 (title)"
+      ]
+    },
+    "D18": {
+      "name": "Four sizes + SIGWINCH",
+      "score": 9.5,
+      "citations": [
+        "iter-1/b6plus.txt EXIT_CODE=0 (B16-120x36/80x24/60x24/40x20 and SIGWINCH 40/80 not in fail list)",
+        "test_four_sizes passed: 120x36, 80x24, 60x24, 40x20 dock never covers composer",
+        "test_pty_sigwinch_compact and test_activity_file_backed_caps_footer_and_resize passed 80→40→80 restore"
+      ]
+    },
+    "D19": {
+      "name": "B1–B5 preservation",
+      "score": 6.0,
+      "citations": [
+        "iter-1/pytest-collect.txt EXIT_CODE=0; 77 collected; all 73 established nodeids still present",
+        "iter-1/pytest.txt EXIT_CODE=1; '4 failed, 73 passed in 382.58s' — B2 requires every collected test to pass",
+        "failures: test_all_verbs.py HOME_ROW_RE still '^\\s*(\\d+\\.\\d)\\s+(\\S+)' so L8 '● name …… score' never seeds; test_slash.py _confirm_open asserts texts[1].startswith('Run') against '● Run\\n   argv to bin/productteam. Output streams as a Command turn.'",
+        "iter-1/cli-interface-parity.txt EXIT_CODE=0; 33/18/15/6 PASS",
+        "iter-1/visual-cli.txt EXIT_CODE=1 allowed: 14/14 + live provider proof missing",
+        "B5 nodeids present and green; needles were not deleted, but B2 is red so this dimension cannot be ≥9.0"
+      ]
+    },
+    "D20": {
+      "name": "Authority / non-rebuild",
+      "score": 9.3,
+      "citations": [
+        "iter-1/diff-stat.txt: only lib/tui/app.py, theme.py, tests, two snapshots — no second frontend, no box-drawing revival",
+        "lib/tui/requirements.txt still textual==8.2.8 / rich==15.0.0; test_cockpit_token_contract and test_bash_two_accent_budget passed",
+        "lib/commands.sh chat vs tui remain separate; lib/repl.sh still owns productteam chat",
+        "iter-1/cli-interface-parity.txt argv-only CLI contract PASS"
+      ]
+    }
+  }
+}

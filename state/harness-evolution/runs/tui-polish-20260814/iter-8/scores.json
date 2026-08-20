@@ -1,0 +1,468 @@
+{
+  "schema": "tui-polish-reviewer-gate-v1",
+  "run": "tui-polish-20260814",
+  "iter": 8,
+  "freeze": "state/harness-evolution/runs/tui-polish-20260814/frozen-benchmark.md",
+  "freeze_sha256": "018c2d0c406e80ffa5127749b5bf3e122b679f993e88020d24901afd939b7bca",
+  "verdict": "FAIL",
+  "all_ge_9": false,
+  "stop": "continue-iter-9",
+  "extension": "state/harness-evolution/runs/tui-polish-20260814/extension.md",
+  "no_sixth_iteration": false,
+  "d01_clears_9": true,
+  "d08_clears_9": true,
+  "d10_clears_9": true,
+  "d11_clears_9": true,
+  "d12_clears_9": true,
+  "d13_clears_9": true,
+  "d14_clears_9": true,
+  "d15_clears_9": true,
+  "d16_clears_9": true,
+  "d19_clears_9": true,
+  "d21_clears_9": true,
+  "d25_clears_9": true,
+  "d26_clears_9": true,
+  "explicit_9_decisions": {
+    "D16": {
+      "clears_9": true,
+      "score": 9.2,
+      "reason": "TUI-owned #splash Static: exact 11x7 three-head ASCII, idle MUTE/brand TEXT, live OK glow Principal-Analyst-Builder-Principal, any-key skip without submit/dock/spawn/exit-130, composer/footer/@Principal visible, compact 40x20 does not cover composer, once-only, banned graph/ROBOTS_MARK/Critic absent. Live-PTY splash is optional 10-band, not a 9 requirement."
+    },
+    "D26": {
+      "clears_9": true,
+      "score": 9.2,
+      "reason": "TUI splash seam plus /splash Command ▣ separation plus non-TTY exit 2 / empty stdout / TTY remedy / no ESC under NO_COLOR. Live-PTY splash is optional 10-band, not a 9 fail."
+    }
+  },
+  "lowest": {
+    "score": 7.5,
+    "ids": [
+      "D06"
+    ]
+  },
+  "below_9": [
+    "D03",
+    "D04",
+    "D05",
+    "D06",
+    "D07",
+    "D09",
+    "D24",
+    "D28"
+  ],
+  "ge_9": [
+    "D01",
+    "D02",
+    "D08",
+    "D10",
+    "D11",
+    "D12",
+    "D13",
+    "D14",
+    "D15",
+    "D16",
+    "D17",
+    "D18",
+    "D19",
+    "D20",
+    "D21",
+    "D22",
+    "D23",
+    "D25",
+    "D26",
+    "D27",
+    "D29"
+  ],
+  "remaining_zeros": [],
+  "cleared_this_iter": [
+    "D16",
+    "D26"
+  ],
+  "reaudit_holds": [
+    "D01",
+    "D08",
+    "D13",
+    "D15"
+  ],
+  "native_pytest": {
+    "passed": 67,
+    "failed": 0,
+    "evidence": "state/harness-evolution/runs/tui-polish-20260814/iter-8/pytest.txt"
+  },
+  "canonical": {
+    "cli_interface_parity": "PASS — 33/18/15/6 intact",
+    "visual_cli": "14/14; allowed overall exit 1 only for pre-existing missing live-provider proof"
+  },
+  "non_regression": {
+    "pty_slash": "PASS — /status streams Product Consulting Harness and harness-cli; /gate refuses no-spawn",
+    "targeting": "PASS — RoleChip Static can_focus, @Role chrome, Principal default, ROLE argv",
+    "role_argv": "PASS — live @Builder -> workers.tsv Builder/done/verify the seam",
+    "interrupt": "PASS — live partial analysis begins; first Ctrl+C keeps interrupting provider + partial output left on disk + failed; second exits 130",
+    "sigwinch": "PASS — ioctl 80->40->80; stripped compact ProductTeam without heads/cwd; @Principal retained; heads restored",
+    "pty_confirm_cancel": "PASS — /gh merge shows Run/Cancel + confirm footer + @Principal; Esc restores idle footer; /exit rc 0",
+    "canonical_gates": "PASS — parity PASS; visual-cli 14/14 with allowed live-provider hole",
+    "splash_native": "PASS — 15 test_splash_* rows: idle-neutral art, stepper glow, natural finish, Enter//Esc/printable skip, env short-circuit, compact non-cover, once/resize, /splash CLI separation, Ctrl+C/Q/P guards"
+  },
+  "audits": {
+    "splash_widget_compose": "HONEST — #splash Static in existing compose tree occupying transcript 1fr while visible; #transcript.splashed display none; no ModalScreen/second Screen/ProgressBar; skip/finish never transcript.clear(); composer.focus restored",
+    "splash_ascii": "HONEST — theme.splash_render owns exact 11x7 SPLASH_HEADS; wide 39 / compact 35; ProductTeam brand; idle subtitle principal · analyst · builder; banned graph/ROBOTS_MARK/Critic absent; /^\\ on widget never in transcript",
+    "splash_glow_spans": "HONEST — idle spans MUTE+TEXT only; live OK one head at a time Principal-Analyst-Builder-Principal plus live subtitle; observed on #splash.render() spans not helper-only",
+    "splash_skip_stepper": "HONEST — _splash_advance 0..5; tests fire stepper directly; Enter//Esc/printable consumed; Ctrl+C/Q/P skip without exit; second / opens dock",
+    "consult_no_splash_and_cli": "HONEST — non-empty CONSULT_NO_SPLASH skips at on_mount; /splash extra empty-string env; NEEDLES splash ▣ stays Command/_turns cli delta; test_nontty.py unedited",
+    "d01_reaudit": "HOLD 9.2 — splash overlay residual closed; every dock still above composer; composer >=20 at 40 including splash",
+    "d08_reaudit": "HOLD 9.1 — sibling ask.json; evidence kind cannot steal poll",
+    "d13_reaudit": "HOLD 9.2 — exact three-write intercept; Cancel/Esc spawns==[]; PTY Esc UI held",
+    "d15_reaudit": "HOLD 9.2 — splash footer boot-only enter continue · any key skip; idle/busy/ask/slash/confirm/evidence unchanged after finish",
+    "pty_regressions": "NONE — test_pty.py mtime 21:47 unchanged; 5/0 with exact needles",
+    "snapshot_scope": "HONEST — idle+palette only; no splash art; header no Directive; harness-cli is a home row; Principal refresh 00:39; needles unweakened",
+    "org_one_writer": "HELD — one Worker on app.py + theme.py splash helpers + test_layout.py; Principal freeze table + snapshots; provider_turn/adapter/session/test_pty/test_slash/test_all_verbs NEEDLES/test_nontty not this iter"
+  },
+  "org": {
+    "one_writer": true,
+    "debate_friction": "iter-8 critic bound 11x7 grid, OK glow, test-firable stepper, consume-first skip including Ctrl+C, #splash vs RichLog/ModalScreen, env short-circuit, /splash Command separation; Worker copied that contract plus Ctrl+Q/P guards",
+    "freeze_blind_spots": "no zero-score function remains; remaining sub-9 are proof gaps on already-implemented home/header/activity/speech/compact/provider plus mapped-first home sort; live-PTY splash and live-PTY /report are 10-band not 9-blockers; D28 still needs empty-artifact PTY",
+    "evidence_complete_for_gate": true,
+    "sixth_iteration": false,
+    "eighth_iteration": true
+  },
+  "iter_9": {
+    "slice": "proof cluster: real PTY activity+empty-artifact+compact score/caps, prompt_export capture, live evidence/splash as optional 10-band, home recency/empty, header pulse/four-role rail",
+    "files": [
+      "lib/tui/app.py",
+      "lib/tui/provider_turn.sh",
+      "lib/tui/tests/test_layout.py",
+      "lib/tui/tests/test_pty.py"
+    ],
+    "theme_constraint": "do not edit token table, ROLE_STYLES, or splash art",
+    "forbidden_files": [
+      "lib/tui/adapter.py",
+      "lib/tui/session.py",
+      "lib/tui/__main__.py",
+      "lib/tui/tests/test_all_verbs.py",
+      "lib/tui/tests/test_slash.py",
+      "lib/tui/tests/test_nontty.py",
+      "lib/splash.sh",
+      "lib/repl.sh"
+    ],
+    "mechanics": [
+      "one live provider turn proves activity strip, empty-artifact silence, and prompt_export prepend",
+      "SIGWINCH during that turn proves compact ProductTeam {score} and 1+N activity cap on the TTY",
+      "native empty-home fixture plus recency sort in _seed_home",
+      "native header middle-head pulse spans and four-role speaking-rail matrix",
+      "optional same-file live /report evidence and live splash PTY are 10-band extras, not D16/D26/D12 9 reopens"
+    ],
+    "worker_check": [
+      "lib/tui/.venv/bin/python -m pytest lib/tui/tests/test_layout.py -q",
+      "lib/tui/.venv/bin/python -m pytest lib/tui/tests/test_pty.py -q"
+    ],
+    "principal_acceptance": [
+      "lib/tui/.venv/bin/python -m pytest lib/tui/tests -q",
+      "lib/tui/.venv/bin/python -m pytest lib/tui/tests/test_pty.py -q",
+      "tests/cli-interface-parity.sh",
+      "tests/visual-cli.sh"
+    ],
+    "out": [
+      "glob-latest ask",
+      "substring confirm",
+      "Enter-to-open files",
+      "ModalScreen / second Screen / RichLog splash",
+      "ROBOTS_MARK / six-node graph",
+      "new hex",
+      "demanding live-PTY splash as a D16/D26 9 reopen",
+      "needle weaken"
+    ],
+    "predicted_lift": {
+      "D06": "7.5 -> ~9.0",
+      "D09": "8.2 -> ~9.0",
+      "D07": "8.5 -> ~9.0",
+      "D24": "8.6 -> ~9.0",
+      "D03": "8.5 -> ~9.0",
+      "D05": "8.5 -> ~9.0",
+      "D04": "8.8 -> ~9.0",
+      "D28": "8.7 -> ~9.0",
+      "D16_D26_D12": "hold >=9 — live evidence/splash PTY optional 10-band only"
+    }
+  },
+  "exact_failures": {
+    "D03": "Honest empty-home copy still not fixture-proven; sort is mapped-first, not recency.",
+    "D04": "Builder speaking rail style-asserted; four-role speaking matrix still incomplete.",
+    "D05": "Compact proven native+PTY; middle-head pulse is source-only (no snapshot/span assertion).",
+    "D06": "Native strip (braille/mission/m:ss/3-2-1+N) proven; no live PTY activity-strip citation.",
+    "D07": "PTY ioctl 80->40->80 green; composer >=20 at 40 including splash; live cap and compact score slot still not asserted on the TTY.",
+    "D09": "Live owned speech held; freeze section 7 empty-artifact PTY citation missing.",
+    "D24": "Exact-session poll + caps + process-group interrupt proven; prompt_export not captured; live PTY strip unasserted.",
+    "D28": "Native pytest 67/0 and PTY 5/0; splash preamble native; empty-artifact-PTY still fails."
+  },
+  "dimensions": {
+    "D01": {
+      "name": "Exact global layout",
+      "score": 9.2,
+      "citations": [
+        "lib/tui/app.py:361-374 compose header/rule/#splash/transcript/#activity/#chips/#dock/#composer-region/footer",
+        "lib/tui/app.py:80-92,116-118 #splash display none until .visible; #transcript.splashed hides RichLog; no ModalScreen",
+        "lib/tui/tests/test_layout.py:93-95 four-size composer width>=20; 1114-1120,1361-1398 splash does not cover composer at 80 and 40",
+        "lib/tui/tests/test_pty.py:262-299 live confirm dock above visible @Principal; Esc restores idle footer",
+        "residual: splash is boot, not a missing idle seventh region"
+      ]
+    },
+    "D02": {
+      "name": "Exact cockpit tokens and glyphs",
+      "score": 9.3,
+      "citations": [
+        "lib/tui/theme.py:17-60 exact hexes, ROLE_STYLES glyphs, STATUS_GLYPHS; no new hex this iter; splash glow uses existing OK",
+        "lib/tui/tests/test_layout.py token contract + bash two-accent passed in pytest.txt 67 passed",
+        "lib/tui/tests/__snapshots__/cockpit-80x24.svg header + #0a0a0a canvas + role hues; no #0178D4; You #8a8a8a and err #ef4444 absent from idle frames"
+      ]
+    },
+    "D03": {
+      "name": "Q1 filtered home",
+      "score": 8.5,
+      "citations": [
+        "lib/tui/tests/test_layout.py:112 test_home_seed_filtered passed: <=3 rows, exclusions, no prose dump",
+        "lib/tui/tests/__snapshots__/cockpit-80x24.svg agcode-learning / harness-cli / onboarding-flight-control; no run-loop/smoke",
+        "lib/tui/app.py:1063 mapped-first sort; 1065-1068 empty copy exists in source and as a wait needle, not a producing fixture"
+      ]
+    },
+    "D04": {
+      "name": "Q2 identity",
+      "score": 8.8,
+      "citations": [
+        "lib/tui/tests/test_layout.py:159 test_you_turn_chrome passed",
+        "lib/tui/tests/test_pty.py:218-260 live Builder speech streams",
+        "lib/tui/tests/test_layout.py:806 markdown fixture asserts Builder rail #22c55e and neutral body",
+        "not 9.0: four-role speaking-rail style matrix still incomplete (Critic speaking rail unasserted)"
+      ]
+    },
+    "D05": {
+      "name": "Q3 header",
+      "score": 8.5,
+      "citations": [
+        "lib/tui/tests/test_layout.py:135 test_header_cwd_projection passed; snapshot wide header no harness-cli/Directive/Mode",
+        "lib/tui/tests/test_pty.py:302-369 compact ProductTeam without heads/cwd; restored wide heads",
+        "lib/tui/app.py:1041 middle head restyles OK while busy; pulse still source-only, not snapshot or span proven"
+      ]
+    },
+    "D06": {
+      "name": "Q4 honest activity",
+      "score": 7.5,
+      "citations": [
+        "lib/tui/tests/test_layout.py:345 test_activity_file_backed_caps_footer_and_resize proves 3/2/1+N caps + hide-on-done — passed in 67",
+        "lib/tui/app.py:507 activity strip braille/mission/m:ss; exact-session workers.tsv; no ProgressBar",
+        "no live PTY assertion of the strip itself"
+      ]
+    },
+    "D07": {
+      "name": "Q5 compact and resize",
+      "score": 8.5,
+      "citations": [
+        "lib/tui/tests/test_layout.py:93 test_four_sizes passed (120x36 80x24 60x24 40x20) with composer width>=20",
+        "lib/tui/tests/test_layout.py:345 native 80->40->80 compact header, 1+N cap, composer focus, restored heads",
+        "lib/tui/tests/test_pty.py:302-369 test_pty_sigwinch_compact passed (pty-test.txt 5 passed)",
+        "lib/tui/tests/test_layout.py:1361-1398 composer >=20 at 40 with splash — live activity cap and compact score slot still not asserted on the TTY"
+      ]
+    },
+    "D08": {
+      "name": "Q6 structured ask",
+      "score": 9.1,
+      "citations": [
+        "lib/tui/app.py:687 _poll_ask reads Path(_active_artifact).parent/ask.json only while provider live and dock_kind==slash; no glob/scrape/supervisor",
+        "lib/tui/tests/test_layout.py ask single/multi/invalid tests still in the 67",
+        "evidence kind cannot steal the poll; splash skip does not open ask",
+        "residual: no live-PTY ask"
+      ]
+    },
+    "D09": {
+      "name": "Thinking versus speech",
+      "score": 8.2,
+      "citations": [
+        "lib/tui/tests/test_layout.py:414 test_empty_artifact_stays_activity_and_speech_is_owned passed in 67",
+        "lib/tui/tests/test_layout.py:821-823 markdown fixture also forbids Thinking… and Analyst in transcript during empty-artifact work",
+        "freeze section 7 running-worker empty-artifact PTY window still not captured"
+      ]
+    },
+    "D10": {
+      "name": "R1 markdown-lite",
+      "score": 9.1,
+      "citations": [
+        "lib/tui/tests/test_layout.py:806 test_provider_speech_markdown_and_attached_done_card: heading bold+OK, +/- OK/ERR, path bold, fence mute, plain unstyled, Builder rail, body count stays 1 after done card",
+        "residual: not a live-PTY markdown row"
+      ]
+    },
+    "D11": {
+      "name": "R2 slash",
+      "score": 9.1,
+      "citations": [
+        "lib/tui/tests/test_pty.py:171-179 harness-cli + owner-gated + no directive absent — passed",
+        "lib/tui/tests/test_layout.py:1264-1287 splash / skip does not open dock; second / does",
+        "mute Command rail held; residual: live PTY does not assert the Command string"
+      ]
+    },
+    "D12": {
+      "name": "R3 evidence",
+      "score": 9.1,
+      "citations": [
+        "lib/tui/theme.py:307 split_evidence_line; lib/tui/app.py:1147-1155 called from _append_cli_line for report/bench only",
+        "lib/tui/app.py:921-942 bordered labelled #dock evidence; empty buffer opens no panel",
+        "residual: live PTY /report is 10-band, not a 9 fail"
+      ]
+    },
+    "D13": {
+      "name": "R4 confirm",
+      "score": 9.2,
+      "citations": [
+        "lib/tui/app.py:884-888 exact-argv intercept of gh merge, checks --allow-dirty, onboarding --yes",
+        "lib/tui/tests/test_pty.py:262-299 live /gh merge confirm UI; Esc idle footer; /exit rc 0",
+        "evidence Enter closes panel and does not run a write; splash Esc does not open confirm"
+      ]
+    },
+    "D14": {
+      "name": "R5 toasts and cards",
+      "score": 9.0,
+      "citations": [
+        "lib/tui/tests/test_layout.py:806 done card attached; plain body count stays 1; no toast on clean done",
+        "lib/tui/tests/test_pty.py:182-215 interrupt toast re-proven (partial analysis begins; interrupting provider; partial on disk; failed; 130)",
+        "residual: non-130 fail toast+card is source-only"
+      ]
+    },
+    "D15": {
+      "name": "R6 footer",
+      "score": 9.2,
+      "citations": [
+        "lib/tui/app.py:554-589 idle / busy / slash / ask / confirm / evidence / splash footer strings; splash is boot-only",
+        "lib/tui/tests/test_layout.py:1122 splash footer exact enter continue · any key skip; 1223-1225 idle restored after finish",
+        "freeze D15 10.0 names idle/busy/ask/slash — all exact; compact busy omits provider (9-band residual)"
+      ]
+    },
+    "D16": {
+      "name": "R7 splash",
+      "score": 9.2,
+      "citations": [
+        "lib/tui/app.py:361-374,619-676 #splash Static; _splash_show/_splash_advance/_splash_finish/_splash_consume_key; composer/footer stay mounted",
+        "lib/tui/theme.py:360-431 SPLASH_HEADS 11x7; splash_render idle MUTE + live OK; no new hex",
+        "lib/tui/tests/test_layout.py:1093-1552 fifteen behavioral run_test rows: idle-neutral exact art, stepper glow order, natural finish, Enter//Esc/printable skip, env short-circuit, compact 40x20 non-cover, once/resize, /splash CLI separation, Ctrl+C/Q/P guards — passed in pytest.txt 67 passed",
+        "residual to 10.0: live-PTY splash frame optional — not required for 9"
+      ]
+    },
+    "D17": {
+      "name": "R8 display-only home",
+      "score": 9.2,
+      "citations": [
+        "lib/tui/app.py:361-374 compose has no project picker; home is transcript.write display rows",
+        "lib/tui/tests/test_layout.py:1205-1235 skip/finish do not clear home; /^\\ absent from transcript",
+        "lib/tui/tests/__snapshots__/cockpit-80x24.svg no switcher chrome"
+      ]
+    },
+    "D18": {
+      "name": "Targeting",
+      "score": 9.3,
+      "citations": [
+        "lib/tui/tests/test_layout.py chips can_focus; typed @Role strips — passed in 67",
+        "lib/tui/tests/test_pty.py:218-260 live @Builder -> workers.tsv Builder/done/verify the seam",
+        "lib/tui/tests/test_layout.py:1240-1260 Enter during splash does not submit or spawn",
+        "lib/tui/provider_turn.sh ROOT PROMPT ROLE; activity_start $ROLE; prompt_export else agent_card_prompt_block"
+      ]
+    },
+    "D19": {
+      "name": "Defaults",
+      "score": 9.1,
+      "citations": [
+        "lib/tui/tests/test_layout.py dim timestamps on You turn passed",
+        "lib/tui/theme.py:17-60 token table unchanged this iter"
+      ]
+    },
+    "D20": {
+      "name": "Palette backend seam",
+      "score": 9.7,
+      "citations": [
+        "lib/tui/adapter.py live help --json; no second verb list",
+        "state/harness-evolution/runs/tui-polish-20260814/argv-dry-run/argv-dry-run.json help --json rc 0"
+      ]
+    },
+    "D21": {
+      "name": "Supported slash backend seam",
+      "score": 9.1,
+      "citations": [
+        "lib/tui/tests/test_all_verbs.py:70 test_all_18_supported_verbs_in_tui_transcript passed (67 passed); NEEDLES remain in _turns cli delta",
+        "lib/tui/tests/test_pty.py:171-175 live /status reaches Product Consulting Harness and harness-cli",
+        "lib/tui/app.py:1147-1162 mute Command + md_line on supported stream"
+      ]
+    },
+    "D22": {
+      "name": "Unsupported/chat-only seam",
+      "score": 9.4,
+      "citations": [
+        "lib/tui/tests/test_all_verbs.py unsupported refuse without spawn passed (15 verbs)",
+        "lib/tui/tests/test_pty.py:176-179 live /gate usage + owner-gated; no directive absent",
+        "lib/tui/app.py chat-only /provider /clear /export /exit /workers /quit"
+      ]
+    },
+    "D23": {
+      "name": "Home/header data seam",
+      "score": 9.3,
+      "citations": [
+        "lib/tui/app.py:972-992 home seeds status --json only; header score from latest runs/iter-*/scores.json when Repo matches cwd",
+        "lib/tui/tests/test_layout.py:112,135 home/header tests passed; snapshot header has no Mode/Directive"
+      ]
+    },
+    "D24": {
+      "name": "Activity/provider seam",
+      "score": 8.6,
+      "citations": [
+        "lib/tui/app.py TUI-owned session-{pid} dir; exact workers.tsv (no glob)",
+        "lib/tui/provider_turn.sh ROOT PROMPT ROLE; activity_start $ROLE; prompt_export else agent_card_prompt_block",
+        "lib/tui/tests/test_layout.py:345 caps 3/2/1+N proven natively",
+        "lib/tui/tests/test_pty.py:182-215 process-group interrupt held; prompt_export not captured; live PTY strip unasserted"
+      ]
+    },
+    "D25": {
+      "name": "Ask/confirm/evidence seams",
+      "score": 9.1,
+      "citations": [
+        "lib/tui/app.py:687 file-backed ask.json beside active artifact",
+        "lib/tui/app.py:884-888 pre-run write intercept; Cancel no _exec_cli",
+        "lib/tui/theme.py:307 split_evidence_line; lib/tui/app.py:1147-1155 product-side stream parse into labelled #dock",
+        "residual: live PTY evidence is 10-band"
+      ]
+    },
+    "D26": {
+      "name": "Splash/non-TTY seams",
+      "score": 9.2,
+      "citations": [
+        "lib/tui/app.py:385-390 CONSULT_NO_SPLASH non-empty skips TUI boot splash; 1493 /splash argv extra empty-string env does not reopen #splash",
+        "lib/tui/tests/test_layout.py:1335-1356 env short-circuit; 1426-1459 /splash Command ▣ delta; #splash stays hidden",
+        "lib/tui/tests/test_all_verbs.py:41 NEEDLES splash ▣ in Command/_turns cli delta — in the 67",
+        "lib/tui/tests/test_nontty.py:25-37 exit 2, empty stdout, TTY remedy, no ESC under NO_COLOR passed (67 passed); file mtime 00:43 unedited",
+        "residual to 10.0: live-PTY splash — not required for 9"
+      ]
+    },
+    "D27": {
+      "name": "Argv safety and dry-run",
+      "score": 9.6,
+      "citations": [
+        "state/harness-evolution/runs/tui-polish-20260814/argv-dry-run/argv-dry-run.json real bin/productteam mode 0o775 shell false whole-token deny",
+        "state/harness-evolution/runs/tui-polish-20260814/argv-dry-run/argv-dry-run.json agents --json allowed rc 0",
+        "lib/tui/app.py splash skip does not spawn; /splash still _exec_cli -> run_argv_stream; no new argv parser"
+      ]
+    },
+    "D28": {
+      "name": "Required test coverage",
+      "score": 8.7,
+      "citations": [
+        "state/harness-evolution/runs/tui-polish-20260814/iter-8/pytest.txt 67 passed, 0 failed",
+        "state/harness-evolution/runs/tui-polish-20260814/iter-8/pty-test.txt 5 passed (status/gate, interrupt, @Builder, confirm-cancel, SIGWINCH) — test_pty.py mtime 21:47 unweakened",
+        "state/harness-evolution/runs/tui-polish-20260814/iter-8/cli-interface-parity.txt PASS 33/18/15/6; visual-cli.txt 14/14 allowed live-provider hole",
+        "splash section 7 preamble lands natively (CONSULT_NO_SPLASH=1 default plus delenv splash tests); empty-artifact-PTY row still fails; live-PTY splash is not a section 7 row and is not required for this 9"
+      ]
+    },
+    "D29": {
+      "name": "Preservation and failure behavior",
+      "score": 9.2,
+      "citations": [
+        "lib/repl.sh chat remains Bash TTY path; no TUI launch",
+        "lib/tui/app.py RoleChip remains Static can_focus True; no Button; PTY needles not replaced; Ctrl+C/Q during splash skip rather than kill boot",
+        "state/harness-evolution/runs/tui-polish-20260814/FREEZE-SHA.txt first line unchanged 018c2d0c406e80ffa5127749b5bf3e122b679f993e88020d24901afd939b7bca",
+        "state/harness-evolution/runs/tui-polish-20260814/iter-8/cli-interface-parity.txt 33/18/15/6 not reverted; extension.md did not amend D01-D29; One Writer held"
+      ]
+    }
+  }
+}

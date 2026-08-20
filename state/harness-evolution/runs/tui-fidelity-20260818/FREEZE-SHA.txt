@@ -1,0 +1,1 @@
+da6335f2a7c100ee4a0f4a46c117986ddb1edf6adbe7a13e198c5dbd70794acd  state/harness-evolution/runs/tui-fidelity-20260818/frozen-benchmark.md

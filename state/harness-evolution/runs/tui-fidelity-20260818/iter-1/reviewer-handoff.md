@@ -1,0 +1,6 @@
+Workflow completed with 1 child run(s). Return: {
+  "key": "iter-1-score",
+  "ok": true,
+  "agent": "reviewer",
+  "runId": "4c674ae5",
+  "output": "# Reviewer handoff — iter-1 score\n\nIndependent score of `tui-fidelity-20260818` / `iter-1` against the immutable freeze.\nNo app/product, test, snapshot, freeze, or source-page edits.\n\n## Freeze\n\n- File: `state/harness-evolution/runs/tui-fidelity-20260818/frozen-benchmark.md`\n- Live `sha256sum`: `da6335f2a7c100ee4a0f4a46c117986ddb1edf6adbe7a13e198c5dbd70794acd`\n- Matches `FREEZE-SHA.txt` and `iter-1/freeze-sha-verified.txt`\n\n## Files written by this review\n\n- `state/harness-evolution/runs/tui-fidelity-20260818/iter-1/scores.json`\n- `state/harness-evolution/runs/tui-fidelity-20260818/iter-1/reviewer-gate.md`\n- this file\n\nProduct diff inspected (parent `iter-1/diff-stat.txt`): `lib/tui/app.py`, `lib/tui/theme.py`, `lib/tui/tests/test_layout.py`, `test_pty.py`, `test_slash.py`, two SVG snapshots. 7 files, +516/−236.\n\n## Commands + exit codes (parent-run evidence; not inven Trace: 2 event(s).

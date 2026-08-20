@@ -1,0 +1,391 @@
+{
+  "generated": "2026-08-14",
+  "cli": "/home/logani/.herdr/worktrees/Product Consulting Harness/exp-tui-migration/bin/productteam",
+  "mode_oct": "0o775",
+  "executable": true,
+  "shell": false,
+  "policy": "whole-token argv audit; agents --json allowed; /bin/sh /bin/bash eval sqlite sqlite3 forbidden; no 0444 proxy",
+  "forbidden_tokens": [
+    "/bin/bash",
+    "/bin/sh",
+    "eval",
+    "sqlite",
+    "sqlite3"
+  ],
+  "results": [
+    {
+      "argv": [
+        "help",
+        "--json"
+      ],
+      "token_ok": true,
+      "token_note": "ok",
+      "rc": 0,
+      "stdout_bytes": 6108,
+      "stderr_bytes": 0,
+      "stdout_sha256": "d9d43afb202e326ce438ccc7253bc34b4ba5e5f6a9790c332c0ecd22a7e0fb98",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_head": "{\n  \"contract\": \"cli-interface-20260812-v3\",\n  \"commands\": [\n    {\n      \"name\": \"agents\",\n      \"usage\": \"productteam agents [--json]\",\n      \"chat_supported\": true\n    },\n    {\n      \"name\": \"baseline\",\n      \"usage\": \"productteam baseline <client> [--allow-dirty <reason>]\",\n      \"chat_supported\": false,\n      \"chat_reason\": \"usefulness: one-shot iter-0 bootstrap gated by --allow-dirty; owner-gated write\"\n    },\n ",
+      "stderr_head": "",
+      "elapsed_s": 0.077
+    },
+    {
+      "argv": [
+        "status",
+        "--json"
+      ],
+      "token_ok": true,
+      "token_note": "ok",
+      "rc": 0,
+      "stdout_bytes": 3177,
+      "stderr_bytes": 0,
+      "stdout_sha256": "67c2624ea4419d70231e4b7401eb1b31112cfa86e0939fb15243c46646606c07",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_head": "{\n  \"selected\": null,\n  \"engagements\": [\n    {\n      \"client\": \"agcode-learning\",\n      \"scored\": true,\n      \"last_iter\": \"iter-3\",\n      \"overall\": 8.3,\n      \"areas_ge_9\": 3,\n      \"trend\": \"+0.1\",\n      \"desc\": \"Local-first agentic-coding learning system — tutor skill plus plain-text learning files; research artifacts justify the design\"\n    },\n    {\n      \"client\": \"gate-smoke-2647695\",\n      \"scored\": false,\n  ",
+      "stderr_head": "",
+      "elapsed_s": 0.447
+    },
+    {
+      "argv": [
+        "agents",
+        "--json"
+      ],
+      "token_ok": true,
+      "token_note": "allowed required seam agents --json",
+      "rc": 0,
+      "stdout_bytes": 2032,
+      "stderr_bytes": 0,
+      "stdout_sha256": "f0b40d92a8795105ca5c39dae17d58bc6f19873ee63d272c55eab6edce6a0997",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_head": "[\n  {\n    \"name\": \"agent\",\n    \"status\": \"found\",\n    \"path\": \"/home/logani/.local/bin/agent\",\n    \"version\": \"unknown\",\n    \"note\": \"on PATH or a known install dir\"\n  },\n  {\n    \"name\": \"claude\",\n    \"status\": \"found\",\n    \"path\": \"/home/logani/.local/bin/claude\",\n    \"version\": \"2.1.222\",\n    \"note\": \"on PATH or a known install dir\"\n  },\n  {\n    \"name\": \"codex\",\n    \"status\": \"found\",\n    \"path\": \"/home/logani/.loc",
+      "stderr_head": "",
+      "elapsed_s": 3.6
+    },
+    {
+      "argv": [
+        "status"
+      ],
+      "token_ok": true,
+      "token_note": "ok",
+      "rc": 0,
+      "stdout_bytes": 1293,
+      "stderr_bytes": 0,
+      "stdout_sha256": "1b577a6d3e9093e6132b685abae6f192e1715946246e6a95fcb248071b8348d9",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_head": "\n  Product Consulting Harness\n  Product Judgment Layer · CLI-first · evidence over opinion\n  Provider: agent · agents: productteam agents\n\n  ● agcode-learning 8.3 +0.1 · 3/9≥9\n    Local-first agentic-coding learning system — tutor skill plus plain-text learning files; …\n  ○ gate-smoke-2647695 not scored\n    no brief\n  ● harness-cli 9.5 +6.1 · 9/9≥9\n    Product Consulting Harness — CLI-first product judgment layer; ev",
+      "stderr_head": "",
+      "elapsed_s": 0.725
+    },
+    {
+      "argv": [
+        "help"
+      ],
+      "token_ok": true,
+      "token_note": "ok",
+      "rc": 0,
+      "stdout_bytes": 4526,
+      "stderr_bytes": 0,
+      "stdout_sha256": "93a4acc83165c4b3150f1c109c95db33c8a7b74689f60661591a5f8b382677d4",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_head": "\n  productteam — Product Consulting Harness\n\n  Commands\n    productteam                     Org status and engagements overview\n    productteam agents [--json]\n                                Coding agents on this device\n    productteam baseline <client> [--allow-dirty <reason>]\n                                iter-0 via workspace + checks/score entrypoints\n    productteam bench <client> [run --iter <n>]\n            ",
+      "stderr_head": "",
+      "elapsed_s": 0.068
+    },
+    {
+      "argv": [
+        "runtime"
+      ],
+      "token_ok": true,
+      "token_note": "ok",
+      "rc": 0,
+      "stdout_bytes": 745,
+      "stderr_bytes": 0,
+      "stdout_sha256": "28c829804dd5d6fe618e159167d06b46977783316a0db9eacdb6a6a4b3c50d40",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_head": "\n  Coding agents\n  ● agent     unknown        /home/logani/.local/bin/agent (selected)\n  ● claude    2.1.222        /home/logani/.local/bin/claude\n  ● codex     0.147.0        /home/logani/.local/bin/codex\n  ● opencode  unknown        /home/logani/.opencode/bin/opencode\n  ○ gemini    missing · \n  ● cursor    unknown        /home/logani/.local/bin/cursor\n  ● droid     unknown        /home/logani/.local/bin/droid\n  ○ a",
+      "stderr_head": "",
+      "elapsed_s": 3.483
+    },
+    {
+      "argv": [
+        "org"
+      ],
+      "token_ok": true,
+      "token_note": "ok",
+      "rc": 0,
+      "stdout_bytes": 1189,
+      "stderr_bytes": 0,
+      "stdout_sha256": "78641c0ceaca43ffda19a0ea6f2f575fd3b5a948100972fe5750044c8a4f218c",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_head": "\n  The organization (AGENTS.md · CONSTITUTION.md · JUDGMENT.md)\n\n    ◆ Principal   orchestrates the loop; decides, escalates; never self-scores\n    ◇ Analyst     inspects and scores against the frozen contract, with evidence\n    ▸ Builder     implements accepted items; smallest diff; verification attached\n    ◉ Critic      rebuts priorities, audits diffs and scores, reviews the org\n\n  Product Judgment modes\n    Guide",
+      "stderr_head": "",
+      "elapsed_s": 0.057
+    },
+    {
+      "argv": [
+        "memory"
+      ],
+      "token_ok": true,
+      "token_note": "ok",
+      "rc": 0,
+      "stdout_bytes": 16041,
+      "stderr_bytes": 0,
+      "stdout_sha256": "d09fc586ec2135f7584fa2b812d72fa42d7d50e96b794680cc9f814e93219ee2",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_head": "\n  # MEMORY.md — Organizational Memory\n  \n  Append-mostly. Newest entry per section on top. This file exists so a\n  future run continues instead of restarting. Keep entries short, dated,\n  and evidence-linked.\n  \n  ## Engagements\n  \n  - **osint-loop-research** (opened + closed 2026-08-11) — operable loop engine lift.\n    Repo: `/home/logani/projects/osint-loop-research` · Mode: Directive · Contract: osint-loop-v1 · S",
+      "stderr_head": "",
+      "elapsed_s": 0.057
+    },
+    {
+      "argv": [
+        "gate",
+        "harness-cli",
+        "status"
+      ],
+      "token_ok": true,
+      "token_note": "ok",
+      "rc": 0,
+      "stdout_bytes": 664,
+      "stderr_bytes": 0,
+      "stdout_sha256": "bac529ad408ae85ba130695c631f9d8602b2700af88db845dc273fc85f792cd4",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_head": "{\n  \"client\": \"harness-cli\",\n  \"mode\": \"Directive\",\n  \"allowed\": false,\n  \"decision\": \"refused\",\n  \"reason\": \"Directive: no directive recorded for harness-cli — run: consult gate harness-cli direct <direction> (expected /home/logani/.herdr/worktrees/Product Consulting Harness/exp-tui-migration/state/engagements/harness-cli/judgment/directive.json)\",\n  \"bound_direction\": null,\n  \"artifact\": null,\n  \"artifact_ts\": null",
+      "stderr_head": "",
+      "elapsed_s": 0.088
+    },
+    {
+      "argv": [
+        "workspace",
+        "harness-cli",
+        "status"
+      ],
+      "token_ok": true,
+      "token_note": "ok",
+      "rc": 0,
+      "stdout_bytes": 358,
+      "stderr_bytes": 0,
+      "stdout_sha256": "63b73f22d1675772343a4302602a69d9bf1c824aec237173be8af40a2f50cd21",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_head": "{\n  \"client\": \"harness-cli\",\n  \"source_repo\": \"/home/logani/.herdr/worktrees/Product Consulting Harness/fix-new-user-tui\",\n  \"path\": \"/home/logani/.herdr/worktrees/Product Consulting Harness/exp-tui-migration/tmp/workspaces/harness-cli\",\n  \"sha\": \"1ae05008278772db3dc7d1702215bec107ee4b62\",\n  \"exists\": true,\n  \"dirty\": false,\n  \"allow_dirty_reason\": null\n}\n",
+      "stderr_head": "",
+      "elapsed_s": 0.554
+    },
+    {
+      "argv": [
+        "role",
+        "harness-cli",
+        "status"
+      ],
+      "token_ok": true,
+      "token_note": "ok",
+      "rc": 0,
+      "stdout_bytes": 718,
+      "stderr_bytes": 0,
+      "stdout_sha256": "2ecfacd2c00b7ad463d869af98630eb06417674d9eeff8e838f328dee66c7d4c",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_head": "{\n  \"client\": \"harness-cli\",\n  \"iter\": 0,\n  \"artifact_root\": \"/home/logani/.herdr/worktrees/Product Consulting Harness/exp-tui-migration/state/engagements/harness-cli/roles/iter-0\",\n  \"asked\": [],\n  \"ran\": [],\n  \"produced\": [],\n  \"missing\": [\n    \"/home/logani/.herdr/worktrees/Product Consulting Harness/exp-tui-migration/state/engagements/harness-cli/roles/iter-0/Analyst/attempt-*/manifest.json\",\n    \"/home/logani/.h",
+      "stderr_head": "",
+      "elapsed_s": 0.082
+    },
+    {
+      "argv": [
+        "bench",
+        "harness-cli"
+      ],
+      "token_ok": true,
+      "token_note": "ok",
+      "rc": 0,
+      "stdout_bytes": 1566,
+      "stderr_bytes": 0,
+      "stdout_sha256": "ea8a592b5de2605dfcad7765c8a136069738999162ec8f71ca19ac7542e65f3a",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_head": "\n  Benchmark — harness-cli\n  Contract harness-cli-v1 · frozen 2026-08-07 · target ≥ 9.0 in every dimension\n\n  HISTORY\n   iter  date        kind        overall   areas≥9   weakest\n   0     2026-08-07  baseline    3.4      0         splash-animation 2.0\n   1     2026-08-07  iteration   9.5      9         visual-cli-clarity 9.5\n   trend: ▃█\n\n  LATEST — iter-1\n   visual-cli-clarity    9.5 ▰▰▰▰▰▰▰▰▰▰  +5.5 checks.json: 5/",
+      "stderr_head": "",
+      "elapsed_s": 0.632
+    },
+    {
+      "argv": [
+        "report",
+        "harness-cli"
+      ],
+      "token_ok": true,
+      "token_note": "ok",
+      "rc": 0,
+      "stdout_bytes": 1949,
+      "stderr_bytes": 0,
+      "stdout_sha256": "bd5cae0eaa11a8c1b52363a148e894346de2dcc8f2fe9175da972e698cf2c551",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_head": "\n  # harness-cli iter-1 — report\n  \n  **Contract:** harness-cli-v1 · **Kind:** iteration · **Overall:** 9.5\n  **Baseline:** 3.4 → **9.5** · **Converged:** yes (every dimension ≥ 9.0)\n  **Live:** full (provider + three skills against tmp-projects)\n  \n  ## Diff summary\n  \n  - `bin/consult` — B&W theme (2 accents), `agents`/`splash`/`onboarding`, checks_runner routing, first-run splash hook, help/dispatch parity\n  - `li",
+      "stderr_head": "",
+      "elapsed_s": 0.067
+    },
+    {
+      "argv": [
+        "judge",
+        "harness-cli"
+      ],
+      "token_ok": true,
+      "token_note": "ok",
+      "rc": 0,
+      "stdout_bytes": 903,
+      "stderr_bytes": 0,
+      "stdout_sha256": "4929522b6d0beda7a2187d09a3f7e1138ce3333e84e515770f575cfef3079b46",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_head": "\n  Product Judgment — harness-cli\n  Mode: Directive   (Guided|Directive|Challenge|Override)\n\n  ## Mission\n  \n  Turn `bin/productteam` into a **fully clean chatbot-style CLI** in the spirit of\n  Grok Build / Droid / OpenCode: black-and-white terminal chrome with sparse\n  accent colors, OpenCode/Droid-style first-run onboarding, a short login/splash\n  animation that draws a knowledge-graph of computer-headed human node",
+      "stderr_head": "",
+      "elapsed_s": 0.056
+    },
+    {
+      "argv": [
+        "run",
+        "harness-cli",
+        "1"
+      ],
+      "token_ok": true,
+      "token_note": "ok",
+      "rc": 0,
+      "stdout_bytes": 1261,
+      "stderr_bytes": 0,
+      "stdout_sha256": "8391f8003e763888a5c5cc2cf03983bccdcd0d9b7c7eb56c2901fef17ccb9ab4",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_head": "\n  harness-cli — iter-1\n   visual-cli-clarity    9.5 ▰▰▰▰▰▰▰▰▰▰\n     +5.5 checks.json: 5/5 pass; gates_ok=True; failed=none\n   splash-animation      9.5 ▰▰▰▰▰▰▰▰▰▰\n     +7.5 checks.json: 5/5 pass; gates_ok=True; failed=none\n   onboarding-ease       9.5 ▰▰▰▰▰▰▰▰▰▰\n     +7.5 checks.json: 5/5 pass; gates_ok=True; failed=none\n   agent-detection       9.5 ▰▰▰▰▰▰▰▰▰▰\n     +7.5 checks.json: 6/6 pass; gates_ok=True; failed=n",
+      "stderr_head": "",
+      "elapsed_s": 0.48
+    },
+    {
+      "argv": [
+        "splash"
+      ],
+      "token_ok": true,
+      "token_note": "ok",
+      "rc": 0,
+      "stdout_bytes": 0,
+      "stderr_bytes": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_head": "",
+      "stderr_head": "",
+      "elapsed_s": 0.049
+    },
+    {
+      "argv": [
+        "report"
+      ],
+      "token_ok": true,
+      "token_note": "ok",
+      "rc": 1,
+      "stdout_bytes": 0,
+      "stderr_bytes": 46,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "4b241c384818400f6d979a488c02e6ea6707967de3bd8f163d13163a5d4c6a5a",
+      "stdout_head": "",
+      "stderr_head": "\n  error: usage: productteam report <client>\n\n",
+      "elapsed_s": 0.043
+    },
+    {
+      "argv": [
+        "score"
+      ],
+      "token_ok": true,
+      "token_note": "ok",
+      "rc": 1,
+      "stdout_bytes": 0,
+      "stderr_bytes": 56,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "557c1585042f538d10ba10fd2eb81a327c918243c1a0df5220dcb80f1c2ba7c2",
+      "stdout_head": "",
+      "stderr_head": "\n  error: usage: productteam score <client> --iter <n>\n\n",
+      "elapsed_s": 0.047
+    },
+    {
+      "argv": [
+        "run"
+      ],
+      "token_ok": true,
+      "token_note": "ok",
+      "rc": 1,
+      "stdout_bytes": 0,
+      "stderr_bytes": 50,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "aba690acbe18508a2bed85fe9895596e71aa534ad67310918685b140664375d6",
+      "stdout_head": "",
+      "stderr_head": "\n  error: usage: productteam run <client> <iter>\n\n",
+      "elapsed_s": 0.045
+    },
+    {
+      "argv": [
+        "skill"
+      ],
+      "token_ok": true,
+      "token_note": "ok",
+      "rc": 1,
+      "stdout_bytes": 0,
+      "stderr_bytes": 90,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "0557a4497c6b06cec02b851bc7dd391f626e3b724a19171ae2e742ee32802392",
+      "stdout_head": "",
+      "stderr_head": "\n  error: usage: productteam skill <critique|benchmark|design-sprint> <target> [out-dir]\n\n",
+      "elapsed_s": 0.048
+    },
+    {
+      "argv": [
+        "bench"
+      ],
+      "token_ok": true,
+      "token_note": "ok",
+      "rc": 1,
+      "stdout_bytes": 0,
+      "stderr_bytes": 62,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "d2b5ff3c4a2fc5302c2740692e0b30ec1864265163e0d90a3e3eb1a9670fd072",
+      "stdout_head": "",
+      "stderr_head": "\n  error: usage: productteam bench <client> [run --iter <n>]\n\n",
+      "elapsed_s": 0.05
+    },
+    {
+      "argv": [
+        "judge"
+      ],
+      "token_ok": true,
+      "token_note": "ok",
+      "rc": 1,
+      "stdout_bytes": 0,
+      "stderr_bytes": 58,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "4c564c2901b3931a61e5df4000c60fbdb7733cb50aa9b1383adebb37378bfc32",
+      "stdout_head": "",
+      "stderr_head": "\n  error: usage: productteam judge <client> [set <mode>]\n\n",
+      "elapsed_s": 0.06
+    },
+    {
+      "argv": [
+        "checks"
+      ],
+      "token_ok": true,
+      "token_note": "ok",
+      "rc": 1,
+      "stdout_bytes": 0,
+      "stderr_bytes": 71,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "c8ede7f06c17b47d457b723a6bcbcf2556cdf452eaf0e47a83e8b0bd44eededd",
+      "stdout_head": "",
+      "stderr_head": "\n  error: usage: productteam checks <client> [--allow-dirty <reason>]\n\n",
+      "elapsed_s": 0.041
+    },
+    {
+      "argv": [
+        "tui"
+      ],
+      "token_ok": true,
+      "token_note": "ok",
+      "rc": 2,
+      "stdout_bytes": 0,
+      "stderr_bytes": 44,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "9cfcb2f429ea6d6a9565f2177a08b8c40e3846db6a336c39ae1e8575ebbfd157",
+      "stdout_head": "",
+      "stderr_head": "productteam tui requires an interactive TTY\n",
+      "elapsed_s": 0.046
+    }
+  ]
+}

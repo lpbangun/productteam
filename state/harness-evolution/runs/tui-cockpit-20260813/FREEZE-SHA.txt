@@ -1,0 +1,8 @@
+# Freeze hashes — tui-cockpit-20260813
+# Recorded after reviewer ACCEPT-FOR-FREEZE (8348c50a). Do not amend frozen-benchmark.md after this file.
+
+cc827fff0e185799f430cb7a1608d45bb0ea5396443ae61ffcd355d86bdc9b18  state/harness-evolution/runs/tui-cockpit-20260813/frozen-benchmark.md
+fe0018a2c18116814f62fd5053c4ce264f62bf4509f34067209ba05b275a1a7d  state/harness-evolution/runs/tui-cockpit-20260813/inspect.md
+a38d75ce371476465e26b5b8aee6969945db704697b7bbb67e3801230de7a48e  state/harness-evolution/runs/tui-cockpit-20260813/reviewer-prebuild.md
+9a5f70c6093b1007d064be9d328c668d0fd15ab430d50b91232b82faca3ade00  state/harness-evolution/runs/tui-cockpit-20260813/argv-dry-run/argv-dry-run.json
+aea78994770d183b3a4059b4c5c557a47034e1b3397bdc6a4e9a21cb199b59ca  state/harness-evolution/runs/tui-cockpit-20260813/argv-dry-run/trace.jsonl

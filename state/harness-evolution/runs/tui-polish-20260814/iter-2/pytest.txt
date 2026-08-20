@@ -1,0 +1,28 @@
+.........................F..........                                     [100%]
+=================================== FAILURES ===================================
+_______________________ test_pty_status_and_gate_refuse ________________________
+
+    def test_pty_status_and_gate_refuse():
+>       out, status = _run_status_gate_session()
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+lib/tui/tests/test_pty.py:111: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _run_status_gate_session():
+        pid, fd, out = _open_session()
+        try:
+            assert _wait_for(fd, out, "ProductTeam", 25), "cockpit header rendered"
+            _send(fd, "/status\r")
+>           assert _wait_for(fd, out, "Product Consulting Harness", 25), \
+                "real status output reached the transcript"
+E               AssertionError: real status output reached the transcript
+E               assert False
+E                +  where False = _wait_for(13, [b'\x1b[?1049h', b'\x1b[?1000h', b'\x1b[?1003h', b'\x1b[?1015h\x1b[?1006h', b'\x1b[?25l\x1b[?1004h', b'\x1b[>25u', ...], 'Product Consulting Harness', 25)
+
+lib/tui/tests/test_pty.py:98: AssertionError
+=========================== short test summary info ============================
+FAILED lib/tui/tests/test_pty.py::test_pty_status_and_gate_refuse - AssertionError: real status output reached the transcript
+assert False
+ +  where False = _wait_for(13, [b'\x1b[?1049h', b'\x1b[?1000h', b'\x1b[?1003h', b'\x1b[?1015h\x1b[?1006h', b'\x1b[?25l\x1b[?1004h', b'\x1b[>25u', ...], 'Product Consulting Harness', 25)
+1 failed, 35 passed in 101.67s (0:01:41)

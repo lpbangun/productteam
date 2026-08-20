@@ -27,7 +27,7 @@ onboarding_run() { # $1=1 to write, anything else to preview
   # shellcheck source=lib/theme.sh
   source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/theme.sh"
 
-  printf '\n  %sProduct Consulting Harness — onboarding%s\n' "${B:-}" "${R:-}"
+  printf '\n  %sProductTeam — onboarding%s\n' "${B:-}" "${R:-}"
   printf '  %sNothing is prompted and stdin is never read.%s\n\n' "${D:-}" "${R:-}"
 
   printf '  1. Detect the coding agents here      %sproductteam agents%s\n' "${B:-}" "${R:-}"

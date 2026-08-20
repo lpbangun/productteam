@@ -1,0 +1,24 @@
+{"argv": ["/home/logani/.herdr/worktrees/Product Consulting Harness/exp-tui-migration/bin/productteam", "help", "--json"], "rc": 0, "token_note": "ok"}
+{"argv": ["/home/logani/.herdr/worktrees/Product Consulting Harness/exp-tui-migration/bin/productteam", "status", "--json"], "rc": 0, "token_note": "ok"}
+{"argv": ["/home/logani/.herdr/worktrees/Product Consulting Harness/exp-tui-migration/bin/productteam", "agents", "--json"], "rc": 0, "token_note": "allowed required seam agents --json"}
+{"argv": ["/home/logani/.herdr/worktrees/Product Consulting Harness/exp-tui-migration/bin/productteam", "status"], "rc": 0, "token_note": "ok"}
+{"argv": ["/home/logani/.herdr/worktrees/Product Consulting Harness/exp-tui-migration/bin/productteam", "help"], "rc": 0, "token_note": "ok"}
+{"argv": ["/home/logani/.herdr/worktrees/Product Consulting Harness/exp-tui-migration/bin/productteam", "runtime"], "rc": 0, "token_note": "ok"}
+{"argv": ["/home/logani/.herdr/worktrees/Product Consulting Harness/exp-tui-migration/bin/productteam", "org"], "rc": 0, "token_note": "ok"}
+{"argv": ["/home/logani/.herdr/worktrees/Product Consulting Harness/exp-tui-migration/bin/productteam", "memory"], "rc": 0, "token_note": "ok"}
+{"argv": ["/home/logani/.herdr/worktrees/Product Consulting Harness/exp-tui-migration/bin/productteam", "gate", "harness-cli", "status"], "rc": 0, "token_note": "ok"}
+{"argv": ["/home/logani/.herdr/worktrees/Product Consulting Harness/exp-tui-migration/bin/productteam", "workspace", "harness-cli", "status"], "rc": 0, "token_note": "ok"}
+{"argv": ["/home/logani/.herdr/worktrees/Product Consulting Harness/exp-tui-migration/bin/productteam", "role", "harness-cli", "status"], "rc": 0, "token_note": "ok"}
+{"argv": ["/home/logani/.herdr/worktrees/Product Consulting Harness/exp-tui-migration/bin/productteam", "bench", "harness-cli"], "rc": 0, "token_note": "ok"}
+{"argv": ["/home/logani/.herdr/worktrees/Product Consulting Harness/exp-tui-migration/bin/productteam", "report", "harness-cli"], "rc": 0, "token_note": "ok"}
+{"argv": ["/home/logani/.herdr/worktrees/Product Consulting Harness/exp-tui-migration/bin/productteam", "judge", "harness-cli"], "rc": 0, "token_note": "ok"}
+{"argv": ["/home/logani/.herdr/worktrees/Product Consulting Harness/exp-tui-migration/bin/productteam", "run", "harness-cli", "1"], "rc": 0, "token_note": "ok"}
+{"argv": ["/home/logani/.herdr/worktrees/Product Consulting Harness/exp-tui-migration/bin/productteam", "splash"], "rc": 0, "token_note": "ok"}
+{"argv": ["/home/logani/.herdr/worktrees/Product Consulting Harness/exp-tui-migration/bin/productteam", "report"], "rc": 1, "token_note": "ok"}
+{"argv": ["/home/logani/.herdr/worktrees/Product Consulting Harness/exp-tui-migration/bin/productteam", "score"], "rc": 1, "token_note": "ok"}
+{"argv": ["/home/logani/.herdr/worktrees/Product Consulting Harness/exp-tui-migration/bin/productteam", "run"], "rc": 1, "token_note": "ok"}
+{"argv": ["/home/logani/.herdr/worktrees/Product Consulting Harness/exp-tui-migration/bin/productteam", "skill"], "rc": 1, "token_note": "ok"}
+{"argv": ["/home/logani/.herdr/worktrees/Product Consulting Harness/exp-tui-migration/bin/productteam", "bench"], "rc": 1, "token_note": "ok"}
+{"argv": ["/home/logani/.herdr/worktrees/Product Consulting Harness/exp-tui-migration/bin/productteam", "judge"], "rc": 1, "token_note": "ok"}
+{"argv": ["/home/logani/.herdr/worktrees/Product Consulting Harness/exp-tui-migration/bin/productteam", "checks"], "rc": 1, "token_note": "ok"}
+{"argv": ["/home/logani/.herdr/worktrees/Product Consulting Harness/exp-tui-migration/bin/productteam", "tui"], "rc": 1, "token_note": "ok"}

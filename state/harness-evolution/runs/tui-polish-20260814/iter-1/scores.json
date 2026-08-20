@@ -1,0 +1,328 @@
+{
+  "schema": "tui-polish-reviewer-gate-v1",
+  "run": "tui-polish-20260814",
+  "iter": 1,
+  "freeze": "state/harness-evolution/runs/tui-polish-20260814/frozen-benchmark.md",
+  "freeze_sha256": "018c2d0c406e80ffa5127749b5bf3e122b679f993e88020d24901afd939b7bca",
+  "verdict": "FAIL",
+  "all_ge_9": false,
+  "lowest": {
+    "score": 0.0,
+    "ids": [
+      "D06",
+      "D08",
+      "D09",
+      "D12",
+      "D13",
+      "D16",
+      "D25"
+    ]
+  },
+  "below_9": [
+    "D01",
+    "D02",
+    "D03",
+    "D04",
+    "D05",
+    "D06",
+    "D07",
+    "D08",
+    "D09",
+    "D10",
+    "D11",
+    "D12",
+    "D13",
+    "D14",
+    "D15",
+    "D16",
+    "D18",
+    "D19",
+    "D21",
+    "D22",
+    "D24",
+    "D25",
+    "D26",
+    "D28"
+  ],
+  "ge_9": [
+    "D17",
+    "D20",
+    "D23",
+    "D27",
+    "D29"
+  ],
+  "native_pytest": {
+    "passed": 23,
+    "failed": 9,
+    "evidence": "state/harness-evolution/runs/tui-polish-20260814/iter-1/pytest.txt"
+  },
+  "canonical": {
+    "cli_interface_parity": "PASS",
+    "visual_cli": "14/14; live provider proof missing",
+    "pty": "2 passed"
+  },
+  "dimensions": {
+    "D01": {
+      "name": "Exact global layout",
+      "score": 7.0,
+      "citations": [
+        "lib/tui/app.py:177-184 compose header/rule/transcript/chips/dock/composer/footer; no #activity",
+        "lib/tui/tests/test_layout.py:47-54 four-size dock-above-composer and Esc close",
+        "state/harness-evolution/runs/tui-polish-20260814/iter-1/pty-note.md:14-18 activity/ask/confirm/evidence/splash absent"
+      ]
+    },
+    "D02": {
+      "name": "Exact cockpit tokens and glyphs",
+      "score": 8.0,
+      "citations": [
+        "lib/tui/theme.py:13-47 exact hex, ROLE_STYLES, STATUS_GLYPHS, GLYPHS",
+        "lib/tui/tests/test_layout.py:151-178 test_cockpit_token_contract and test_bash_two_accent_budget passed in pytest.txt",
+        "lib/tui/tests/__snapshots__/cockpit-80x24.svg role glyphs present; role hex #c084fc #60a5fa #22c55e #f59e0b #8a8a8a count 0",
+        "lib/tui/app.py:74-78 #chips color MUTE"
+      ]
+    },
+    "D03": {
+      "name": "Q1 filtered home",
+      "score": 8.5,
+      "citations": [
+        "lib/tui/tests/test_layout.py:76-94 test_home_seed_filtered passed: <=3 rows, exclusions, no prose dump",
+        "lib/tui/tests/__snapshots__/cockpit-80x24.svg three scored rows; no run-loop/smoke",
+        "lib/tui/app.py:316-333 cap/exclusions/empty copy; empty path not fixture-proven this run"
+      ]
+    },
+    "D04": {
+      "name": "Q2 identity",
+      "score": 7.0,
+      "citations": [
+        "lib/tui/tests/test_layout.py:123-146 test_you_turn_chrome isolated delta You rail/label/timestamp",
+        "lib/tui/tests/__snapshots__/cockpit-80x24.svg four role glyphs; role hexes absent",
+        "lib/tui/app.py:672 _provider_done still role_tag Analyst"
+      ]
+    },
+    "D05": {
+      "name": "Q3 header",
+      "score": 8.0,
+      "citations": [
+        "lib/tui/tests/test_layout.py:99-118 test_header_cwd_projection passed; no harness-cli/Directive/Mode in header",
+        "lib/tui/tests/__snapshots__/cockpit-80x24.svg wide header ProductTeam \u00b7 exp-tui-migration \u00b7 \u2014",
+        "lib/tui/app.py:304-311 wide header only; no pulse; no compact ProductTeam {score}"
+      ]
+    },
+    "D06": {
+      "name": "Q4 honest activity",
+      "score": 0.0,
+      "citations": [
+        "state/harness-evolution/runs/tui-polish-20260814/iter-1/pty-note.md:14 no activity region",
+        "state/harness-evolution/runs/tui-polish-20260814/iter-1/notes.md:32 Activity vs speech FAIL / absent",
+        "lib/tui/app.py:177-184 compose has no #activity widget"
+      ]
+    },
+    "D07": {
+      "name": "Q5 compact and resize",
+      "score": 5.0,
+      "citations": [
+        "lib/tui/tests/test_layout.py:10,22-24,57-59 test_four_sizes passed for 120x36 80x24 60x24 40x20",
+        "lib/tui/app.py:304-311 _render_header always wide; on_resize absent",
+        "state/harness-evolution/runs/tui-polish-20260814/iter-1/pty-note.md:12 live 80->40->80 FAIL / no proof"
+      ]
+    },
+    "D08": {
+      "name": "Q6 structured ask",
+      "score": 0.0,
+      "citations": [
+        "state/harness-evolution/runs/tui-polish-20260814/iter-1/pty-note.md:15 structured ask dock FAIL / absent",
+        "state/harness-evolution/runs/tui-polish-20260814/iter-1/notes.md:33 Ask dock FAIL / absent"
+      ]
+    },
+    "D09": {
+      "name": "Thinking versus speech",
+      "score": 0.0,
+      "citations": [
+        "state/harness-evolution/runs/tui-polish-20260814/iter-1/pty-note.md:14 empty-artifact activity-vs-speech FAIL",
+        "lib/tui/app.py:372-377,646-653 provider streams unowned md_line chunks, not a role turn on first artifact text"
+      ]
+    },
+    "D10": {
+      "name": "R1 markdown-lite",
+      "score": 6.0,
+      "citations": [
+        "lib/tui/theme.py:115-187 md_line heading/fence/+/-/evidence-path",
+        "lib/tui/app.py:367-370 CLI stream uses md_line; 385-387 You body uses turn()",
+        "lib/tui/app.py:658-676 completion is detached Analyst card, not attached speaking-turn evidence"
+      ]
+    },
+    "D11": {
+      "name": "R2 slash",
+      "score": 6.5,
+      "citations": [
+        "lib/tui/adapter.py:147-197 live help --json palette",
+        "lib/tui/tests/__snapshots__/palette-80x24.svg /st filters /status and /style unsupported above composer",
+        "lib/tui/tests/test_pty.py:110-117 PTY /status real CLI; /gate refuse no spawn",
+        "lib/tui/app.py:512 unstyled /verb echo not mute Command rail",
+        "state/harness-evolution/runs/tui-polish-20260814/iter-1/pytest.txt:429-436 native slash tests failed"
+      ]
+    },
+    "D12": {
+      "name": "R3 evidence",
+      "score": 0.0,
+      "citations": [
+        "state/harness-evolution/runs/tui-polish-20260814/iter-1/pty-note.md:17 bordered evidence panel FAIL / absent",
+        "state/harness-evolution/runs/tui-polish-20260814/inspect.md:57 no bordered evidence panel"
+      ]
+    },
+    "D13": {
+      "name": "R4 confirm",
+      "score": 0.0,
+      "citations": [
+        "state/harness-evolution/runs/tui-polish-20260814/iter-1/pty-note.md:16 confirm cancel/no-spawn FAIL / absent",
+        "lib/tui/app.py:557-558 supported writes call _exec_cli immediately"
+      ]
+    },
+    "D14": {
+      "name": "R5 toasts and cards",
+      "score": 4.5,
+      "citations": [
+        "lib/tui/tests/test_pty.py:139-154 interrupt toast, partial artifact, workers.tsv failed, exit 130",
+        "lib/tui/app.py:663-678 notify on interrupt/fail; done card hardcoded Analyst",
+        "lib/tui/app.py:522-525 /export writes mute transcript line"
+      ]
+    },
+    "D15": {
+      "name": "R6 footer",
+      "score": 2.5,
+      "citations": [
+        "lib/tui/app.py:188 idle footer enter send \u00b7 tab complete \u00b7 \u2191\u2193 choose \u00b7 esc close",
+        "lib/tui/tests/__snapshots__/cockpit-80x24.svg and palette-80x24.svg same footer while dock open",
+        "state/harness-evolution/runs/tui-polish-20260814/frozen-benchmark.md:145-147 locked idle/busy/ask/slash strings"
+      ]
+    },
+    "D16": {
+      "name": "R7 splash",
+      "score": 0.0,
+      "citations": [
+        "state/harness-evolution/runs/tui-polish-20260814/iter-1/pty-note.md:18 TUI-owned splash FAIL / absent",
+        "lib/tui/app.py:571 /splash still real CLI Command turn"
+      ]
+    },
+    "D17": {
+      "name": "R8 display-only home",
+      "score": 9.2,
+      "citations": [
+        "lib/tui/app.py:177-184 compose has no project picker",
+        "lib/tui/app.py:255-264,316-350 cwd header; home is transcript.write display rows",
+        "lib/tui/tests/__snapshots__/cockpit-80x24.svg no switcher chrome"
+      ]
+    },
+    "D18": {
+      "name": "Targeting",
+      "score": 2.0,
+      "citations": [
+        "lib/tui/app.py:352-361 static identity chips only",
+        "lib/tui/app.py:605-606 provider_turn.sh ROOT PROMPT with no ROLE",
+        "lib/tui/provider_turn.sh:26 activity_start Analyst",
+        "lib/tui/tests/__snapshots__/cockpit-80x24.svg no @Role / @Principal"
+      ]
+    },
+    "D19": {
+      "name": "Defaults",
+      "score": 8.0,
+      "citations": [
+        "lib/tui/tests/test_layout.py:139-141 dim timestamps on You turn",
+        "lib/tui/theme.py:13-24 high-contrast token defaults",
+        "lib/tui/app.py:522-525 copy remains a transcript line"
+      ]
+    },
+    "D20": {
+      "name": "Palette backend seam",
+      "score": 9.7,
+      "citations": [
+        "lib/tui/adapter.py:147-197 _Palette.load run_argv [help, --json]; palette_verbs from registry + chat_only",
+        "lib/tui/tests/test_adapter.py test_help_json_contract and test_palette_verbs passed (pytest.txt 23 passed)",
+        "state/harness-evolution/runs/tui-polish-20260814/argv-dry-run/argv-dry-run.json:16-23 help --json rc 0"
+      ]
+    },
+    "D21": {
+      "name": "Supported slash backend seam",
+      "score": 6.0,
+      "citations": [
+        "lib/tui/adapter.py:66-79,82-101 run_argv / run_argv_stream argv arrays shell=False",
+        "lib/tui/tests/test_pty.py:97-99,113 real /status output Product Consulting Harness",
+        "state/harness-evolution/runs/tui-polish-20260814/iter-1/pytest.txt:42-45 test_all_18_supported_verbs_in_tui_transcript failed boot wait"
+      ]
+    },
+    "D22": {
+      "name": "Unsupported/chat-only seam",
+      "score": 7.5,
+      "citations": [
+        "lib/tui/tests/test_all_verbs.py:97-132 test_every_unsupported_verb_refuses_without_spawn passed; spawns == []",
+        "lib/tui/tests/test_pty.py:115-117 /gate refuse owner-gated; no directive absent",
+        "state/harness-evolution/runs/tui-polish-20260814/iter-1/pytest.txt:434-436 /clear /export /exit native tests failed in _boot"
+      ]
+    },
+    "D23": {
+      "name": "Home/header data seam",
+      "score": 9.3,
+      "citations": [
+        "lib/tui/app.py:245-265 status --json only; cwd mapped via engagement.md Repo:",
+        "lib/tui/app.py:280-311 latest runs/iter-*/scores.json overall or honest em dash",
+        "lib/tui/tests/test_layout.py:76-118 home/header tests passed; snapshot header has no Mode/Directive"
+      ]
+    },
+    "D24": {
+      "name": "Activity/provider seam",
+      "score": 5.5,
+      "citations": [
+        "lib/tui/tests/test_pty.py:121-154 first Ctrl+C partial artifact + workers.tsv failed; second Ctrl+C 130",
+        "lib/tui/provider_turn.sh:14-26 ROOT PROMPT; activity_start Analyst; no agent-cards.sh",
+        "lib/tui/app.py:605-606 Popen bash provider_turn.sh ROOT prompt; no ROLE"
+      ]
+    },
+    "D25": {
+      "name": "Ask/confirm/evidence seams",
+      "score": 0.0,
+      "citations": [
+        "state/harness-evolution/runs/tui-polish-20260814/iter-1/pty-note.md:15-17 ask/confirm/evidence FAIL / absent",
+        "state/harness-evolution/runs/tui-polish-20260814/iter-1/notes.md:33-35 Ask/Confirm/Evidence FAIL / absent"
+      ]
+    },
+    "D26": {
+      "name": "Splash/non-TTY seams",
+      "score": 5.0,
+      "citations": [
+        "lib/tui/tests/test_nontty.py:25-37 exit 2, empty stdout, TTY remedy, no ESC under NO_COLOR passed",
+        "state/harness-evolution/runs/tui-polish-20260814/argv-dry-run/argv-dry-run.json:376-387 argv [tui] rc 2 empty stdout",
+        "state/harness-evolution/runs/tui-polish-20260814/iter-1/pty-note.md:18 TUI-owned splash absent"
+      ]
+    },
+    "D27": {
+      "name": "Argv safety and dry-run",
+      "score": 9.6,
+      "citations": [
+        "state/harness-evolution/runs/tui-polish-20260814/argv-dry-run/argv-dry-run.json:2-14 real bin/productteam mode 0o775 shell false whole-token deny",
+        "state/harness-evolution/runs/tui-polish-20260814/argv-dry-run/argv-dry-run.json:49-55 agents --json allowed rc 0",
+        "lib/tui/adapter.py:17,72-74 FORBIDDEN_TOKENS; shell=False",
+        "lib/tui/tests/test_adapter.py forbidden-token and agents --json tests passed"
+      ]
+    },
+    "D28": {
+      "name": "Required test coverage",
+      "score": 3.5,
+      "citations": [
+        "state/harness-evolution/runs/tui-polish-20260814/iter-1/pytest.txt:437 9 failed, 23 passed",
+        "state/harness-evolution/runs/tui-polish-20260814/iter-1/cli-interface-parity.txt:35 PASS",
+        "state/harness-evolution/runs/tui-polish-20260814/iter-1/visual-cli.txt:16 14/14 live provider proof missing",
+        "state/harness-evolution/runs/tui-polish-20260814/iter-1/pty-note.md:10-18 SIGWINCH/role-argv/activity/ask/confirm/evidence/splash not satisfied"
+      ]
+    },
+    "D29": {
+      "name": "Preservation and failure behavior",
+      "score": 9.1,
+      "citations": [
+        "lib/repl.sh no productteam tui launch path",
+        "git diffstat lib/tui limited to app.py theme.py test_layout.py cockpit-80x24.svg palette-80x24.svg",
+        "state/harness-evolution/runs/tui-polish-20260814/iter-1/cli-interface-parity.txt:35 33/18/15/6 not reverted",
+        "state/harness-evolution/runs/tui-polish-20260814/frozen-benchmark.md:354-383 forbidden cuts not implemented; lib/tui not deleted"
+      ]
+    }
+  }
+}

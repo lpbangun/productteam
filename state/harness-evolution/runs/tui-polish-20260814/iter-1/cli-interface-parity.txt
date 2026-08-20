@@ -1,0 +1,36 @@
+
+  cli-interface parity v3 (frozen contract cli-interface-20260812-v3)
+
+  PASS  frozen contract hash matches FREEZE-SHA.txt
+  PASS  help exits 0
+  PASS  -h exits 0
+  PASS  --help exits 0
+  PASS  help names all 33 top-level commands
+  PASS  checks onboarding-flight-control exits 0
+  PASS  workspace recovery is non-destructive (existing path untouched)
+  PASS  README documents every help-listed command
+  PASS  chat refuses non-TTY with TTY remedy
+  PASS  help --json registry membership matches frozen classification (33/18/15/6)
+  PASS  /help lists the full palette (24 verbs: registry-derived)
+  PASS  all 15 unsupported commands classify honestly in chat
+  PASS  CLI control: score --iter 0 reaches stamp refusal (not missing-iter)
+  PASS  CLI control: bench run --iter 7 reaches stamp refusal (not missing-iter)
+  PASS  /score <client> --iter <n> forwards --iter (reaches stamp refusal)
+  PASS  /bench <client> run --iter <n> forwards --iter (reaches stamp refusal)
+  PASS  quoted slash argv parsed as one value (/provider "codex" → codex)
+  PASS  slash line with embedded ;$(...) is inert (nothing executed)
+  PASS  existing machine-readable surfaces emit valid JSON
+  PASS  status --json lists engagements (incl. onboarding-flight-control, harness-evolution)
+  PASS  onboarding next-step uses current score syntax (--iter)
+  PASS  bench harness-evolution handles summary-shaped scores honestly (rc=1)
+  PASS  run harness-evolution 7 handles summary-shaped scores honestly (rc=1)
+  PASS  multi-word argv round-trips byte-identical
+  PASS  empty argv rejected
+  PASS  redirected output carries no ANSI
+  PASS  color TTY emits ANSI
+  PASS  NO_COLOR=1 suppresses ANSI on TTY
+  PASS  unknown command exits non-zero
+  PASS  usage error exits non-zero (open)
+  PASS  usage error exits non-zero (run-loop)
+
+  cli-interface parity v3: PASS

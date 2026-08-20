@@ -1,0 +1,17 @@
+  PASS  role-chrome              four distinct role tags; Principal prompt and Analyst return card
+  PASS  worker-strip             isolated runs/session worker log renders role, mission, provider, done
+  PASS  live-loading-card        loading fields + elapsed failure card; live success proof remains required
+  PASS  two-accent-language      two accent hues + legible glyph language for every semantic state
+  PASS  evidence-path-highlight  flat+nested histories render; real deltas sit beside evidence paths
+  PASS  markdown-lite            heading, verdict, fence, and body render without content loss
+  FAIL  session-footer           status line fields, prompt placement, or /bench refresh is missing
+  PASS  agents-provider-cycle    /provider cycles installed catalog; /agents shows selected and missing
+  PASS  grouped-check-progress   grouped summary 'checks ▸ ofc-demo · 32/40 · weakest: documentation' matches real JSON counts/weakest
+  PASS  judgment-mode-badge      mode vocabulary renders dim chips; Override reuses escalate styling
+  PASS  honest-partial-output    SIGINT keeps REPL alive; artifact bytes/path preserved; worker marked failed
+  PASS  slash-palette-hints      live prefix hints narrow while typing; help and hints share one verb array
+  PASS  transcript-export        timestamped export under sessions/ with both turns, honest markdown, printed path
+  PASS  header-score-spark       chrome spark '▃█' matches real history.jsonl; mode badge present
+
+  13/14 pass · 1 fail · 0 skipped · live provider proof missing
+  result → state/harness-evolution/runs/tui-cockpit-20260813/iter-1/visual-cli.json

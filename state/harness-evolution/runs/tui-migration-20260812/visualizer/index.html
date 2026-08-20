@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ProductTeam</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --canvas: #0a0a0a;
+      --field: #141414;
+      --rule: #2a2a2a;
+      --text: #e4e4e4;
+      --mute: #737373;
+      --ok: #22c55e;
+      --err: #ef4444;
+      --cols: 80;
+      --rows: 24;
+      --cell: 13px;
+      --lh: 20px;
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0; min-height: 100%; background: var(--canvas); color: var(--text);
+      font-family: "IBM Plex Mono", ui-monospace, monospace;
+    }
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 28px;
+      padding: 32px 16px 48px;
+    }
+    nav {
+      display: flex;
+      gap: 22px;
+      color: var(--mute);
+      font-size: 11px;
+      letter-spacing: .04em;
+    }
+    nav button {
+      font: inherit; color: inherit; background: none; border: 0;
+      padding: 0; cursor: pointer;
+    }
+    nav button[aria-pressed="true"] { color: var(--text); }
+    .app {
+      width: calc(var(--cols) * 0.62em);
+      height: calc(var(--rows) * var(--lh));
+      display: grid;
+      grid-template-rows: auto 1px 1fr auto auto auto auto;
+      font-size: var(--cell);
+      line-height: var(--lh);
+      color: var(--text);
+      position: relative;
+    }
+    .app[data-size="120x36"] { --cols: 120; --rows: 36; }
+    .app[data-size="80x24"] { --cols: 80; --rows: 24; }
+    .app[data-size="60x24"] { --cols: 60; --rows: 24; --cell: 12px; --lh: 18px; }
+    .app[data-size="40x20"] { --cols: 40; --rows: 20; --cell: 12px; --lh: 18px; }
+
+    .hdr { white-space: nowrap; overflow: hidden; }
+    .hdr .score { color: var(--ok); font-weight: 600; }
+    .rule { background: var(--rule); height: 1px; }
+
+    .log {
+      min-height: 0; overflow: hidden;
+      display: flex; flex-direction: column;
+      padding: 8px 0 6px;
+      position: relative;
+    }
+    .turns {
+      min-height: 0;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      gap: 10px;
+      flex: 1;
+    }
+    .turn { display: grid; grid-template-columns: 11ch 1fr; gap: 12px; }
+    .role { color: var(--mute); }
+    .role.live { color: var(--ok); font-weight: 600; }
+    .body { min-width: 0; white-space: pre-wrap; }
+    .md { color: var(--ok); font-weight: 600; }
+    .fence { color: var(--mute); }
+    .plus { color: var(--ok); }
+    .del { color: var(--err); }
+    .warn { color: var(--err); }
+    .mute { color: var(--mute); }
+
+    .workers {
+      display: flex; gap: 18px; color: var(--mute);
+      white-space: nowrap; overflow: hidden; padding: 2px 0;
+    }
+    .w.live { color: var(--ok); font-weight: 600; }
+
+    .dock {
+      display: none;
+      background: var(--field);
+      border-top: 1px solid var(--rule);
+      padding: 4px 0 2px;
+      max-height: calc(var(--lh) * 8);
+      overflow: hidden;
+    }
+    .app[data-view="palette"] .dock,
+    .app[data-view="evidence"] .dock,
+    .app[data-view="permission"] .dock { display: block; }
+    .opt {
+      display: grid;
+      grid-template-columns: 1.2ch 13ch 1fr;
+      gap: 8px;
+      color: var(--mute);
+      padding: 0 8px;
+    }
+    .opt .mark { color: transparent; }
+    .opt.sel { color: var(--text); font-weight: 600; background: #1c1c1c; }
+    .opt.sel .mark { color: var(--ok); }
+    .opt .u { font-weight: 400; color: var(--mute); }
+    .opt.off { color: var(--mute); }
+    .ev { display: grid; grid-template-columns: 4ch 1fr; gap: 10px; padding: 0 8px; }
+
+    .composer { background: var(--field); padding: 4px 8px; min-height: calc(var(--lh) * 3); }
+    .app[data-view="palette"] .composer { box-shadow: inset 0 1px 0 var(--rule); }
+    .composer textarea {
+      width: 100%;
+      height: calc(var(--lh) * 2.4);
+      resize: none;
+      border: 0;
+      outline: none;
+      background: transparent;
+      color: var(--text);
+      font: inherit;
+      line-height: var(--lh);
+      padding: 0;
+      caret-color: var(--text);
+    }
+
+    .ftr { color: var(--mute); display: flex; gap: 16px; padding-top: 2px; }
+    .ftr b { color: var(--mute); font-weight: 400; }
+
+    .toast {
+      display: none;
+      position: absolute; top: 10px; right: 0;
+      color: var(--err); z-index: 4;
+    }
+    .app[data-toast="1"] .toast { display: block; }
+
+    .app[data-size="40x20"] .wide,
+    .app[data-size="40x20"] .clip,
+    .app[data-size="60x24"] .wide { display: none; }
+    .plusn { display: none; color: var(--mute); }
+    .app[data-size="40x20"] .plusn { display: inline; }
+    .app[data-size="40x20"] .turn { grid-template-columns: 1fr; gap: 0; }
+    .app[data-size="40x20"] .ftr span:nth-child(n+4),
+    .app[data-size="60x24"] .ftr span:nth-child(n+5) { display: none; }
+    .app[data-size="40x20"] .hdr .eng { display: none; }
+    .app[data-size="40x20"] .opt { grid-template-columns: 1.2ch 1fr; }
+    .app[data-size="40x20"] .opt .u { display: none; }
+    .app[data-size="40x20"] .dock { max-height: calc(var(--lh) * 5); }
+  </style>
+</head>
+<body>
+  <nav>
+    <span id="sizes">
+      <button type="button" data-size="120x36">120×36</button>
+      <button type="button" data-size="80x24" aria-pressed="true">80×24</button>
+      <button type="button" data-size="60x24">60×24</button>
+      <button type="button" data-size="40x20">40×20</button>
+    </span>
+  </nav>
+
+  <div class="app" id="app" data-view="cockpit" data-size="80x24">
+    <header class="hdr" id="hdr">
+      ProductTeam<span class="eng"> · agcode-learning</span> · <span id="mode">Directive</span> · <span class="score" id="score">9.5</span>
+    </header>
+    <div class="rule"></div>
+
+    <section class="log">
+      <div class="turns" id="turns"></div>
+      <div class="toast" id="toast">✗ Critic failed</div>
+    </section>
+
+    <section class="workers" id="workers"></section>
+
+    <section class="dock" id="dock">
+      <div id="panel"></div>
+    </section>
+
+    <section class="composer">
+      <textarea id="input" spellcheck="false" autocomplete="off" rows="2" placeholder="/help"></textarea>
+    </section>
+
+    <footer class="ftr">
+      <span><b>enter</b> send</span>
+      <span><b>tab</b> complete</span>
+      <span><b>↑↓</b> choose</span>
+      <span><b>esc</b> close</span>
+      <span><b>^e</b> evidence</span>
+    </footer>
+  </div>
+
+  <script>
+    const VERBS = [
+      { name: "help", chat: 1, usage: "productteam help [--json]", summary: "This text" },
+      { name: "status", chat: 1, usage: "productteam status [--json]", summary: "Engagement overview" },
+      { name: "agents", chat: 1, usage: "productteam agents [--json]", summary: "Coding agents on this device" },
+      { name: "runtime", chat: 1, usage: "productteam runtime [--check]", summary: "Alias of agents" },
+      { name: "provider", chat: 1, only: 1, usage: "/provider [name]", summary: "Cycle session provider" },
+      { name: "workers", chat: 1, only: 1, usage: "/workers", summary: "File-backed worker strip" },
+      { name: "org", chat: 1, usage: "productteam org", summary: "Roles, loop, autonomy" },
+      { name: "memory", chat: 1, usage: "productteam memory", summary: "Organizational memory" },
+      { name: "report", chat: 1, usage: "productteam report <client>", summary: "Latest iteration report" },
+      { name: "bench", chat: 1, usage: "productteam bench <client>", summary: "Benchmark + history + scores" },
+      { name: "score", chat: 1, usage: "productteam score <client> --iter <n>", summary: "Score via declared scorer" },
+      { name: "run", chat: 1, usage: "productteam run <client> <iter>", summary: "Show scores for iteration n" },
+      { name: "judge", chat: 1, usage: "productteam judge <client> [set <mode>]", summary: "Product Judgment mode" },
+      { name: "checks", chat: 1, usage: "productteam checks <client>", summary: "Deterministic workspace checks" },
+      { name: "harness-checks", chat: 1, usage: "productteam harness-checks", summary: "Harness-apc checks" },
+      { name: "skill", chat: 1, usage: "productteam skill <critique|benchmark|design-sprint> …", summary: "Run a named skill" },
+      { name: "gh", chat: 1, usage: "productteam gh status|checks|…", summary: "GitHub auth, PRs, checks" },
+      { name: "onboarding", chat: 1, usage: "productteam onboarding [--yes]", summary: "First run: agents, provider, first score" },
+      { name: "splash", chat: 1, usage: "productteam splash [--frames]", summary: "Knowledge-graph banner" },
+      { name: "smoke", chat: 1, usage: "productteam smoke", summary: "CLI smoke tests" },
+      { name: "clear", chat: 1, only: 1, usage: "/clear", summary: "Clear the session transcript" },
+      { name: "export", chat: 1, only: 1, usage: "/export", summary: "Write markdown transcript" },
+      { name: "exit", chat: 1, only: 1, usage: "/exit", summary: "Leave the session" },
+      { name: "quit", chat: 1, only: 1, usage: "/quit", summary: "Leave the session" },
+      { name: "gate", chat: 0, usage: "productteam gate <client> status|direct|…", reason: "owner-gated durable decisions must leave a durable record" },
+      { name: "inspect", chat: 0, usage: "productteam inspect <client>", reason: "regenerates the inspect pack (a write op)" },
+      { name: "workspace", chat: 0, usage: "productteam workspace <client> status|ensure|remove", reason: "worktree mutation" },
+      { name: "direction", chat: 0, usage: "productteam direction <client> propose|list|…", reason: "mutates durable direction state" },
+      { name: "escalation", chat: 0, usage: "productteam escalation <client> block|resume …", reason: "authorization tokens; not mid-session" },
+      { name: "role", chat: 0, usage: "productteam role <client> invoke|seal|status", reason: "authorship and stamp integrity" },
+      { name: "open", chat: 0, usage: "productteam open <client> --repo <abs-path>", reason: "creates engagement state mid-session" },
+      { name: "baseline", chat: 0, usage: "productteam baseline <client>", reason: "owner-gated write" },
+      { name: "style", chat: 0, usage: "productteam style show|append|…", reason: "org style is owner-edited durable memory" },
+      { name: "card", chat: 0, usage: "productteam card list|show|seed-specialist", reason: "seed-specialist writes agent cards" },
+      { name: "pool", chat: 0, usage: "productteam pool list|search|add …", reason: "one-shot CLI ops" },
+      { name: "project-memory", chat: 0, usage: "productteam project-memory show|append …", reason: "append is a one-shot CLI op" },
+      { name: "run-loop", chat: 0, usage: "productteam run-loop <client> …", reason: "overnight driver; not a chat verb" },
+      { name: "chat", chat: 0, usage: "productteam chat", reason: "nested sessions re-enter the same REPL" }
+    ];
+
+    const PROVIDERS = ["Codex", "Claude", "Gemini", "OpenCode"];
+    const state = {
+      view: "cockpit",
+      size: "80x24",
+      sel: 0,
+      provider: 0,
+      mode: "Directive",
+      score: "9.5",
+      toast: "",
+      workers: [
+        { g: "…", name: "◇ Analyst", live: 1 },
+        { g: "○", name: "▸ Builder", live: 0 },
+        { g: "✓", name: "◉ Critic", live: 0 }
+      ]
+    };
+
+    function esc(s) {
+      return String(s).replace(/[&<>]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]));
+    }
+
+    const seed = [
+      { role: "◆ Principal", cls: "role", html: "Inspect the repository and select the highest-impact improvement." },
+      { role: "· You", cls: "role", html: "Repair the onboarding flow, then verify it against the frozen contract." },
+      { role: "◇ Analyst", cls: "role live", html: `… inspecting · ${esc(PROVIDERS[0])}
+<div>Inspecting the workspace and collecting evidence…</div>
+<div class="wide">Unicode: ASCII · emoji 🧪 · CJK 漢字</div>
+<div class="md">Findings</div>
+<div>- preserve argv boundaries</div>
+<div class="fence">\`\`\`ts</div>
+<div>const path = "src/onboarding.ts";</div>
+<div class="fence">\`\`\`</div>` },
+      { role: "▸ Builder", cls: "role", html: `<span class="mute">○ waiting for direction</span>` }
+    ];
+    let turns = seed.map((t) => ({ ...t }));
+
+    const app = document.getElementById("app");
+    const panel = document.getElementById("panel");
+    const input = document.getElementById("input");
+    const turnsEl = document.getElementById("turns");
+    const workersEl = document.getElementById("workers");
+    const toastEl = document.getElementById("toast");
+    const modeEl = document.getElementById("mode");
+
+    function slashPrefix(text) {
+      if (!text.startsWith("/")) return null;
+      const rest = text.slice(1);
+      const nl = rest.indexOf("\n");
+      const line = nl === -1 ? rest : rest.slice(0, nl);
+      const sp = line.indexOf(" ");
+      return {
+        verb: (sp === -1 ? line : line.slice(0, sp)).toLowerCase(),
+        args: (sp === -1 ? "" : line.slice(sp + 1)).trim(),
+        line
+      };
+    }
+
+    function matches(prefix) {
+      const p = (prefix || "").toLowerCase();
+      const list = VERBS.filter((v) => !p || v.name.startsWith(p));
+      return list.sort((a, b) => (b.chat - a.chat) || a.name.localeCompare(b.name));
+    }
+
+    function renderTurns() {
+      const keep = state.size === "40x20" ? 3 : state.size === "60x24" ? 4 : 8;
+      const shown = turns.slice(-keep);
+      turnsEl.innerHTML = shown.map((t) =>
+        `<div class="turn"><div class="${t.cls}">${t.role}</div><div class="body">${t.html}</div></div>`
+      ).join("");
+    }
+
+    function renderWorkers() {
+      workersEl.innerHTML = state.workers.map((w, i) =>
+        `<span class="w${w.live ? " live" : ""}${i ? " clip" : ""}">${w.g} ${w.name}</span>`
+      ).join("") + `<span class="plusn">+${Math.max(0, state.workers.length - 1)}</span>`;
+    }
+
+    function setView(view) {
+      state.view = view;
+      app.dataset.view = view;
+      if (view !== "palette") state.sel = 0;
+      if (view === "palette") renderPalette();
+      else if (view === "evidence") renderEvidence();
+      else if (view === "permission") renderPermission();
+      else panel.innerHTML = "";
+    }
+
+    function renderPalette() {
+      const p = slashPrefix(input.value);
+      const list = matches(p ? p.verb : "");
+      const cap = state.size === "40x20" ? 4 : 6;
+      if (state.sel >= Math.min(list.length, cap)) state.sel = Math.max(0, Math.min(list.length, cap) - 1);
+      const shown = list.slice(0, cap);
+      panel.innerHTML = shown.length
+        ? shown.map((v, i) =>
+            `<div class="opt${i === state.sel ? " sel" : ""}${v.chat ? "" : " off"}"><span class="mark">›</span><span>/${v.name}</span><span class="u">${esc(v.chat ? v.summary : "unsupported")}</span></div>`
+          ).join("")
+        : `<div class="mute" style="padding:0 8px">no match</div>`;
+    }
+
+    function renderEvidence() {
+      panel.innerHTML = `<div class="ev"><span class="plus">+0.0</span><span>state/engagements/harness-cli/runs/iter-1/scores.json</span></div>
+        <div class="ev"><span class="mute">·</span><span>state/engagements/harness-cli/history.jsonl</span></div>
+        <div class="ev"><span class="mute">·</span><span>inspect-pack.json</span></div>`;
+    }
+
+    function renderPermission() {
+      panel.innerHTML = `<div class="ev"><span class="warn">▲</span><span>apply patch</span></div>
+        <div class="ev"><span></span><span class="mute">productteam gate harness-cli direct &lt;direction&gt;</span></div>
+        <div class="ev"><span class="del">-</span><span>return next();</span></div>
+        <div class="ev"><span class="plus">+</span><span>validate(contract);</span></div>`;
+    }
+
+    function toast(msg, err) {
+      toastEl.textContent = msg;
+      toastEl.style.color = err ? "var(--err)" : "var(--mute)";
+      app.dataset.toast = "1";
+      clearTimeout(toast._t);
+      toast._t = setTimeout(() => { app.dataset.toast = "0"; }, 2400);
+    }
+
+    function you(line) {
+      turns.push({ role: "· You", cls: "role", html: esc(line) });
+    }
+
+    function sys(html, role = "◆ Principal", cls = "role") {
+      turns.push({ role, cls, html });
+    }
+
+    function closePalette() {
+      if (state.view === "palette") setView("cockpit");
+    }
+
+    function run(verb, args) {
+      const v = VERBS.find((x) => x.name === verb);
+      you("/" + verb + (args ? " " + args : ""));
+      input.value = "";
+      closePalette();
+
+      if (!v) {
+        sys(`unknown /${esc(verb)} — /help`, "·", "role");
+        renderTurns();
+        return;
+      }
+      if (!v.chat) {
+        sys(`<span class="mute">/${esc(verb)} — ${esc(v.reason)}</span>
+<div class="mute">use the CLI: ${esc(v.usage)}</div>`);
+        renderTurns();
+        return;
+      }
+
+      const provider = PROVIDERS[state.provider];
+      const handlers = {
+        help() {
+          const names = VERBS.filter((x) => x.chat).map((x) => "/" + x.name).join("  ");
+          sys(`<div class="md">slash palette</div><div>${esc(names)}</div>
+<div class="mute">unsupported verbs stay in the registry and refuse with a reason</div>`);
+        },
+        status() {
+          sys(`agcode-learning · ${esc(state.mode)} · iter 3 · <span class="plus">${esc(state.score)}</span>
+<div class="mute">provider ${esc(provider)} · gate refused · workspace absent</div>`);
+        },
+        agents() { handlers.runtime(); },
+        runtime() {
+          sys(`<span class="plus">✓</span> ${esc(provider)} selected
+<div class="mute">○ Claude · ○ Gemini · ○ OpenCode</div>
+<div class="mute">/provider cycles this session only</div>`);
+        },
+        provider() {
+          if (args && PROVIDERS.some((p) => p.toLowerCase() === args.toLowerCase())) {
+            state.provider = PROVIDERS.findIndex((p) => p.toLowerCase() === args.toLowerCase());
+          } else {
+            state.provider = (state.provider + 1) % PROVIDERS.length;
+          }
+          sys(`<span class="plus">provider → ${esc(PROVIDERS[state.provider])}</span>`);
+        },
+        workers() {
+          sys(state.workers.map((w) => `${w.g} ${w.name}`).join(" · "));
+        },
+        org() {
+          sys(`◆ Principal · ◇ Analyst · ▸ Builder · ◉ Critic
+<div class="mute">inspect → debate → implement → score · no daemon</div>`);
+        },
+        memory() {
+          sys(`<span class="md">memory</span>
+<div>CLI is the viewer. Judgment lives in workers. Durable state is plain text.</div>`);
+        },
+        report() {
+          sys(`<span class="md">iter 3 report</span>
+<div>No winner. Both prototypes deleted. Canonical Bash CLI unchanged.</div>
+<div class="mute">state/harness-evolution/runs/tui-migration-20260812/final-report.md</div>`);
+        },
+        bench() {
+          sys(`harness-cli  iter 3  <span class="plus">9.5</span>  ▁▃▅▇█
+<div class="mute">scorer: checks · contract frozen</div>`);
+        },
+        score() {
+          sys(`overall <span class="plus">9.5</span>
+<div>correctness 9 · evidence 10 · ux 8</div>
+<div class="mute">Analyst stamp required</div>`);
+        },
+        run() {
+          sys(`run iter 3
+<div>correctness 9 · evidence 10 · ux 8 · overall <span class="plus">9.5</span></div>`);
+        },
+        judge() {
+          const next = { Guided: "Directive", Directive: "Challenge", Challenge: "Override", Override: "Guided" };
+          if (args.startsWith("set ")) state.mode = args.slice(4).trim() || state.mode;
+          else if (args) state.mode = args;
+          else state.mode = next[state.mode] || "Directive";
+          modeEl.textContent = state.mode;
+          const badge = state.mode === "Override" ? `<span class="warn">▲ Override</span>` : `<span class="mute">${esc(state.mode)}</span>`;
+          sys(`mode ${badge}`);
+        },
+        checks() {
+          sys(`checks ▸ harness-cli · 14/14 · weakest: —`);
+        },
+        "harness-checks"() {
+          sys(`<span class="plus">✓</span> harness-apc · secrets scan clean`);
+        },
+        skill() {
+          sys(`/critique · /benchmark · /design-sprint
+<div class="mute">usage: /skill critique &lt;target&gt;</div>`);
+        },
+        gh() {
+          sys(`<span class="plus">✓</span> auth: logged in
+<div class="mute">PR none · checks: none reported</div>`);
+        },
+        onboarding() {
+          sys(`1 <span class="plus">✓</span> agents present
+<div>2 <span class="plus">✓</span> provider ${esc(provider)}</div>
+<div>3 <span class="plus">✓</span> engagement agcode-learning</div>
+<div class="mute">4 ○ score · 5 ○ bench</div>`);
+        },
+        splash() {
+          sys(`<span class="mute">▣───▣───▣</span>
+<div class="mute">▣───▣───▣</div>
+<div>6 people · one shared evidence graph</div>`);
+        },
+        smoke() {
+          sys(`<span class="plus">✓</span> CLI smoke`);
+        },
+        clear() {
+          turns = [];
+          sys("transcript cleared", "·", "role");
+        },
+        export() {
+          toast("state/.cli/sessions/chat-visualizer.md", false);
+          sys(`<span class="mute">wrote state/.cli/sessions/chat-visualizer.md</span>`);
+        },
+        exit() { toast("visualizer stays", false); sys(`<span class="mute">/exit — mock session only</span>`); },
+        quit() { handlers.exit(); }
+      };
+      (handlers[verb] || (() => sys(esc(v.summary))))();
+      renderTurns();
+    }
+
+    function submitComposer() {
+      const raw = input.value.replace(/\s+$/, "");
+      if (!raw) return;
+      const p = slashPrefix(raw);
+      if (p) {
+        if (state.view === "palette") {
+          const list = matches(p.verb);
+          const hit = list[state.sel];
+          if (hit) return run(hit.name, p.verb === hit.name ? p.args : "");
+        }
+        if (!p.verb) return setView("palette");
+        return run(p.verb, p.args);
+      }
+      you(raw);
+      input.value = "";
+      sys("Waiting for direction selection and Critic rebuttal.", "▸ Builder", "role");
+      renderTurns();
+    }
+
+    function onComposerInput() {
+      const p = slashPrefix(input.value);
+      if (p) {
+        setView("palette");
+        renderPalette();
+      } else if (state.view === "palette") {
+        setView("cockpit");
+      }
+    }
+
+    document.getElementById("sizes").addEventListener("click", (e) => {
+      const b = e.target.closest("button");
+      if (!b) return;
+      state.size = b.dataset.size;
+      app.dataset.size = state.size;
+      document.querySelectorAll("#sizes button").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+      renderTurns();
+      if (state.view === "palette") renderPalette();
+    });
+
+    input.addEventListener("input", onComposerInput);
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        e.preventDefault();
+        if (state.view !== "cockpit") setView("cockpit");
+        else if (input.value.startsWith("/")) { input.value = ""; setView("cockpit"); }
+        return;
+      }
+      if (state.view === "palette") {
+        const p = slashPrefix(input.value) || { verb: "" };
+        const list = matches(p.verb);
+        const cap = Math.min(list.length, state.size === "40x20" ? 4 : 6);
+        if (e.key === "ArrowDown") { e.preventDefault(); state.sel = Math.min(cap - 1, state.sel + 1); renderPalette(); return; }
+        if (e.key === "ArrowUp") { e.preventDefault(); state.sel = Math.max(0, state.sel - 1); renderPalette(); return; }
+        if (e.key === "Tab") {
+          e.preventDefault();
+          const hit = list[state.sel];
+          if (hit) { input.value = "/" + hit.name + " "; renderPalette(); }
+          return;
+        }
+      }
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        submitComposer();
+      }
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (e.target === input) return;
+      if (e.key === "Escape") setView("cockpit");
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "p") {
+        e.preventDefault();
+        input.focus();
+        if (!input.value.startsWith("/")) input.value = "/";
+        setView("palette");
+        renderPalette();
+      }
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "e") {
+        e.preventDefault();
+        setView(state.view === "evidence" ? "cockpit" : "evidence");
+      }
+    });
+
+    input.addEventListener("focus", () => { if (slashPrefix(input.value)) setView("palette"); });
+
+    renderTurns();
+    renderWorkers();
+    input.focus();
+  </script>
+</body>
+</html>

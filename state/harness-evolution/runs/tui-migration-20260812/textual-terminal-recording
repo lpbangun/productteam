@@ -1,0 +1,6 @@
+Direct PTY smoke, 2026-08-13
+command: <absolute spikes/textual/.venv/bin/python> <absolute spikes/textual/src/productteam_tui/app.py>
+--terminal-case success: exit=0 restored=true rendered_PRODUCTTEAM=true replacement_character=false
+--terminal-case failure: exit=17 restored=true rendered_PRODUCTTEAM=true replacement_character=false
+base-frame tmux captures: frame-captures/textual-rich/{120x36,80x24,60x24,40x20}-base.txt
+common frozen interactive recording: incomplete/void because generated ProductTeam proxy was mode 0444.

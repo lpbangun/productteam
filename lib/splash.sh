@@ -58,7 +58,7 @@ splash_render() { # $1=highest frame to include
 }
 
 splash_banner() { # $1=highest frame to include
-  printf '\n  %sProduct Consulting Harness%s\n' "${B:-}" "${R:-}"
+  printf '\n  %sProductTeam%s\n' "${B:-}" "${R:-}"
   printf '  %sProduct Judgment Layer · CLI-first · evidence over opinion%s\n\n' "${D:-}" "${R:-}"
   splash_render "$1"
   printf '\n  %s%s people · %s links · one shared evidence graph%s\n\n' \

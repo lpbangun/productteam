@@ -167,7 +167,10 @@ fi
 # ── 7. session-footer ────────────────────────────────────────────────
 id=session-footer
 footer_out=$(pty_chat $'/bench harness-cli\n/exit\n' 2>&1)
-if grep -q 'engagement: — · mode: — · provider:' <<<"$footer_out" \
+# Strip ANSI so dim mode chips (mode: <dim>—</dim>) still match the
+# five-field footer contract. This is a chat-PTY probe, not a TUI change.
+footer_flat=$(printf '%s' "$footer_out" | sed $'s/\x1b\[[0-9;]*[A-Za-z]//g')
+if grep -q 'engagement: — · mode: — · provider:' <<<"$footer_flat" \
    && grep -qE 'engagement: harness-cli .* mode: .* provider: .* last-iter: iter-1 .* overall: 9\.5' <<<"$footer_out" \
    && grep -q '◆ Principal.*›' <<<"$footer_out"; then
   pass "$id" 'five-field status line redraws above prompt and refreshes after /bench'

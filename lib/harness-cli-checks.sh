@@ -3,7 +3,7 @@
 #
 # Usage:  bash lib/harness-cli-checks.sh [iter-dir]
 #
-# Scores the Product Consulting Harness CLI itself (bin/productteam + lib/ + docs +
+# Scores the ProductTeam CLI itself (bin/productteam + lib/ + docs +
 # tests) against the 49 frozen check ids in
 # state/engagements/harness-cli/checks/CHECK-CATALOG.md. Writes
 # <iter-dir>/checks.json and exits 0 only when every check passed.
@@ -424,7 +424,7 @@ chk_cli_monochrome_chrome() {
   NO_COLOR=1 timeout 60 "$CONSULT" help   </dev/null 2>&1 | strip_ansi > "$TMP/m-help"
   NO_COLOR=1 timeout 60 "$CONSULT" org    </dev/null 2>&1 | strip_ansi > "$TMP/m-org"
   NO_COLOR=1 timeout 60 "$CONSULT" bench harness-cli </dev/null 2>&1 | strip_ansi > "$TMP/m-bench"
-  _need status "$TMP/m-status" 'Product Consulting Harness'
+  _need status "$TMP/m-status" 'ProductTeam'
   _need help   "$TMP/m-help"   'Commands' 'productteam help'
   _need org    "$TMP/m-org"    'Loop' 'Autonomy'
   _need bench  "$TMP/m-bench"  'Benchmark' 'Contract'
@@ -1420,7 +1420,7 @@ chk_scripts_parse_clean() {
 chk_status_states_identity() {
   local head6
   head6=$(NO_COLOR=1 timeout 60 "$CONSULT" </dev/null 2>&1 | strip_ansi | grep -v '^[[:space:]]*$' | head -6)
-  grep -qF 'Product Consulting Harness' <<<"$head6" \
+  grep -qF 'ProductTeam' <<<"$head6" \
     || { echo 'product name absent from the first 6 output lines'; return 1; }
   grep -qiE 'product judgment|judgment layer|product consulting|CLI-first' <<<"$head6" \
     || { echo "no identity phrase in the first 6 lines: $(tr '\n' ' ' <<<"$head6" | cut -c1-100)"; return 1; }

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# cli-interface-parity — frozen benchmark probes for the Product Consulting
-# Harness CLI (contract cli-interface-20260812-v3).
+# cli-interface-parity — frozen benchmark probes for the ProductTeam
+# CLI (contract cli-interface-20260812-v3).
 #
 # Verifies the objective, observable layer of the frozen contract
 # `state/harness-evolution/runs/cli-interface-20260812/CLI-BENCHMARK-CONTRACT.md`:
@@ -53,14 +53,14 @@ trap 'rm -rf "$CONSULT_STATE_ROOT" "${CONSULT_STYLE_DIR:-}" "$PWNED" "$ROOT/tmp/
 commands=(agents baseline bench card chat checks direction escalation gate gh
   harness-checks help inspect judge memory onboarding open org pool
   project-memory report role run run-loop runtime score skill smoke splash
-  status style workspace)
+  status style tui workspace)
 # Frozen classification table (contract §2). The registry must agree; used as
 # baseline-safe fallback while help --json is absent.
 frozen_palette=(help status agents runtime onboarding splash judge score checks
   bench report run memory org gh skill smoke harness-checks workers provider
   clear export exit quit)
 frozen_unsupported=(chat open baseline workspace gate direction escalation
-  inspect role card style project-memory pool run-loop)
+  inspect role card style project-memory pool run-loop tui)
 frozen_chat_only=(provider workers clear export exit quit)
 
 printf '\n  cli-interface parity v3 (frozen contract %s)\n\n' 'cli-interface-20260812-v3'
@@ -87,7 +87,7 @@ missing=0
 for cmd in "${commands[@]}"; do
   grep -q "productteam $cmd" <<<"$help_out" || { missing=1; bad "help names $cmd"; }
 done
-[[ $missing == 0 ]] && ok 'help names all 32 top-level commands'
+[[ $missing == 0 ]] && ok 'help names all 33 top-level commands'
 
 # ── 3. D1 — reachability on a cold checkout + non-destructive recovery ───────
 if "$C" checks onboarding-flight-control >/tmp/cli-parity-checks.out 2>&1; then
@@ -145,10 +145,10 @@ if reg=$(timeout 30 "$C" help --json 2>/dev/null | jq -e . 2>/dev/null); then
   co_sorted=$(printf '%s\n' "${reg_chat_only[@]}")
   frozen_co_sorted=$(printf '%s\n' "${frozen_chat_only[@]}" | sort)
   mism=0
-  # command table membership: registry names must equal the frozen 32
+  # command table membership: registry names must equal the frozen 33
   reg_names=$(jq -r '.commands[]?.name' <<<"$reg" | sort | tr '\n' ' ')
   exp_names=$(printf '%s\n' "${commands[@]}" | sort | tr '\n' ' ')
-  [[ "$reg_names" == "$exp_names" ]] || { mism=1; bad "help --json registry names match the 32-command table"; }
+  [[ "$reg_names" == "$exp_names" ]] || { mism=1; bad "help --json registry names match the 33-command table"; }
   # supported membership: registry chat_supported=true == frozen palette minus chat_only
   if [[ "$sup_sorted" == "$exp_supported_sorted" ]]; then :; else
     mism=1
@@ -156,12 +156,12 @@ if reg=$(timeout 30 "$C" help --json 2>/dev/null | jq -e . 2>/dev/null); then
     extra=$(comm -13 <(printf '%s\n' "$exp_supported_sorted") <(printf '%s\n' "$sup_sorted") | tr '\n' ' ')
     bad "help --json chat_supported membership matches classification (missing: ${miss:-none}, unexpected: ${extra:-none})"
   fi
-  # unsupported membership: registry chat_supported=false == frozen 14
+  # unsupported membership: registry chat_supported=false == frozen 15
   if [[ "$unsup_sorted" == "$frozen_unsup_sorted" ]]; then :; else
     mism=1
     miss=$(comm -23 <(printf '%s\n' "$frozen_unsup_sorted") <(printf '%s\n' "$unsup_sorted") | tr '\n' ' ')
     extra=$(comm -13 <(printf '%s\n' "$frozen_unsup_sorted") <(printf '%s\n' "$unsup_sorted") | tr '\n' ' ')
-    bad "help --json chat_supported=false membership matches frozen 14 (missing: ${miss:-none}, unexpected: ${extra:-none})"
+    bad "help --json chat_supported=false membership matches frozen 15 (missing: ${miss:-none}, unexpected: ${extra:-none})"
   fi
   # chat_only membership: registry chat_only == frozen 6
   if [[ "$co_sorted" == "$frozen_co_sorted" ]]; then :; else
@@ -180,7 +180,7 @@ if reg=$(timeout 30 "$C" help --json 2>/dev/null | jq -e . 2>/dev/null); then
     r=$(jq -r --arg n "$cmd" '.commands[] | select(.name == $n) | .chat_reason // ""' <<<"$reg")
     [[ -n "$r" ]] || { mism=1; bad "help --json registry has chat_reason for unsupported $cmd"; }
   done
-  [[ $mism == 0 ]] && ok 'help --json registry membership matches frozen classification (32/18/14/6)'
+  [[ $mism == 0 ]] && ok 'help --json registry membership matches frozen classification (33/18/15/6)'
 else
   bad 'help --json emits a parseable command registry (got prose or exit != 0)'
   # registry absent: baseline-safe fallback for the PTY probes below

@@ -1,0 +1,93 @@
+# Established nodeid preservation
+
+- Git HEAD established test functions: **73**
+- Current test functions: **77**
+- Iteration-2 collected nodeids: **77**
+- Missing from current source: **none**
+- Missing from iteration-2 collection: **none**
+- Appended tests: **4**
+
+## Appended nodeids
+
+- `lib/tui/tests/test_layout.py::test_chip_done_status_on_chip_and_card`
+- `lib/tui/tests/test_layout.py::test_compact_chips_single_plus_count`
+- `lib/tui/tests/test_layout.py::test_home_row_lock_shape`
+- `lib/tui/tests/test_layout.py::test_no_provider_first_run_copy`
+
+## Established nodeids retained
+
+- `lib/tui/tests/test_adapter.py::test_adapter_source_has_no_shell`
+- `lib/tui/tests/test_adapter.py::test_agents_json_two_tokens`
+- `lib/tui/tests/test_adapter.py::test_classify`
+- `lib/tui/tests/test_adapter.py::test_forbidden_tokens_refused`
+- `lib/tui/tests/test_adapter.py::test_help_json_contract`
+- `lib/tui/tests/test_adapter.py::test_palette_verbs`
+- `lib/tui/tests/test_adapter.py::test_run_argv_agents_json`
+- `lib/tui/tests/test_adapter.py::test_run_argv_report_usage`
+- `lib/tui/tests/test_adapter.py::test_run_argv_status`
+- `lib/tui/tests/test_adapter.py::test_run_argv_stream_usage`
+- `lib/tui/tests/test_adapter.py::test_usage_and_reason`
+- `lib/tui/tests/test_all_verbs.py::test_all_18_supported_verbs_in_tui_transcript`
+- `lib/tui/tests/test_all_verbs.py::test_every_unsupported_verb_refuses_without_spawn`
+- `lib/tui/tests/test_layout.py::test_activity_file_backed_caps_footer_and_resize`
+- `lib/tui/tests/test_layout.py::test_ask_dock_multi_toggle_and_esc_cancel`
+- `lib/tui/tests/test_layout.py::test_ask_dock_single_exact_question_and_answer`
+- `lib/tui/tests/test_layout.py::test_ask_invalid_retires_once_and_refuses`
+- `lib/tui/tests/test_layout.py::test_bash_two_accent_budget`
+- `lib/tui/tests/test_layout.py::test_cockpit_token_contract`
+- `lib/tui/tests/test_layout.py::test_command_rail_mute_no_role_hues`
+- `lib/tui/tests/test_layout.py::test_composer_width_visible_in_dock_states`
+- `lib/tui/tests/test_layout.py::test_empty_artifact_stays_activity_and_speech_is_owned`
+- `lib/tui/tests/test_layout.py::test_evidence_dock_caps_composer_focus_and_keys`
+- `lib/tui/tests/test_layout.py::test_four_role_speaking_rails_neutral_body`
+- `lib/tui/tests/test_layout.py::test_four_sizes`
+- `lib/tui/tests/test_layout.py::test_header_cwd_projection`
+- `lib/tui/tests/test_layout.py::test_header_pulse_middle_head_ok_when_busy`
+- `lib/tui/tests/test_layout.py::test_home_empty_copy_when_no_scored`
+- `lib/tui/tests/test_layout.py::test_home_recency_mtime_order`
+- `lib/tui/tests/test_layout.py::test_home_recency_numeric_and_client_tiebreak`
+- `lib/tui/tests/test_layout.py::test_home_seed_filtered`
+- `lib/tui/tests/test_layout.py::test_provider_speech_markdown_and_attached_done_card`
+- `lib/tui/tests/test_layout.py::test_role_chips_focusable_and_selectable`
+- `lib/tui/tests/test_layout.py::test_snapshot_role_hues_and_no_cyan`
+- `lib/tui/tests/test_layout.py::test_snapshots_export`
+- `lib/tui/tests/test_layout.py::test_splash_any_key_skips_consumed`
+- `lib/tui/tests/test_layout.py::test_splash_cli_separation`
+- `lib/tui/tests/test_layout.py::test_splash_compact_40x20_does_not_cover`
+- `lib/tui/tests/test_layout.py::test_splash_ctrl_c_skips_no_exit_130`
+- `lib/tui/tests/test_layout.py::test_splash_ctrl_p_palette_guard`
+- `lib/tui/tests/test_layout.py::test_splash_ctrl_q_after_skip_exits_normally`
+- `lib/tui/tests/test_layout.py::test_splash_ctrl_q_skips_no_exit`
+- `lib/tui/tests/test_layout.py::test_splash_enter_skips_no_submit`
+- `lib/tui/tests/test_layout.py::test_splash_env_short_circuit`
+- `lib/tui/tests/test_layout.py::test_splash_escape_skips`
+- `lib/tui/tests/test_layout.py::test_splash_idle_neutral_and_exact_art`
+- `lib/tui/tests/test_layout.py::test_splash_natural_finish_home_and_focus`
+- `lib/tui/tests/test_layout.py::test_splash_no_replay_on_resize`
+- `lib/tui/tests/test_layout.py::test_splash_slash_skips_second_slash_opens_dock`
+- `lib/tui/tests/test_layout.py::test_splash_stepper_glow_order_one_ok_head`
+- `lib/tui/tests/test_layout.py::test_typed_role_prefix_strips`
+- `lib/tui/tests/test_layout.py::test_you_turn_chrome`
+- `lib/tui/tests/test_nontty.py::test_nontty_no_color_no_escapes`
+- `lib/tui/tests/test_nontty.py::test_nontty_refusal`
+- `lib/tui/tests/test_pty.py::test_pty_activity_empty_artifact_compact_and_prompt_export`
+- `lib/tui/tests/test_pty.py::test_pty_confirm_cancel_keeps_composer`
+- `lib/tui/tests/test_pty.py::test_pty_provider_interrupt`
+- `lib/tui/tests/test_pty.py::test_pty_sigwinch_compact`
+- `lib/tui/tests/test_pty.py::test_pty_status_and_gate_refuse`
+- `lib/tui/tests/test_pty.py::test_pty_typed_role_records_builder`
+- `lib/tui/tests/test_slash.py::test_bench_stream_evidence_panel`
+- `lib/tui/tests/test_slash.py::test_clear_clears_transcript`
+- `lib/tui/tests/test_slash.py::test_confirm_cancel_no_spawn`
+- `lib/tui/tests/test_slash.py::test_confirm_non_matching_gh_unchanged`
+- `lib/tui/tests/test_slash.py::test_confirm_run_exact_argv_for_all_three_intercepts`
+- `lib/tui/tests/test_slash.py::test_exit_leaves`
+- `lib/tui/tests/test_slash.py::test_export_writes_markdown`
+- `lib/tui/tests/test_slash.py::test_gate_refused_without_spawn`
+- `lib/tui/tests/test_slash.py::test_provider_named`
+- `lib/tui/tests/test_slash.py::test_provider_sets_session_env`
+- `lib/tui/tests/test_slash.py::test_report_missing_args_prints_usage`
+- `lib/tui/tests/test_slash.py::test_report_stream_evidence_panel`
+- `lib/tui/tests/test_slash.py::test_sta_filters_to_status`
+
+Evidence method: parsed top-level `test_*` functions from each tracked test module at Git `HEAD` and in the current worktree with Python `ast`, then compared both with `iter-2/pytest-collect.txt`. The complete iteration-2 run is `77 passed` in `iter-2/pytest.txt`.

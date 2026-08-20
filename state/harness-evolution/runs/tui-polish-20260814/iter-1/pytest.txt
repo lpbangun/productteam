@@ -1,0 +1,437 @@
+...........F............FFFFFFFF                                         [100%]
+=================================== FAILURES ===================================
+________________ test_all_18_supported_verbs_in_tui_transcript _________________
+
+    def test_all_18_supported_verbs_in_tui_transcript():
+        data = adapter.help_json()
+        supported = [c["name"] for c in data["commands"] if c["chat_supported"]]
+        assert len(supported) == 18
+        os.environ.setdefault("CONSULT_NO_SPLASH", "1")
+        os.environ.setdefault("CONSULT_SMOKE_SKIP_CLIENT", "1")
+        real_stream = adapter.run_argv_stream
+    
+        def stream(args, on_line=None, env=None, timeout=60):
+            # smoke / harness-checks print their banner immediately, then run long.
+            # Cap so the TUI still receives real stdout and the turn ends.
+            if args and args[0] in ("smoke", "harness-checks"):
+                timeout = 12
+            return real_stream(args, on_line=on_line, env=env, timeout=timeout)
+    
+        adapter.run_argv_stream = stream
+        try:
+>           asyncio.run(_run_supported(supported))
+
+lib/tui/tests/test_all_verbs.py:69: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib/python3.12/asyncio/runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/asyncio/base_events.py:687: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+supported = ['agents', 'bench', 'checks', 'gh', 'harness-checks', 'help', ...]
+
+    async def _run_supported(supported):
+        async with ProductTeamApp().run_test(size=(80, 24)) as pilot:
+            app = pilot.app
+>           assert await _wait(app, lambda: "Product Consulting" in app.transcript_text())
+E           assert False
+
+lib/tui/tests/test_all_verbs.py:77: AssertionError
+__________________________ test_sta_filters_to_status __________________________
+
+fake_env = PosixPath('/tmp/pytest-of-logani/pytest-103/test_sta_filters_to_status0')
+
+    def test_sta_filters_to_status(fake_env):
+        async def run():
+            async with ProductTeamApp().run_test(size=(80, 24)) as pilot:
+                app = await _boot(pilot)
+                await pilot.press("/", "s", "t", "a")
+                await pilot.pause()
+                assert app.dock_visible()
+                assert app._dock_verbs == ["status"]
+>       asyncio.run(run())
+
+lib/tui/tests/test_slash.py:106: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib/python3.12/asyncio/runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/asyncio/base_events.py:687: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+lib/tui/tests/test_slash.py:101: in run
+    app = await _boot(pilot)
+          ^^^^^^^^^^^^^^^^^^
+lib/tui/tests/test_slash.py:94: in _boot
+    await _wait_for(app, lambda: "Product Consulting Harness" in app.transcript_text())
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = ProductTeamApp(title='ProductTeam', classes={'-dark-mode', '-theme-productteam'}, pseudo_classes={'focus', 'dark', 'nocolor'})
+predicate = <function _boot.<locals>.<lambda> at 0x7e2710bb0860>, timeout = 10.0
+
+    async def _wait_for(app, predicate, timeout=10.0):
+        deadline = asyncio.get_event_loop().time() + timeout
+        while asyncio.get_event_loop().time() < deadline:
+            if predicate():
+                return True
+>           await app.pause()
+                  ^^^^^^^^^
+E           AttributeError: 'ProductTeamApp' object has no attribute 'pause'
+
+lib/tui/tests/test_slash.py:84: AttributeError
+_______________________ test_gate_refused_without_spawn ________________________
+
+fake_env = PosixPath('/tmp/pytest-of-logani/pytest-103/test_gate_refused_without_spaw0')
+
+    def test_gate_refused_without_spawn(fake_env):
+        spawns = []
+    
+        def stream(args, on_line=None, env=None, timeout=60):
+            spawns.append(args)
+            return subprocess.CompletedProcess(args, 0, "", "")
+    
+        adapter.run_argv_stream = stream
+    
+        async def run():
+            async with ProductTeamApp().run_test(size=(80, 24)) as pilot:
+                app = await _boot(pilot)
+                await pilot.press("/", "g", "a", "t", "e")
+                await pilot.press("enter")
+                ok = await _wait_for(
+                    app, lambda: "use the CLI: productteam gate" in app.transcript_text())
+                assert ok, "refuse reason printed"
+                assert "owner-gated durable decisions" in app.transcript_text()
+                assert "Directive: no directive" not in app.transcript_text()
+>       asyncio.run(run())
+
+lib/tui/tests/test_slash.py:128: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib/python3.12/asyncio/runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/asyncio/base_events.py:687: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+lib/tui/tests/test_slash.py:120: in run
+    app = await _boot(pilot)
+          ^^^^^^^^^^^^^^^^^^
+lib/tui/tests/test_slash.py:94: in _boot
+    await _wait_for(app, lambda: "Product Consulting Harness" in app.transcript_text())
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = ProductTeamApp(title='ProductTeam', classes={'-dark-mode', '-theme-productteam'}, pseudo_classes={'focus', 'dark', 'nocolor'})
+predicate = <function _boot.<locals>.<lambda> at 0x7e27108be340>, timeout = 10.0
+
+    async def _wait_for(app, predicate, timeout=10.0):
+        deadline = asyncio.get_event_loop().time() + timeout
+        while asyncio.get_event_loop().time() < deadline:
+            if predicate():
+                return True
+>           await app.pause()
+                  ^^^^^^^^^
+E           AttributeError: 'ProductTeamApp' object has no attribute 'pause'
+
+lib/tui/tests/test_slash.py:84: AttributeError
+____________________ test_report_missing_args_prints_usage _____________________
+
+fake_env = PosixPath('/tmp/pytest-of-logani/pytest-103/test_report_missing_args_print0')
+
+    def test_report_missing_args_prints_usage(fake_env):
+        async def run():
+            async with ProductTeamApp().run_test(size=(80, 24)) as pilot:
+                app = await _boot(pilot)
+                await pilot.press("/", "r", "e", "p", "o", "r", "t")
+                await pilot.press("enter")
+                ok = await _wait_for(
+                    app, lambda: "usage: productteam report <client>" in app.transcript_text())
+                assert ok, "usage printed without inventing a client"
+>       asyncio.run(run())
+
+lib/tui/tests/test_slash.py:141: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib/python3.12/asyncio/runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/asyncio/base_events.py:687: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+lib/tui/tests/test_slash.py:135: in run
+    app = await _boot(pilot)
+          ^^^^^^^^^^^^^^^^^^
+lib/tui/tests/test_slash.py:94: in _boot
+    await _wait_for(app, lambda: "Product Consulting Harness" in app.transcript_text())
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = ProductTeamApp(title='ProductTeam', classes={'-dark-mode', '-theme-productteam'}, pseudo_classes={'focus', 'dark', 'nocolor'})
+predicate = <function _boot.<locals>.<lambda> at 0x7e2710809940>, timeout = 10.0
+
+    async def _wait_for(app, predicate, timeout=10.0):
+        deadline = asyncio.get_event_loop().time() + timeout
+        while asyncio.get_event_loop().time() < deadline:
+            if predicate():
+                return True
+>           await app.pause()
+                  ^^^^^^^^^
+E           AttributeError: 'ProductTeamApp' object has no attribute 'pause'
+
+lib/tui/tests/test_slash.py:84: AttributeError
+________________________ test_provider_sets_session_env ________________________
+
+fake_env = PosixPath('/tmp/pytest-of-logani/pytest-103/test_provider_sets_session_env0')
+
+    def test_provider_sets_session_env(fake_env):
+        async def run():
+            async with ProductTeamApp().run_test(size=(80, 24)) as pilot:
+                app = await _boot(pilot)
+                await pilot.press("/", "p", "r", "o", "v", "i", "d", "e", "r")
+                await pilot.press("enter")
+                ok = await _wait_for(app, lambda: "provider → agent" in app.transcript_text())
+                assert ok
+                assert os.environ.get("CONSULT_PROVIDER") == "agent"
+>       asyncio.run(run())
+
+lib/tui/tests/test_slash.py:153: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib/python3.12/asyncio/runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/asyncio/base_events.py:687: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+lib/tui/tests/test_slash.py:147: in run
+    app = await _boot(pilot)
+          ^^^^^^^^^^^^^^^^^^
+lib/tui/tests/test_slash.py:94: in _boot
+    await _wait_for(app, lambda: "Product Consulting Harness" in app.transcript_text())
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = ProductTeamApp(title='ProductTeam', classes={'-dark-mode', '-theme-productteam'}, pseudo_classes={'focus', 'dark', 'nocolor'})
+predicate = <function _boot.<locals>.<lambda> at 0x7e2710a68540>, timeout = 10.0
+
+    async def _wait_for(app, predicate, timeout=10.0):
+        deadline = asyncio.get_event_loop().time() + timeout
+        while asyncio.get_event_loop().time() < deadline:
+            if predicate():
+                return True
+>           await app.pause()
+                  ^^^^^^^^^
+E           AttributeError: 'ProductTeamApp' object has no attribute 'pause'
+
+lib/tui/tests/test_slash.py:84: AttributeError
+_____________________________ test_provider_named ______________________________
+
+fake_env = PosixPath('/tmp/pytest-of-logani/pytest-103/test_provider_named0')
+
+    def test_provider_named(fake_env):
+        async def run():
+            async with ProductTeamApp().run_test(size=(80, 24)) as pilot:
+                app = await _boot(pilot)
+                keys = list('/provider "claude"')
+                await pilot.press(*keys)
+                await pilot.press("enter")
+                ok = await _wait_for(app, lambda: "provider → claude" in app.transcript_text())
+                assert ok
+>       asyncio.run(run())
+
+lib/tui/tests/test_slash.py:165: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib/python3.12/asyncio/runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/asyncio/base_events.py:687: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+lib/tui/tests/test_slash.py:159: in run
+    app = await _boot(pilot)
+          ^^^^^^^^^^^^^^^^^^
+lib/tui/tests/test_slash.py:94: in _boot
+    await _wait_for(app, lambda: "Product Consulting Harness" in app.transcript_text())
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = ProductTeamApp(title='ProductTeam', classes={'-dark-mode', '-theme-productteam'}, pseudo_classes={'focus', 'dark', 'nocolor'})
+predicate = <function _boot.<locals>.<lambda> at 0x7e27107193a0>, timeout = 10.0
+
+    async def _wait_for(app, predicate, timeout=10.0):
+        deadline = asyncio.get_event_loop().time() + timeout
+        while asyncio.get_event_loop().time() < deadline:
+            if predicate():
+                return True
+>           await app.pause()
+                  ^^^^^^^^^
+E           AttributeError: 'ProductTeamApp' object has no attribute 'pause'
+
+lib/tui/tests/test_slash.py:84: AttributeError
+_________________________ test_clear_clears_transcript _________________________
+
+fake_env = PosixPath('/tmp/pytest-of-logani/pytest-103/test_clear_clears_transcript0')
+
+    def test_clear_clears_transcript(fake_env):
+        async def run():
+            async with ProductTeamApp().run_test(size=(80, 24)) as pilot:
+                app = await _boot(pilot)
+                assert "Product Consulting Harness" in app.transcript_text()
+                await pilot.press(*list("/status"))
+                await pilot.press("enter")
+                ok = await _wait_for(
+                    app, lambda: "usage: productteam report" in app.transcript_text())
+                assert ok, "status streamed its (fake) output"
+                await pilot.press(*list("/clear"))
+                await pilot.press("enter")
+                await pilot.pause()
+                assert app.transcript_text().strip() == ""
+>       asyncio.run(run())
+
+lib/tui/tests/test_slash.py:182: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib/python3.12/asyncio/runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/asyncio/base_events.py:687: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+lib/tui/tests/test_slash.py:171: in run
+    app = await _boot(pilot)
+          ^^^^^^^^^^^^^^^^^^
+lib/tui/tests/test_slash.py:94: in _boot
+    await _wait_for(app, lambda: "Product Consulting Harness" in app.transcript_text())
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = ProductTeamApp(title='ProductTeam', classes={'-dark-mode', '-theme-productteam'}, pseudo_classes={'focus', 'dark', 'nocolor'})
+predicate = <function _boot.<locals>.<lambda> at 0x7e2710bb2ac0>, timeout = 10.0
+
+    async def _wait_for(app, predicate, timeout=10.0):
+        deadline = asyncio.get_event_loop().time() + timeout
+        while asyncio.get_event_loop().time() < deadline:
+            if predicate():
+                return True
+>           await app.pause()
+                  ^^^^^^^^^
+E           AttributeError: 'ProductTeamApp' object has no attribute 'pause'
+
+lib/tui/tests/test_slash.py:84: AttributeError
+_________________________ test_export_writes_markdown __________________________
+
+fake_env = PosixPath('/tmp/pytest-of-logani/pytest-103/test_export_writes_markdown0')
+
+    def test_export_writes_markdown(fake_env):
+        async def run():
+            async with ProductTeamApp().run_test(size=(80, 24)) as pilot:
+                app = await _boot(pilot)
+                await pilot.press("/", "e", "x", "p", "o", "r", "t")
+                await pilot.press("enter")
+                ok = await _wait_for(app, lambda: "wrote " in app.transcript_text())
+                assert ok
+>       asyncio.run(run())
+
+lib/tui/tests/test_slash.py:193: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib/python3.12/asyncio/runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/asyncio/base_events.py:687: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+lib/tui/tests/test_slash.py:188: in run
+    app = await _boot(pilot)
+          ^^^^^^^^^^^^^^^^^^
+lib/tui/tests/test_slash.py:94: in _boot
+    await _wait_for(app, lambda: "Product Consulting Harness" in app.transcript_text())
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = ProductTeamApp(title='ProductTeam', classes={'-dark-mode', '-theme-productteam'}, pseudo_classes={'focus', 'dark', 'nocolor'})
+predicate = <function _boot.<locals>.<lambda> at 0x7e2710790d60>, timeout = 10.0
+
+    async def _wait_for(app, predicate, timeout=10.0):
+        deadline = asyncio.get_event_loop().time() + timeout
+        while asyncio.get_event_loop().time() < deadline:
+            if predicate():
+                return True
+>           await app.pause()
+                  ^^^^^^^^^
+E           AttributeError: 'ProductTeamApp' object has no attribute 'pause'
+
+lib/tui/tests/test_slash.py:84: AttributeError
+_______________________________ test_exit_leaves _______________________________
+
+fake_env = PosixPath('/tmp/pytest-of-logani/pytest-103/test_exit_leaves0')
+
+    def test_exit_leaves(fake_env):
+        async def run():
+            async with ProductTeamApp().run_test(size=(80, 24)) as pilot:
+                app = await _boot(pilot)
+                await pilot.press(*list("/exit"))
+                await pilot.press("enter")
+                ok = await _wait_for(app, lambda: getattr(app, "_exit", False), timeout=5.0)
+                assert ok, "app exited via /exit"
+                assert app.return_code == 0
+>       asyncio.run(run())
+
+lib/tui/tests/test_slash.py:211: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib/python3.12/asyncio/runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/asyncio/base_events.py:687: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+lib/tui/tests/test_slash.py:205: in run
+    app = await _boot(pilot)
+          ^^^^^^^^^^^^^^^^^^
+lib/tui/tests/test_slash.py:94: in _boot
+    await _wait_for(app, lambda: "Product Consulting Harness" in app.transcript_text())
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = ProductTeamApp(title='ProductTeam', classes={'-dark-mode', '-theme-productteam'}, pseudo_classes={'focus', 'dark', 'nocolor'})
+predicate = <function _boot.<locals>.<lambda> at 0x7e27104949a0>, timeout = 10.0
+
+    async def _wait_for(app, predicate, timeout=10.0):
+        deadline = asyncio.get_event_loop().time() + timeout
+        while asyncio.get_event_loop().time() < deadline:
+            if predicate():
+                return True
+>           await app.pause()
+                  ^^^^^^^^^
+E           AttributeError: 'ProductTeamApp' object has no attribute 'pause'
+
+lib/tui/tests/test_slash.py:84: AttributeError
+=========================== short test summary info ============================
+FAILED lib/tui/tests/test_all_verbs.py::test_all_18_supported_verbs_in_tui_transcript - assert False
+FAILED lib/tui/tests/test_slash.py::test_sta_filters_to_status - AttributeError: 'ProductTeamApp' object has no attribute 'pause'
+FAILED lib/tui/tests/test_slash.py::test_gate_refused_without_spawn - AttributeError: 'ProductTeamApp' object has no attribute 'pause'
+FAILED lib/tui/tests/test_slash.py::test_report_missing_args_prints_usage - AttributeError: 'ProductTeamApp' object has no attribute 'pause'
+FAILED lib/tui/tests/test_slash.py::test_provider_sets_session_env - AttributeError: 'ProductTeamApp' object has no attribute 'pause'
+FAILED lib/tui/tests/test_slash.py::test_provider_named - AttributeError: 'ProductTeamApp' object has no attribute 'pause'
+FAILED lib/tui/tests/test_slash.py::test_clear_clears_transcript - AttributeError: 'ProductTeamApp' object has no attribute 'pause'
+FAILED lib/tui/tests/test_slash.py::test_export_writes_markdown - AttributeError: 'ProductTeamApp' object has no attribute 'pause'
+FAILED lib/tui/tests/test_slash.py::test_exit_leaves - AttributeError: 'ProductTeamApp' object has no attribute 'pause'
+9 failed, 23 passed in 200.52s (0:03:20)

@@ -1,0 +1,8 @@
+ lib/tui/app.py                                | 267 ++++++++++++++++++++------
+ lib/tui/tests/__snapshots__/cockpit-80x24.svg | 130 ++++++-------
+ lib/tui/tests/__snapshots__/palette-80x24.svg | 133 +++++++------
+ lib/tui/tests/test_layout.py                  | 176 ++++++++++++++---
+ lib/tui/tests/test_pty.py                     |  10 +-
+ lib/tui/tests/test_slash.py                   |   9 +-
+ lib/tui/theme.py                              |  27 +--
+ 7 files changed, 516 insertions(+), 236 deletions(-)

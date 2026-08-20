@@ -56,7 +56,7 @@ and evidence-linked.
   **PR:** https://github.com/lpbangun/agcode-learning/pull/1
   (branch consult/engagement-2026-08-05). Vision never touched.
 - **Harness published (2026-08-05):**
-  https://github.com/lpbangun/product-consulting-harness (public).
+  https://github.com/lpbangun/productteam (public).
   Future engagements: clone it, run `bin/consult` — memory carries.
 
 ## Client model — agcode-learning

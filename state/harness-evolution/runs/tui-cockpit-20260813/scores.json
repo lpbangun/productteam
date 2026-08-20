@@ -1,0 +1,21 @@
+{
+  "run": "tui-cockpit-20260813",
+  "iter": 3,
+  "reviewer": "ceaab23a",
+  "verdict": "PASS",
+  "keep": true,
+  "scores": {
+    "visual-layout": 9.4,
+    "registry-palette": 9.8,
+    "supported-argv": 9.7,
+    "unsupported-refuse": 9.7,
+    "provider-interrupt": 9.4,
+    "nontty-nocolor": 10.0,
+    "four-sizes": 9.6,
+    "canonical-cli": 9.5,
+    "argv-trace-honesty": 9.8,
+    "authority": 9.3
+  },
+  "mandatory_min": 9.4,
+  "citations": "state/harness-evolution/runs/tui-cockpit-20260813/iter-3/reviewer-gate.md"
+}

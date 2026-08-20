@@ -1,0 +1,6 @@
+Workflow completed with 1 child run(s). Return: {
+  "key": "retarget-audit",
+  "ok": true,
+  "agent": "reviewer",
+  "runId": "66ffd9f5",
+  "output": "# Retarget audit — established-test retargeting\n\n**Verdict: ACCEPT**\n\nIndependent post-tweak audit of established-test retargeting for\n`tui-fidelity-20260818`. No rescore. No implementation iteration. No\nproduct, test, snapshot, freeze, source-page, score, reviewer-gate, or\nfinal-report edits.\n\nThe existing iter-2 **pass remains valid** under the owner-confirmed\nnarrow retarget exception.\n\n## Authority applied\n\nOwner tweak (as given to this audit):\n\n- May narrowly retarget an established assertion **only** when its former\n  expected presentation directly contradicts a mandatory Ask lock.\n- Forbids deleting, renaming, skipping, broadly weakening, or changing\n  non-conflicting functional assertions.\n- Matching local/remote pinned source hashes remain authoritative even\n  if the source differs from Git HEAD.\n\nCross-checked against:\n\n- `frozen-benchmark.md` Ask loc Trace: 2 event(s).

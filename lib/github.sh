@@ -51,7 +51,7 @@ gh_pr_create() {
     if [[ -n "$body_file" && -f "$body_file" ]]; then
       args+=(--body-file "$body_file")
     else
-      args+=(--body "Opened by Product Consulting Harness (gated GitHub workflow).")
+      args+=(--body "Opened by ProductTeam (gated GitHub workflow).")
     fi
     _gh "${args[@]}"
   )
