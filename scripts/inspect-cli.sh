@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Inspect the designed Product Consulting Harness CLI.
+# Inspect the designed ProductTeam CLI.
 # Run from the harness root:
 #   bash scripts/inspect-cli.sh
 # Or:
@@ -35,7 +35,7 @@ pause() {
 export CONSULT_STATE_ROOT="$DEMO_STATE"
 export CONSULT_NO_SPLASH="${CONSULT_NO_SPLASH:-}"
 
-printf 'Product Consulting Harness — CLI inspect\n'
+printf 'ProductTeam — CLI inspect\n'
 printf 'ROOT=%s\n' "$ROOT"
 printf 'Isolated state: %s\n' "$DEMO_STATE"
 printf 'Tip: CONSULT_INSPECT_NONINTERACTIVE=1 skips Enter pauses.\n'

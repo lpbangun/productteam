@@ -125,7 +125,7 @@ def test_home_seed_filtered():
                     f"banned engagement seeded into home: {name}"
                 )
             # the full prose status dump never enters the transcript
-            assert "Product Consulting Harness" not in text
+            assert "ProductTeam" not in text
             assert "Product Judgment Layer" not in text
             assert "not scored" not in text
 
@@ -152,7 +152,7 @@ def test_home_empty_copy_when_no_scored(monkeypatch):
             text = await _boot_home(pilot, app)
             assert text == "No scored sessions yet — bench <client> to score", text
             assert HOME_ROW_RE.findall(text) == [], "empty home must have zero rows"
-            assert "Product Consulting Harness" not in text
+            assert "ProductTeam" not in text
             assert "Product Judgment Layer" not in text
             assert "not scored" not in text
             assert "@" not in str(app.query_one("#role-prefix", Static).render())
@@ -249,7 +249,7 @@ def test_home_recency_mtime_order(tmp_path, monkeypatch):
             assert len(rows) == 3, "cap stays three"
             for absent in ("lex-client", "old-client", "smoke-client", "idle-client"):
                 assert absent not in names, f"{absent} must not seed home"
-            assert "Product Consulting Harness" not in text
+            assert "ProductTeam" not in text
             assert "Product Judgment Layer" not in text
             assert "not scored" not in text
 
@@ -1342,7 +1342,7 @@ def test_command_rail_mute_no_role_hues(tmp_path, monkeypatch):
     monkeypatch.setenv("CONSULT_STATE_ROOT", str(tmp_path / "state"))
 
     def stream(args, on_line=None, env=None, timeout=60):
-        out = "Product Consulting Harness\n  harness-cli · Directive · 9.5\n"
+        out = "ProductTeam\n  harness-cli · Directive · 9.5\n"
         for line in out.splitlines(True):
             if on_line:
                 on_line(line)
@@ -1364,7 +1364,7 @@ def test_command_rail_mute_no_role_hues(tmp_path, monkeypatch):
             assert ok, "stream finished"
             delta = app.transcript_text()[len(before):]
             assert delta.count("│ Command") == 1, "one Command open per turn"
-            assert "Product Consulting Harness" in delta, "streamed summary is Command"
+            assert "ProductTeam" in delta, "streamed summary is Command"
             for hue in (PRINCIPAL, ANALYST, BUILDER, CRITIC, YOU):
                 assert not _turn_has_hue(app, "Command", hue), (
                     f"Command label must stay mute, got {hue}")
@@ -1404,7 +1404,6 @@ BANNED_SPLASH_NEEDLES = (
     "6 people",
     "14 links",
     "shared evidence graph",
-    "Product Consulting Harness",
     "Product Judgment Layer",
     "▄██▄",
     "█ ██ █",

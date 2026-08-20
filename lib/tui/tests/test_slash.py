@@ -51,7 +51,7 @@ def _fake_run_argv(args, env=None, timeout=60):
         )
     if args == ["status"]:
         return subprocess.CompletedProcess(
-            args, 0, "Product Consulting Harness\n  harness-cli · Directive · 9.5\n", "")
+            args, 0, "ProductTeam\n  harness-cli · Directive · 9.5\n", "")
     if args[:2] == ["agents", "--json"]:
         return subprocess.CompletedProcess(
             args, 0,

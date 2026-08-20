@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# productteam — interface to the Product Consulting Harness.
+# productteam — interface to ProductTeam.
 # Calm, inspectable, honest. All state lives in plain files under state/.
 set -euo pipefail
 
@@ -190,7 +190,7 @@ cmd_help() {
   fi
   local prov i out
   prov="$(runtime_default 2>/dev/null || echo '(none)')"
-  printf -v out '\n  %sproductteam%s — Product Consulting Harness\n\n  %sCommands%s\n    productteam                     Org status and engagements overview\n' \
+  printf -v out '\n  %sproductteam%s — ProductTeam\n\n  %sCommands%s\n    productteam                     Org status and engagements overview\n' \
     "$B" "$R" "$B" "$R"
   for i in "${!CMD_REGISTRY[@]}"; do
     cmd_reg_get "$i"
@@ -346,7 +346,7 @@ cmd_status() {
   prov="$(runtime_default 2>/dev/null || echo none)"
   cat <<EOF
 
-  ${B}Product Consulting Harness${R}
+  ${B}ProductTeam${R}
   ${D}Product Judgment Layer · CLI-first · evidence over opinion${R}
   ${D}Provider: ${CONSULT_PROVIDER:-$prov} · agents: productteam agents${R}
 

@@ -66,7 +66,7 @@ def test_palette_verbs(env):
 def test_run_argv_status(env):
     cp = adapter.run_argv(["status"], env=env)
     assert cp.returncode == 0
-    assert "Product Consulting" in cp.stdout
+    assert "ProductTeam" in cp.stdout
 
 
 def test_run_argv_report_usage(env):

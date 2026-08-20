@@ -63,7 +63,7 @@ skill_header() {
 case "$SKILL" in
   critique)
     prompt=$(cat <<EOF
-You are running the /critique skill for the Product Consulting Harness.
+You are running the /critique skill for ProductTeam.
 Write a product critique of the repository below. Cite at least two real
 file paths that appear in the tree. If GUIDANCE.md is present, use at least
 one distinctive term from it. Prefer deletion over addition. No filler.

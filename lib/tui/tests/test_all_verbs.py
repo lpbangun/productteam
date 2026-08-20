@@ -23,7 +23,7 @@ VALID_ARGS = {
 # Needles that must appear in THIS turn's delta (not the accumulated log).
 NEEDLES = {
     "help": ("Commands",),
-    "status": ("Product Consulting Harness",),
+    "status": ("Product Judgment Layer",),
     "agents": ("Coding agents",),
     "runtime": ("Coding agents",),
     "org": ("The organization",),

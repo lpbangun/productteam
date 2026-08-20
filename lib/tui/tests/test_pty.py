@@ -158,7 +158,7 @@ def _run_status_gate_session():
     try:
         assert _wait_for(fd, out, "ProductTeam", 25), "cockpit header rendered"
         _send(fd, "/status\r")
-        assert _wait_for(fd, out, "Product Consulting Harness", 25), \
+        assert _wait_for(fd, out, "Product Judgment Layer", 25), \
             "real status output reached the transcript"
         # The cockpit runs one turn at a time: the busy guard refuses a
         # second submit while /status is still streaming, so wait for the
@@ -187,7 +187,7 @@ def _run_status_gate_session():
 def test_pty_status_and_gate_refuse():
     out, status = _run_status_gate_session()
     txt = out.decode("utf-8", "replace")
-    assert "Product Consulting Harness" in txt, "real status output seeded the transcript"
+    assert "Product Judgment Layer" in txt, "real status output seeded the transcript"
     assert "harness-cli" in txt, "real engagement text visible"
     assert "use the CLI: productteam gate" in txt, "unsupported /gate refuses with usage"
     assert "owner-gated" in txt, "refuse carries the registry reason"

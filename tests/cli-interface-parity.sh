@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# cli-interface-parity — frozen benchmark probes for the Product Consulting
-# Harness CLI (contract cli-interface-20260812-v3).
+# cli-interface-parity — frozen benchmark probes for the ProductTeam
+# CLI (contract cli-interface-20260812-v3).
 #
 # Verifies the objective, observable layer of the frozen contract
 # `state/harness-evolution/runs/cli-interface-20260812/CLI-BENCHMARK-CONTRACT.md`:

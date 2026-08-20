@@ -1,8 +1,8 @@
-# Product Consulting Harness
+# ProductTeam
 
 **A CLI-first product judgment and improvement loop for coding agents.**
 
-Product Consulting Harness turns an existing software repository and an open-ended
+ProductTeam turns an existing software repository and an open-ended
 product brief into a bounded, measurable engagement. It coordinates distinct
 Analyst, Builder, and Critic roles; freezes the benchmark before implementation;
 runs work in an isolated Git worktree; and records decisions, scores, evidence,
@@ -22,7 +22,7 @@ Coding agents are good at producing changes, but a useful product-improvement
 process also needs to decide **what should change**, preserve the product's
 vision, measure whether the change helped, and retain what was learned.
 
-Product Consulting Harness supplies that missing judgment layer:
+ProductTeam supplies that missing judgment layer:
 
 - **Evidence before claims** — benchmark scores cite artifacts and paths.
 - **Frozen goals** — the benchmark contract is fixed before implementation.
@@ -66,8 +66,8 @@ Optional TUI:
 Clone the repository and run the CLI directly:
 
 ```sh
-git clone https://github.com/lpbangun/product-consulting-harness.git
-cd product-consulting-harness
+git clone https://github.com/lpbangun/productteam.git
+cd productteam
 bin/productteam help
 bin/productteam runtime --check
 ```

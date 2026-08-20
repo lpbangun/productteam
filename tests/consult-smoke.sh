@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# consult-smoke — CLI smoke tests for the Product Consulting Harness.
+# consult-smoke — CLI smoke tests for ProductTeam.
 # Run from repo root: tests/consult-smoke.sh
 set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
